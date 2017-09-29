@@ -193,19 +193,6 @@
         <string>Bezeichnung:</string>
        </property>
       </widget>
-      <widget class="QRadioButton" name="rb_pflichtfeld">
-       <property name="geometry">
-        <rect>
-         <x>340</x>
-         <y>60</y>
-         <width>103</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Pflichtfeld</string>
-       </property>
-      </widget>
       <widget class="QPushButton" name="btn_saveCustomField">
        <property name="geometry">
         <rect>
@@ -230,6 +217,19 @@
        </property>
        <property name="text">
         <string>Löschen</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="cb_pflichtfeld">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>50</y>
+         <width>83</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Pflichtfeld</string>
        </property>
       </widget>
      </widget>

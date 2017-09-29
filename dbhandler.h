@@ -20,7 +20,8 @@ public:
     bool feldDatentypenAuslesen(QSqlQuery* p_qry, QString *error);
 
     bool createNewCustomField(QString *error, QString name, QString geraeteTyp, QString datentyp, bool pflichtfeld);
-    bool saveCustomField(QString *error);
+    bool saveCustomField(QString name, QString gerateTyp,QString datentyp, bool pflichtfeld, QString *error);
+    bool loadCustomField(QString geraetetyp, QString *name, QString *datentyp, bool *pflichtfeld);
 private:
 
     QSqlDatabase db;

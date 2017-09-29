@@ -74,10 +74,9 @@ void MainWindow::gereateTypenEinlesen()
     }
 }
 
-void MainWindow::loadCustomFields() // Geraetetypen namen auslelsen
-{
-    QString current = this->ui->cb_datenfeld->currentText();
-    if(current == "Neu anlegen")
+void MainWindow::loadCustomFields() {
+    QString current = this->ui->cb_typ->currentText();
+    if(current.isEmpty())
         return;
 
     QSqlQuery p_qry;
@@ -101,17 +100,51 @@ void MainWindow::on_cb_typ_currentIndexChanged(const QString &arg1)
 
 void MainWindow::createNewCustomField()
 {
+    if(this->ui->edt_datenfeldBezeichnung->text().isEmpty()) {
+        QMessageBox::information(this, "Information", "Bitte Namen angeben.");
+        return;
+    }
 
+    QString error;
+    QString name = this->ui->edt_datenfeldBezeichnung->text();
+    QString datentyp = this->ui->cb_datenfeldTyp->currentText();
+    QString geraetetyp = this->ui->cb_typ->currentText();
+    bool pflichtfeld = this->ui->cb_pflichtfeld->isChecked();
+
+    if(!this->dbHandler.createNewCustomField(&error,name,geraetetyp,datentyp,pflichtfeld))
+        QMessageBox::warning(this, "Fehler", "Feld konnte nicht angelegt werden: " + error);
+    else
+    {
+        emit do_loadCustomFields();
+        QMessageBox::information(this, "Information", "Datenfeld wurde angelegt");
+    }
 }
 
 void MainWindow::saveCustomField()
 {
+    QString error;
+    QString name = this->ui->edt_datenfeldBezeichnung->text();
+    QString datentyp = this->ui->cb_datenfeldTyp->currentText();
+    QString geraetetyp = this->ui->cb_typ->currentText();
+    bool pflichtfeld = this->ui->cb_pflichtfeld->isChecked();
 
+    if(!this->dbHandler.saveCustomField(name,geraetetyp, datentyp,pflichtfeld, &error))
+        QMessageBox::warning(this, "Fehler", "Datenfeld konnte nicht geändert werden: " + error);
+    else {
+        if(!this->dbHandler.loadCustomField(geraetetyp, &name, &datentyp, &pflichtfeld))
+            QMessageBox::warning(this,"Fehler", "Datenfeld konnte nicht neu geladen werden: " + error);
+        else {
+            this->ui->edt_datenfeldBezeichnung->setText(name);
+            this->ui->cb_datenfeldTyp->setCurrentText(datentyp);
+            this->ui->cb_pflichtfeld->setChecked(pflichtfeld);
+        }
+    }
 }
+
 
 void MainWindow::on_btn_saveCustomField_clicked()
 {
-    if(this->ui->cb_typ->currentText() == "Neu anlegen")
+    if(this->ui->cb_datenfeld->currentText() == "Neu anlegen")
         this->createNewCustomField();
     else
         this->saveCustomField();
