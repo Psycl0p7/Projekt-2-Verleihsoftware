@@ -6,84 +6,64 @@
 
 bool DBHandler::feldDatentypenAuslesen(QSqlQuery* p_qry, QString *error)
 {
-    bool ok = false;
-
-    if(!this->openDB())
-            *error = "Datenbank konnte nicht geöffnet werden.";
-    else
-    {
-        p_qry->prepare("SELECT name FROM tbl_feldDatentypen ORDER BY name ASC");
-
-        if(!p_qry->exec())
-            *error = "Datenbankabfrage konnte nicht ausgeführt werden: " + p_qry->lastError().text();
-        else
-            ok = true;
-    }
-
-    return ok;
+    QString statement = "SELECT name FROM tbl_feldDatentypen ORDER BY name ASC";
+    return this->execute(statement, p_qry, error);
 }
 
 bool DBHandler::geratetypAnlegen(QString name,QString* error)
 {
-    bool ok = false;
-
-    if(!this->openDB())
-            *error = "Datenbank konnte nicht geöffnet werden.";
-    else
-    {
-        QSqlQuery qry(this->db);
-        qry.prepare("INSERT INTO tbl_geraeteTypen (name) VALUES ('" + name + "')");
-
-        if(!qry.exec())
-            *error = "Datenbankabfrage konnte nicht ausgeführt werden: " + qry.lastError().text();
-        else
-            ok = true;
-    }
-
-    return ok;
+    QString statement = "INSERT INTO tbl_geraeteTypen (name) VALUES ('" + name + "')";
+    return this->execute(statement, new QSqlQuery(), error);
 }
 
 bool DBHandler::geratetypenAuslesen(QSqlQuery* p_qry, QString* error)
 {
-    bool ok = false;
-
-    if(!this->openDB())
-            *error = "Datenbank konnte nicht geöffnet werden.";
-    else
-    {
-        p_qry->prepare("SELECT name FROM tbl_geraeteTypen ORDER BY name ASC");
-
-        if(!p_qry->exec())
-            *error = "Datenbankabfrage konnte nicht ausgeführt werden: " + p_qry->lastError().text();
-        else
-            ok = true;
-    }
-
-    return ok;
+    QString statement = "SELECT name FROM tbl_geraeteTypen ORDER BY name ASC";
+    return this->execute(statement, p_qry, error);
 }
 
 bool DBHandler::getCustomFelder(QSqlQuery* p_qry, QString *error, QString gereateTyp)
 {
-    bool ok = false;
+    QString statement = "SELECT name FROM tbl_customfelder WHERE fk_geraetetyp='" + gereateTyp + "'";
+    return this->execute(statement, p_qry, error);
+}
 
-    if(!this->openDB())
-            *error = "Datenbank konnte nicht geöffnet werden.";
-    else
-    {
-        p_qry->prepare("SELECT name FROM tbl_customfelder WHERE fk_geraetetyp='" + gereateTyp + "'");
+bool DBHandler::createNewCustomField(QString *error, QString name, QString geraeteTyp, QString datentyp, bool pflichtfeld)
+{
+    QString statement = "INSERT INTO tbl_tbl_customfelder (name, fk_geraetetyp,fk_feldDatentyp, pflichtfeld) VALUES('"
+            + name + "',"
+            + geraeteTyp + "','"
+            +
+            +")";
+}
 
-        if(!p_qry->exec())
-            *error = "Datenbankabfrage konnte nicht ausgeführt werden: " + p_qry->lastError().text();
-        else
-            ok = true;
-    }
+bool DBHandler::saveCustomField(QString *error)
+{
 
-    return ok;
 }
 
 /********************************************************************************
  *                              INIT-METHODEN                                   *
  ********************************************************************************/
+
+bool DBHandler::execute(QString statement, QSqlQuery *p_qry, QString *error)
+{
+    bool ok = false;
+
+    if(!this->openDB())
+            *error = "Datenbank konnte nicht geöffnet werden.";
+    else
+    {
+        p_qry->prepare(statement);
+
+        if(!p_qry->exec())
+            *error = "Datenbankabfrage konnte nicht ausgeführt werden: " + p_qry->lastError().text();
+        else
+            ok = true;
+    }
+
+    return ok;
+}
 
 DBHandler::DBHandler()
 {
@@ -166,3 +146,4 @@ bool DBHandler::closeDB()
 
     return true;
 }
+

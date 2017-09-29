@@ -150,9 +150,9 @@
       <widget class="QLineEdit" name="edt_datenfeldBezeichnung">
        <property name="geometry">
         <rect>
-         <x>229</x>
+         <x>187</x>
          <y>60</y>
-         <width>113</width>
+         <width>119</width>
          <height>20</height>
         </rect>
        </property>
@@ -160,9 +160,9 @@
       <widget class="QLabel" name="label_5">
        <property name="geometry">
         <rect>
-         <x>229</x>
+         <x>187</x>
          <y>104</y>
-         <width>111</width>
+         <width>117</width>
          <height>16</height>
         </rect>
        </property>
@@ -173,9 +173,9 @@
       <widget class="QComboBox" name="cb_datenfeldTyp">
        <property name="geometry">
         <rect>
-         <x>228</x>
+         <x>186</x>
          <y>129</y>
-         <width>121</width>
+         <width>127</width>
          <height>24</height>
         </rect>
        </property>
@@ -183,9 +183,9 @@
       <widget class="QLabel" name="label_6">
        <property name="geometry">
         <rect>
-         <x>228</x>
+         <x>186</x>
          <y>40</y>
-         <width>111</width>
+         <width>117</width>
          <height>16</height>
         </rect>
        </property>
@@ -196,9 +196,9 @@
       <widget class="QRadioButton" name="rb_pflichtfeld">
        <property name="geometry">
         <rect>
-         <x>390</x>
-         <y>55</y>
-         <width>97</width>
+         <x>340</x>
+         <y>60</y>
+         <width>103</width>
          <height>22</height>
         </rect>
        </property>
@@ -206,17 +206,30 @@
         <string>Pflichtfeld</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="btn_speichern">
+      <widget class="QPushButton" name="btn_saveCustomField">
        <property name="geometry">
         <rect>
-         <x>380</x>
-         <y>130</y>
-         <width>131</width>
-         <height>25</height>
+         <x>420</x>
+         <y>120</y>
+         <width>121</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
         <string>Speichern</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_deleteCustomField">
+       <property name="geometry">
+        <rect>
+         <x>470</x>
+         <y>30</y>
+         <width>71</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Löschen</string>
        </property>
       </widget>
      </widget>

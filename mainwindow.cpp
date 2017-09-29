@@ -16,6 +16,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::init()
 {
+    QObject::connect(this, SIGNAL(do_loadCustomFields()), this , SLOT(loadCustomFields()));
+
     this->ui->cb_datenfeld->addItem(QString("Neu anlegen"));
     this->gereateTypenEinlesen();
     this->feldDatentypenEinlesen();
@@ -58,6 +60,7 @@ void MainWindow::gereateTypenEinlesen()
     QSqlQuery qry;
     QString error;
 
+    this->geraeteTypenReady = false;
     if(!this->dbHandler.geratetypenAuslesen(&qry, &error))
         QMessageBox::warning(this, "Fehler", "Geraetetypen konnten nicht ausgelesen werden: " + error);
     else
@@ -65,17 +68,21 @@ void MainWindow::gereateTypenEinlesen()
         this->ui->cb_typ->clear();
         while(qry.next())
             this->ui->cb_typ->addItem(qry.value(0).toString());
+
+        this->geraeteTypenReady = true;
+        emit this->do_loadCustomFields();
     }
 }
 
-void MainWindow::on_cb_typ_currentIndexChanged(const QString &arg1) // Geraetetypen namen auslelsen
+void MainWindow::loadCustomFields() // Geraetetypen namen auslelsen
 {
-    if(arg1 == "Neu anlegen")
+    QString current = this->ui->cb_datenfeld->currentText();
+    if(current == "Neu anlegen")
         return;
 
     QSqlQuery p_qry;
     QString error;
-    if(!this->dbHandler.getCustomFelder(&p_qry, &error, arg1))
+    if(!this->dbHandler.getCustomFelder(&p_qry, &error, current))
         QMessageBox::warning(this, "Fehler", "Auslesen der CustomFelder nicht möglich: " + error);
     else
     {
@@ -84,4 +91,28 @@ void MainWindow::on_cb_typ_currentIndexChanged(const QString &arg1) // Geraetety
             this->ui->cb_datenfeld->addItem(p_qry.value(0).toString());
         this->ui->cb_datenfeld->addItem(QString("Neu anlegen"));
     }
+}
+
+void MainWindow::on_cb_typ_currentIndexChanged(const QString &arg1)
+{
+    if(this->geraeteTypenReady)
+        emit this->do_loadCustomFields();
+}
+
+void MainWindow::createNewCustomField()
+{
+
+}
+
+void MainWindow::saveCustomField()
+{
+
+}
+
+void MainWindow::on_btn_saveCustomField_clicked()
+{
+    if(this->ui->cb_typ->currentText() == "Neu anlegen")
+        this->createNewCustomField();
+    else
+        this->saveCustomField();
 }
