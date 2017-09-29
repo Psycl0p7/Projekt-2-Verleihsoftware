@@ -75,11 +75,11 @@ bool DBHandler::createDB()
     if(!DBExists())
     {
         QString path = "db.sqlite";
-        QString tblGeraetetyp   = "CREATE TABLE 'tbl_geraetetypen'    ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' CHAR NOT NULL UNIQUE )";
-        QString tblCustomFeld   = "CREATE TABLE 'tbl_customfelder'   ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' CHAR NOT NULL, 'fk_geraetetyp' CHAR NOT NULL, 'fk_feldDatentyp' CHAR NOT NULL, 'pflichtfeld' BOOLEAN NOT NULL)";
-        QString tblGeraeteData  = "CREATE TABLE 'tbl_geraeteData'     ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'fk_customfeld' INTEGER, 'fk_geraet' INTEGER NOT NULL, 'data' CHAR)";
-        QString tblFelddatentyp = "CREATE TABLE 'tbl_feldDatentypen' ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'name' TEXT);";
-        QString tblGeraet       = "CREATE TABLE 'tbl_geraete' ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,'fk_geraetetyp INTEGER);";
+        QString tblGeraetetyp   = "CREATE TABLE 'tbl_geraetetypen'  ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL UNIQUE )";
+        QString tblCustomFeld   = "CREATE TABLE 'tbl_customfelder'  ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL, 'fk_geraetetyp' TEXT NOT NULL, 'fk_feldDatentyp' TEXT NOT NULL, 'pflichtfeld' BOOLEAN NOT NULL)";
+        QString tblGeraeteData  = "CREATE TABLE 'tbl_geraeteData'   ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'fk_customfeld' INTEGER, 'fk_geraet' INTEGER NOT NULL, 'data' TEXT)";
+        QString tblFelddatentyp = "CREATE TABLE 'tbl_feldDatentypen'('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'name' TEXT);";
+        QString tblGeraet       = "CREATE TABLE 'tbl_geraete'       ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,'fk_geraetetyp INTEGER);";
 
         this->db = QSqlDatabase::addDatabase("QSQLITE");
         this->db.setDatabaseName(path);
