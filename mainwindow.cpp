@@ -38,23 +38,34 @@ void MainWindow::readSupportedDatatypes()
 
 void MainWindow::createCustomfield()
 {
-    if(this->ui->edt_customfieldName->text().isEmpty()) {
+    QString error = NULL;
+    bool customFieldExists = NULL;
+    QString fieldName = this->ui->edt_customfieldName->text();
+    QString categoryName = this->ui->cb_category->currentText();
+
+    if(fieldName.isEmpty()) {
         QMessageBox::information(this, "Information", "Bitte Namen angeben.");
         return;
     }
 
-    QString error;
-    QString name = this->ui->edt_customfieldName->text();
-    QString datentyp = this->ui->cb_customfieldType->currentText();
-    QString geraetetyp = this->ui->cb_category->currentText();
-    bool pflichtfeld = this->ui->cb_customfieldRequired->isChecked();
+    if(!this->dbHandler.checkCustomfieldExists(fieldName, categoryName, &customFieldExists, &error))
+        QMessageBox::warning(this, "Fehler", "Custom-Feld konnte nicht erstellt werden: " + error);
+    else if(customFieldExists)
+        QMessageBox::information(this, "Information", "Custom-Feld bereits vorhanden.");
+    else {
+        QString error;
+        QString name = this->ui->edt_customfieldName->text();
+        QString datentyp = this->ui->cb_customfieldType->currentText();
+        QString geraetetyp = this->ui->cb_category->currentText();
+        bool pflichtfeld = this->ui->cb_customfieldRequired->isChecked();
 
-    if(!this->dbHandler.createCustomField(&error,name,geraetetyp,datentyp,pflichtfeld))
-        QMessageBox::warning(this, "Fehler", "Feld konnte nicht angelegt werden: " + error);
-    else
-    {
-        emit do_getCustomfields();
-        QMessageBox::information(this, "Information", "Datenfeld wurde angelegt");
+        if(!this->dbHandler.createCustomField(&error,name,geraetetyp,datentyp,pflichtfeld))
+            QMessageBox::warning(this, "Fehler", "Feld konnte nicht angelegt werden: " + error);
+        else
+        {
+            emit do_getCustomfields();
+            QMessageBox::information(this, "Information", "Datenfeld wurde angelegt");
+        }
     }
 }
 
@@ -126,13 +137,6 @@ void MainWindow::on_cb_category_currentIndexChanged(const QString &arg1)
         emit this->do_getCustomfields();
 }
 
-void MainWindow::on_btn_customfieldSave_clicked()
-{
-    if(this->ui->cb_customfield->currentText() == "Neu anlegen")
-        this->createCustomfield();
-    else
-        this->saveCustomfield();
-}
 
 void MainWindow::on_btn_categorySave_clicked()
 {
@@ -152,5 +156,17 @@ void MainWindow::on_btn_categorySave_clicked()
     this->getCategories();
 }
 
+void MainWindow::on_btn_customfieldSave_clicked()
+{
+    if(this->ui->cb_customfield->currentText() == "Neu anlegen")
+        this->createCustomfield();
+    else
+        this->saveCustomfield();
+}
 
-
+void MainWindow::on_cb_customfield_currentIndexChanged(const QString &arg1)
+{
+    if(arg1 == "Neu anlegen") {
+        this->ui->edt_customfieldName->clear();
+    }
+}

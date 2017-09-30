@@ -39,6 +39,8 @@ private slots:
     void on_btn_categorySave_clicked();
     void on_btn_customfieldSave_clicked();
 
+    void on_cb_customfield_currentIndexChanged(const QString &arg1);
+
 signals:
     void do_getCustomfields();
 

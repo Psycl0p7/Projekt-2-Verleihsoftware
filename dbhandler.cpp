@@ -110,6 +110,7 @@ bool DBHandler::execute(QString statement, QSqlQuery *p_qry, QString *error)
  *                              DB-Anfragen                                     *
  ********************************************************************************/
 
+
 bool DBHandler::readSupportedDatatypes(QSqlQuery* p_qry, QString *error)
 {
     QString statement = "SELECT name FROM tbl_feldDatentypen ORDER BY name ASC";
@@ -126,6 +127,25 @@ bool DBHandler::createCategory(QString name,QString* error)
 {
     QString statement = "INSERT INTO tbl_geraeteTypen (name) VALUES ('" + name + "')";
     return this->execute(statement, new QSqlQuery(), error);
+}
+
+bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, bool* customfieldExists,QString *error)
+{
+    bool ok = false;
+    QSqlQuery qry;
+    QString statement = "SELECT name FROM tbl_customfelder WHERE name='"
+            + fieldName
+            + "' AND fk_geraetetyp=(SELECT id FROM tbl_geraetetypen WHERE name='"
+            + categoryName
+            + "');";
+    qDebug() << statement;
+    if(this->execute(statement, &qry, error))
+    {
+        ok = true;
+        if(qry.first())
+            *customfieldExists = true;
+    }
+    return ok;
 }
 
 bool DBHandler::getCustomfields(QSqlQuery* p_qry, QString *error, QString gereateTyp)
