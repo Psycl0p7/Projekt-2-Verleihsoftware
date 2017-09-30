@@ -19,13 +19,13 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_btn_neuenTypAnlegen_clicked();
+    void on_btn_categorySave_clicked();
     void loadCustomFields();
     void gereateTypenEinlesen();
 
-    void on_cb_typ_currentIndexChanged(const QString &arg1);
+    void on_cb_category_currentIndexChanged(const QString &arg1);
 
-    void on_btn_saveCustomField_clicked();
+    void on_btn_customfieldSave_clicked();
 
 private:
     Ui::MainWindow *ui;

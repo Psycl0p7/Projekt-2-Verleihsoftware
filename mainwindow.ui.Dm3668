@@ -52,7 +52,7 @@
       <property name="title">
        <string>Kategorien</string>
       </property>
-      <widget class="QPushButton" name="btn_categorySave">
+      <widget class="QPushButton" name="btn_categoryDelete">
        <property name="geometry">
         <rect>
          <x>140</x>
