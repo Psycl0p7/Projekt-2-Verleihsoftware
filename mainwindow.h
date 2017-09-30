@@ -13,6 +13,7 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+    static const QString CREATE_OPERATOR;
 
 public:
     explicit MainWindow(QWidget *parent = 0);

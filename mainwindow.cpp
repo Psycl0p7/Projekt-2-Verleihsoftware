@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+const QString MainWindow::CREATE_OPERATOR = "Neu anlegen";
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -17,8 +19,8 @@ MainWindow::~MainWindow()
 void MainWindow::init()
 {
     QObject::connect(this, SIGNAL(do_getCustomfields()), this , SLOT(getCustomFields()));
-
-    this->ui->cb_customfield->addItem(QString("Neu anlegen"));
+    this->ui->cb_category->addItem(MainWindow::CREATE_OPERATOR);
+    this->ui->cb_customfield->addItem(MainWindow::CREATE_OPERATOR);
     this->getCategories();
     this->readSupportedDatatypes();
 }
@@ -101,6 +103,7 @@ void MainWindow::getCategories()
     else
     {
         this->ui->cb_category->clear();
+        this->ui->cb_category->addItem(MainWindow::CREATE_OPERATOR);
         while(qry.next())
             this->ui->cb_category->addItem(qry.value(0).toString());
 
@@ -121,9 +124,9 @@ void MainWindow::getCustomFields() {
     else
     {
         this->ui->cb_customfield->clear();
+        this->ui->cb_customfield->addItem(MainWindow::CREATE_OPERATOR);
         while(p_qry.next())
             this->ui->cb_customfield->addItem(p_qry.value(0).toString());
-        this->ui->cb_customfield->addItem(QString("Neu anlegen"));
     }
 }
 
@@ -133,6 +136,11 @@ void MainWindow::getCustomFields() {
 
 void MainWindow::on_cb_category_currentIndexChanged(const QString &arg1)
 {
+    if(this->ui->cb_category->currentText() == MainWindow::CREATE_OPERATOR)
+        this->ui->edt_categoryName->clear();
+    else
+        this->ui->edt_categoryName->setText(arg1);
+
     if(this->categoriesReady)
         emit this->do_getCustomfields();
 }
@@ -158,7 +166,7 @@ void MainWindow::on_btn_categorySave_clicked()
 
 void MainWindow::on_btn_customfieldSave_clicked()
 {
-    if(this->ui->cb_customfield->currentText() == "Neu anlegen")
+    if(this->ui->cb_customfield->currentText() == MainWindow::CREATE_OPERATOR)
         this->createCustomfield();
     else
         this->saveCustomfield();
@@ -166,7 +174,7 @@ void MainWindow::on_btn_customfieldSave_clicked()
 
 void MainWindow::on_cb_customfield_currentIndexChanged(const QString &arg1)
 {
-    if(arg1 == "Neu anlegen") {
+    if(arg1 == MainWindow::CREATE_OPERATOR) {
         this->ui->edt_customfieldName->clear();
     }
 }
