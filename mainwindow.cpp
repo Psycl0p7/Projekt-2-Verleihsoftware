@@ -59,9 +59,9 @@ void MainWindow::createCustomfield()
         QString name = this->ui->edt_customfieldName->text();
         QString datentyp = this->ui->cb_customfieldType->currentText();
         QString geraetetyp = this->ui->cb_category->currentText();
-        bool pflichtfeld = this->ui->cb_customfieldRequired->isChecked();
+        bool required = this->ui->cb_customfieldRequired->isChecked();
 
-        if(!this->dbHandler.createCustomField(&error,name,geraetetyp,datentyp,pflichtfeld))
+        if(!this->dbHandler.createCustomField(&error,name,geraetetyp,datentyp,required))
             QMessageBox::warning(this, "Fehler", "Feld konnte nicht angelegt werden: " + error);
         else
         {
@@ -77,17 +77,17 @@ void MainWindow::saveCustomfield()
     QString name = this->ui->edt_customfieldName->text();
     QString datentyp = this->ui->cb_customfieldType->currentText();
     QString geraetetyp = this->ui->cb_category->currentText();
-    bool pflichtfeld = this->ui->cb_customfieldRequired->isChecked();
+    bool required = this->ui->cb_customfieldRequired->isChecked();
 
-    if(!this->dbHandler.saveCustomField(name,geraetetyp, datentyp,pflichtfeld, &error))
+    if(!this->dbHandler.saveCustomField(name,geraetetyp, datentyp,required, &error))
         QMessageBox::warning(this, "Fehler", "Datenfeld konnte nicht geändert werden: " + error);
     else {
-        if(!this->dbHandler.readCustomField(geraetetyp, &name, &datentyp, &pflichtfeld))
+        if(!this->dbHandler.readCustomField(geraetetyp, &name, &datentyp, &required))
             QMessageBox::warning(this,"Fehler", "Datenfeld konnte nicht neu geladen werden: " + error);
         else {
             this->ui->edt_customfieldName->setText(name);
             this->ui->cb_customfieldType->setCurrentText(datentyp);
-            this->ui->cb_customfieldRequired->setChecked(pflichtfeld);
+            this->ui->cb_customfieldRequired->setChecked(required);
         }
     }
 }
@@ -114,7 +114,7 @@ void MainWindow::getCategories()
 
 void MainWindow::getCustomFields() {
     QString current = this->ui->cb_category->currentText();
-    if(current.isEmpty())
+    if(current.isEmpty() || current == MainWindow::CREATE_OPERATOR)
         return;
 
     QSqlQuery p_qry;
