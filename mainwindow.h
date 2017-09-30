@@ -18,13 +18,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-private slots:
-    void on_btn_categorySave_clicked();
-    void getCustomFields();
-    void getCategories();
-
-    void on_cb_category_currentIndexChanged(const QString &arg1);
-    void on_btn_customfieldSave_clicked();
+public slots:
 
 private:
     Ui::MainWindow *ui;
@@ -37,9 +31,17 @@ private:
     void createCustomfield();
     void saveCustomfield();
 
+private slots:
+    void getCategories();
+    void getCustomFields();
+
+    void on_cb_category_currentIndexChanged(const QString &arg1);
+    void on_btn_categorySave_clicked();
+    void on_btn_customfieldSave_clicked();
+
 signals:
     void do_getCustomfields();
-public slots:
+
 };
 
 #endif // MAINWINDOW_H

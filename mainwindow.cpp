@@ -36,68 +36,6 @@ void MainWindow::readSupportedDatatypes()
     }
 }
 
-void MainWindow::on_btn_categorySave_clicked()
-{
-    if(this->ui->edt_categoryName->text().length() <= 0)
-    {
-        QMessageBox::information(this,"Information", "Bitte Namen angeben.");
-        return;
-    }
-
-    QString error = "";
-    if(this->dbHandler.createCategory(this->ui->edt_categoryName->text(), &error))
-        QMessageBox::information(this, "Information", "Geraetetyp wurde angelegt.");
-    else
-        QMessageBox::warning(this, "Fehler", error);
-
-    this->ui->edt_categoryName->clear();
-    this->getCategories();
-}
-
-
-void MainWindow::getCategories()
-{
-    QSqlQuery qry;
-    QString error;
-
-    this->categoriesReady = false;
-    if(!this->dbHandler.getCategories(&qry, &error))
-        QMessageBox::warning(this, "Fehler", "Geraetetypen konnten nicht ausgelesen werden: " + error);
-    else
-    {
-        this->ui->cb_category->clear();
-        while(qry.next())
-            this->ui->cb_category->addItem(qry.value(0).toString());
-
-        this->categoriesReady = true;
-        emit this->do_getCustomfields();
-    }
-}
-
-void MainWindow::getCustomFields() {
-    QString current = this->ui->cb_category->currentText();
-    if(current.isEmpty())
-        return;
-
-    QSqlQuery p_qry;
-    QString error;
-    if(!this->dbHandler.getCustomfields(&p_qry, &error, current))
-        QMessageBox::warning(this, "Fehler", "Auslesen der CustomFelder nicht möglich: " + error);
-    else
-    {
-        this->ui->cb_customfield->clear();
-        while(p_qry.next())
-            this->ui->cb_customfield->addItem(p_qry.value(0).toString());
-        this->ui->cb_customfield->addItem(QString("Neu anlegen"));
-    }
-}
-
-void MainWindow::on_cb_category_currentIndexChanged(const QString &arg1)
-{
-    if(this->categoriesReady)
-        emit this->do_getCustomfields();
-}
-
 void MainWindow::createCustomfield()
 {
     if(this->ui->edt_customfieldName->text().isEmpty()) {
@@ -141,6 +79,52 @@ void MainWindow::saveCustomfield()
     }
 }
 
+void MainWindow::getCategories()
+{
+    QSqlQuery qry;
+    QString error;
+
+    this->categoriesReady = false;
+    if(!this->dbHandler.getCategories(&qry, &error))
+        QMessageBox::warning(this, "Fehler", "Geraetetypen konnten nicht ausgelesen werden: " + error);
+    else
+    {
+        this->ui->cb_category->clear();
+        while(qry.next())
+            this->ui->cb_category->addItem(qry.value(0).toString());
+
+        this->categoriesReady = true;
+        emit this->do_getCustomfields();
+    }
+}
+
+void MainWindow::getCustomFields() {
+    QString current = this->ui->cb_category->currentText();
+    if(current.isEmpty())
+        return;
+
+    QSqlQuery p_qry;
+    QString error;
+    if(!this->dbHandler.getCustomfields(&p_qry, &error, current))
+        QMessageBox::warning(this, "Fehler", "Auslesen der CustomFelder nicht möglich: " + error);
+    else
+    {
+        this->ui->cb_customfield->clear();
+        while(p_qry.next())
+            this->ui->cb_customfield->addItem(p_qry.value(0).toString());
+        this->ui->cb_customfield->addItem(QString("Neu anlegen"));
+    }
+}
+
+/********************************************************************************
+ *                              UI-SLOTS                                        *
+ ********************************************************************************/
+
+void MainWindow::on_cb_category_currentIndexChanged(const QString &arg1)
+{
+    if(this->categoriesReady)
+        emit this->do_getCustomfields();
+}
 
 void MainWindow::on_btn_customfieldSave_clicked()
 {
@@ -149,3 +133,24 @@ void MainWindow::on_btn_customfieldSave_clicked()
     else
         this->saveCustomfield();
 }
+
+void MainWindow::on_btn_categorySave_clicked()
+{
+    if(this->ui->edt_categoryName->text().length() <= 0)
+    {
+        QMessageBox::information(this,"Information", "Bitte Namen angeben.");
+        return;
+    }
+
+    QString error = "";
+    if(this->dbHandler.createCategory(this->ui->edt_categoryName->text(), &error))
+        QMessageBox::information(this, "Information", "Geraetetyp wurde angelegt.");
+    else
+        QMessageBox::warning(this, "Fehler", error);
+
+    this->ui->edt_categoryName->clear();
+    this->getCategories();
+}
+
+
+
