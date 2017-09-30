@@ -16,14 +16,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::init()
 {
-    QObject::connect(this, SIGNAL(do_loadCustomFields()), this , SLOT(loadCustomFields()));
+    QObject::connect(this, SIGNAL(do_getCustomfields()), this , SLOT(getCustomFields()));
 
     this->ui->cb_customfield->addItem(QString("Neu anlegen"));
-    this->gereateTypenEinlesen();
-    this->feldDatentypenEinlesen();
+    this->getCategories();
+    this->readSupportedDatatypes();
 }
 
-void MainWindow::feldDatentypenEinlesen()
+void MainWindow::readSupportedDatatypes()
 {
     QSqlQuery qry;
     QString error;
@@ -51,16 +51,16 @@ void MainWindow::on_btn_categorySave_clicked()
         QMessageBox::warning(this, "Fehler", error);
 
     this->ui->edt_categoryName->clear();
-    this->gereateTypenEinlesen();
+    this->getCategories();
 }
 
 
-void MainWindow::gereateTypenEinlesen()
+void MainWindow::getCategories()
 {
     QSqlQuery qry;
     QString error;
 
-    this->geraeteTypenReady = false;
+    this->categoriesReady = false;
     if(!this->dbHandler.getCategories(&qry, &error))
         QMessageBox::warning(this, "Fehler", "Geraetetypen konnten nicht ausgelesen werden: " + error);
     else
@@ -69,12 +69,12 @@ void MainWindow::gereateTypenEinlesen()
         while(qry.next())
             this->ui->cb_category->addItem(qry.value(0).toString());
 
-        this->geraeteTypenReady = true;
-        emit this->do_loadCustomFields();
+        this->categoriesReady = true;
+        emit this->do_getCustomfields();
     }
 }
 
-void MainWindow::loadCustomFields() {
+void MainWindow::getCustomFields() {
     QString current = this->ui->cb_category->currentText();
     if(current.isEmpty())
         return;
@@ -94,11 +94,11 @@ void MainWindow::loadCustomFields() {
 
 void MainWindow::on_cb_category_currentIndexChanged(const QString &arg1)
 {
-    if(this->geraeteTypenReady)
-        emit this->do_loadCustomFields();
+    if(this->categoriesReady)
+        emit this->do_getCustomfields();
 }
 
-void MainWindow::createNewCustomField()
+void MainWindow::createCustomfield()
 {
     if(this->ui->edt_customfieldName->text().isEmpty()) {
         QMessageBox::information(this, "Information", "Bitte Namen angeben.");
@@ -115,12 +115,12 @@ void MainWindow::createNewCustomField()
         QMessageBox::warning(this, "Fehler", "Feld konnte nicht angelegt werden: " + error);
     else
     {
-        emit do_loadCustomFields();
+        emit do_getCustomfields();
         QMessageBox::information(this, "Information", "Datenfeld wurde angelegt");
     }
 }
 
-void MainWindow::saveCustomField()
+void MainWindow::saveCustomfield()
 {
     QString error;
     QString name = this->ui->edt_customfieldName->text();
@@ -145,7 +145,7 @@ void MainWindow::saveCustomField()
 void MainWindow::on_btn_customfieldSave_clicked()
 {
     if(this->ui->cb_customfield->currentText() == "Neu anlegen")
-        this->createNewCustomField();
+        this->createCustomfield();
     else
-        this->saveCustomField();
+        this->saveCustomfield();
 }

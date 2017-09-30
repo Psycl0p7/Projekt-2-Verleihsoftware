@@ -20,26 +20,25 @@ public:
 
 private slots:
     void on_btn_categorySave_clicked();
-    void loadCustomFields();
-    void gereateTypenEinlesen();
+    void getCustomFields();
+    void getCategories();
 
     void on_cb_category_currentIndexChanged(const QString &arg1);
-
     void on_btn_customfieldSave_clicked();
 
 private:
     Ui::MainWindow *ui;
     DBHandler dbHandler;
-
-    bool geraeteTypenReady;
-
-    void createNewCustomField();
-    void saveCustomField();
+    bool categoriesReady;
 
     void init();
-    void feldDatentypenEinlesen();
+    void readSupportedDatatypes();
+
+    void createCustomfield();
+    void saveCustomfield();
+
 signals:
-    void do_loadCustomFields();
+    void do_getCustomfields();
 public slots:
 };
 
