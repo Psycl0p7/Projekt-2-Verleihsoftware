@@ -18,6 +18,7 @@ public:
 
     bool getCategories(QSqlQuery* p_qry, QString *error);
     bool createCategory(QString name, QString *error);
+    bool updateCategory(QString name, QString newName, QString* error);
 
     bool getCustomfields(QSqlQuery* p_qry, QString *error, QString gereateTyp);
     bool createCustomField(QString *error, QString name, QString geraeteTyp, QString datentyp, bool pflichtfeld);

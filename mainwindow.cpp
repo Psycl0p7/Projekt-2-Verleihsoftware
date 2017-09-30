@@ -148,17 +148,24 @@ void MainWindow::on_cb_category_currentIndexChanged(const QString &arg1)
 
 void MainWindow::on_btn_categorySave_clicked()
 {
+    QString error = "";
     if(this->ui->edt_categoryName->text().length() <= 0)
     {
         QMessageBox::information(this,"Information", "Bitte Namen angeben.");
         return;
     }
-
-    QString error = "";
-    if(this->dbHandler.createCategory(this->ui->edt_categoryName->text(), &error))
-        QMessageBox::information(this, "Information", "Geraetetyp wurde angelegt.");
-    else
-        QMessageBox::warning(this, "Fehler", error);
+    else if(this->ui->cb_category->currentText() == MainWindow::CREATE_OPERATOR) {
+        if(this->dbHandler.createCategory(this->ui->edt_categoryName->text(), &error))
+            QMessageBox::information(this, "Information", "Geraetetyp wurde angelegt.");
+        else
+            QMessageBox::warning(this, "Fehler", error);
+    }
+    else {
+        if(this->dbHandler.updateCategory(this->ui->cb_category->currentText(),this->ui->edt_categoryName->text(), &error))
+            QMessageBox::information(this, "Information", "Geraetetyp wurde angelegt.");
+        else
+            QMessageBox::warning(this, "Fehler", error);
+    }
 
     this->ui->edt_categoryName->clear();
     this->getCategories();

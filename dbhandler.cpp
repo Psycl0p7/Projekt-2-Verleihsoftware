@@ -127,6 +127,11 @@ bool DBHandler::createCategory(QString name,QString* error)
     return this->execute(statement, new QSqlQuery(), error);
 }
 
+bool DBHandler::updateCategory(QString name, QString newName, QString* error) {
+    QString statement = "UPDATE tbl_categories SET name='" + newName + "' WHERE name='" + name + "';";
+    return this->execute(statement, new QSqlQuery(), error);
+}
+
 bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, bool* customfieldExists,QString *error)
 {
     bool ok = false;
