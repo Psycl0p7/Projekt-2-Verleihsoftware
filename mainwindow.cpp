@@ -27,7 +27,7 @@ void MainWindow::feldDatentypenEinlesen()
 {
     QSqlQuery qry;
     QString error;
-    if(!this->dbHandler.feldDatentypenAuslesen(&qry,&error))
+    if(!this->dbHandler.readSupportedDatatypes(&qry,&error))
         QMessageBox::warning(this,"Fehler", "Datentypen konnten nicht gelsen werden: " + error);
     else
     {   this->ui->cb_customfieldType->clear();
@@ -45,7 +45,7 @@ void MainWindow::on_btn_categorySave_clicked()
     }
 
     QString error = "";
-    if(this->dbHandler.geratetypAnlegen(this->ui->edt_categoryName->text(), &error))
+    if(this->dbHandler.createCategory(this->ui->edt_categoryName->text(), &error))
         QMessageBox::information(this, "Information", "Geraetetyp wurde angelegt.");
     else
         QMessageBox::warning(this, "Fehler", error);
@@ -61,7 +61,7 @@ void MainWindow::gereateTypenEinlesen()
     QString error;
 
     this->geraeteTypenReady = false;
-    if(!this->dbHandler.geratetypenAuslesen(&qry, &error))
+    if(!this->dbHandler.getCategories(&qry, &error))
         QMessageBox::warning(this, "Fehler", "Geraetetypen konnten nicht ausgelesen werden: " + error);
     else
     {
@@ -81,7 +81,7 @@ void MainWindow::loadCustomFields() {
 
     QSqlQuery p_qry;
     QString error;
-    if(!this->dbHandler.getCustomFelder(&p_qry, &error, current))
+    if(!this->dbHandler.getCustomfields(&p_qry, &error, current))
         QMessageBox::warning(this, "Fehler", "Auslesen der CustomFelder nicht möglich: " + error);
     else
     {
@@ -111,7 +111,7 @@ void MainWindow::createNewCustomField()
     QString geraetetyp = this->ui->cb_category->currentText();
     bool pflichtfeld = this->ui->cb_customfieldRequired->isChecked();
 
-    if(!this->dbHandler.createNewCustomField(&error,name,geraetetyp,datentyp,pflichtfeld))
+    if(!this->dbHandler.createCustomField(&error,name,geraetetyp,datentyp,pflichtfeld))
         QMessageBox::warning(this, "Fehler", "Feld konnte nicht angelegt werden: " + error);
     else
     {
@@ -131,7 +131,7 @@ void MainWindow::saveCustomField()
     if(!this->dbHandler.saveCustomField(name,geraetetyp, datentyp,pflichtfeld, &error))
         QMessageBox::warning(this, "Fehler", "Datenfeld konnte nicht geändert werden: " + error);
     else {
-        if(!this->dbHandler.loadCustomField(geraetetyp, &name, &datentyp, &pflichtfeld))
+        if(!this->dbHandler.readCustomField(geraetetyp, &name, &datentyp, &pflichtfeld))
             QMessageBox::warning(this,"Fehler", "Datenfeld konnte nicht neu geladen werden: " + error);
         else {
             this->ui->edt_customfieldName->setText(name);

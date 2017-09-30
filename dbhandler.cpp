@@ -4,31 +4,31 @@
  *                              DB-Anfragen                                     *
  ********************************************************************************/
 
-bool DBHandler::geratetypAnlegen(QString name,QString* error)
+bool DBHandler::createCategory(QString name,QString* error)
 {
     QString statement = "INSERT INTO tbl_geraeteTypen (name) VALUES ('" + name + "')";
     return this->execute(statement, new QSqlQuery(), error);
 }
 
-bool DBHandler::geratetypenAuslesen(QSqlQuery* p_qry, QString* error)
+bool DBHandler::getCategories(QSqlQuery* p_qry, QString* error)
 {
     QString statement = "SELECT name FROM tbl_geraeteTypen ORDER BY name ASC";
     return this->execute(statement, p_qry, error);
 }
 
-bool DBHandler::feldDatentypenAuslesen(QSqlQuery* p_qry, QString *error)
+bool DBHandler::readSupportedDatatypes(QSqlQuery* p_qry, QString *error)
 {
     QString statement = "SELECT name FROM tbl_feldDatentypen ORDER BY name ASC";
     return this->execute(statement, p_qry, error);
 }
 
-bool DBHandler::getCustomFelder(QSqlQuery* p_qry, QString *error, QString gereateTyp)
+bool DBHandler::getCustomfields(QSqlQuery* p_qry, QString *error, QString gereateTyp)
 {
     QString statement = QString("SELECT name FROM tbl_customfelder WHERE fk_geraetetyp=") + "(SELECT id FROM tbl_geraetetypen WHERE name='" + gereateTyp + "');";
     return this->execute(statement, p_qry, error);
 }
 
-bool DBHandler::createNewCustomField(QString *error, QString name, QString geraeteTyp, QString datentyp, bool pflichtfeld)
+bool DBHandler::createCustomField(QString *error, QString name, QString geraeteTyp, QString datentyp, bool pflichtfeld)
 {
     QString statement = "INSERT INTO tbl_customfelder (name, fk_geraetetyp,fk_feldDatentyp, pflichtfeld) VALUES('"
             + name + "',"
@@ -52,7 +52,7 @@ bool DBHandler::saveCustomField(QString name, QString gerateTyp,QString datentyp
     return this->execute(statement, new QSqlQuery(), error);
 }
 
-bool DBHandler::loadCustomField(QString geraetetyp, QString *name, QString* datentyp, bool* pflichtfeld)
+bool DBHandler::readCustomField(QString geraetetyp, QString *name, QString* datentyp, bool* pflichtfeld)
 {
     QSqlQuery qry;
     QString error;
