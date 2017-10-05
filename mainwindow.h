@@ -19,7 +19,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-
 public slots:
 
 private:
@@ -30,8 +29,6 @@ private:
     void init();
     void readSupportedDatatypes();
 
-    void createCategory();
-    void saveCategory();
     void createCustomfield();
     void saveCustomfield();
 
@@ -44,8 +41,6 @@ private slots:
     void on_btn_customfieldSave_clicked();
 
     void on_cb_customfield_currentIndexChanged(const QString &arg1);
-
-    void on_btn_categoryDelete_clicked();
 
 signals:
     void do_getCustomfields();
