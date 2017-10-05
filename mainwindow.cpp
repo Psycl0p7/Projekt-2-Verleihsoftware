@@ -25,6 +25,7 @@ void MainWindow::init()
     this->readSupportedDatatypes();
 }
 
+
 void MainWindow::readSupportedDatatypes()
 {
     QSqlQuery qry;
@@ -36,6 +37,62 @@ void MainWindow::readSupportedDatatypes()
         while(qry.next())
             this->ui->cb_customfieldType->addItem(qry.value(0).toString());
     }
+}
+
+void MainWindow::getCategories()
+{
+    QSqlQuery qry;
+    QString error;
+
+    this->categoriesReady = false;
+    if(!this->dbHandler.getCategories(&qry, &error))
+        QMessageBox::warning(this, "Fehler", "Geraetetypen konnten nicht ausgelesen werden: " + error);
+    else
+    {
+        this->ui->cb_category->clear();
+        this->ui->cb_category->addItem(MainWindow::CREATE_OPERATOR);
+        while(qry.next())
+            this->ui->cb_category->addItem(qry.value(0).toString());
+
+        this->categoriesReady = true;
+        emit this->do_getCustomfields();
+    }
+}
+
+void MainWindow::createCategory() {
+    QString error = "";
+    bool categoryExists;
+    QString newCategoryName = this->ui->edt_categoryName->text();
+
+    if(!this->dbHandler.checkCategoryExists(newCategoryName, &categoryExists,&error))
+        QMessageBox::warning(this,"Fehler", "Kategorie konnte nicht angelget werden: " + error);
+    else if (categoryExists)
+                QMessageBox::information(this,"Information", "Kategorie bereits vorhanden.");
+    else if(!this->dbHandler.createCategory(newCategoryName, &error))
+        QMessageBox::warning(this, "Fehler", error);
+    else
+        QMessageBox::information(this, "Information", "Gerätetyp wurde angelegt.");
+
+    this->getCategories();
+    this->ui->cb_category->setCurrentText(newCategoryName);
+}
+
+void MainWindow::saveCategory() {
+    QString error = "";
+    bool categoryExists;
+    QString newName = this->ui->edt_categoryName->text();
+
+    if(!this->dbHandler.checkCategoryExists(this->ui->edt_categoryName->text(), &categoryExists, &error))
+        QMessageBox::warning(this, "Fehler", "Kategories konnte nicht gespeichert werden: " + error);
+    else if(categoryExists)
+        QMessageBox::information(this, "Information", "Kategorie bereits vorhanden.");
+    else if(!this->dbHandler.saveCategory(this->ui->cb_category->currentText(), newName, &error))
+        QMessageBox::warning(this, "Fehler", "Kategorie konnte nicht gespeichert werden: " + error);
+    else
+        QMessageBox::information(this, "Information", "Kategorie wurde geändert.");
+
+    this->getCategories();
+    this->ui->cb_category->setCurrentText(newName);
 }
 
 void MainWindow::createCustomfield()
@@ -67,6 +124,8 @@ void MainWindow::createCustomfield()
         {
             emit do_getCustomfields();
             QMessageBox::information(this, "Information", "Datenfeld wurde angelegt");
+            this->ui->cb_category->setCurrentText(categoryName);
+            this->ui->cb_customfield->setCurrentText(fieldName);
         }
     }
 }
@@ -74,12 +133,18 @@ void MainWindow::createCustomfield()
 void MainWindow::saveCustomfield()
 {
     QString error;
+    bool fieldExists;
+    QString categoryName = this->ui->cb_category->currentText();
     QString name = this->ui->edt_customfieldName->text();
     QString datentyp = this->ui->cb_customfieldType->currentText();
     QString geraetetyp = this->ui->cb_category->currentText();
     bool required = this->ui->cb_customfieldRequired->isChecked();
 
-    if(!this->dbHandler.saveCustomField(name,geraetetyp, datentyp,required, &error))
+    if(!this->dbHandler.checkCustomfieldExists(name, categoryName, &fieldExists, &error))
+        QMessageBox::warning(this, "Fehler", error);
+    else if (fieldExists)
+        QMessageBox::information(this, "Information", "Feld bereits vorhanden.");
+    if(!this->dbHandler.saveCustomField(name,geraetetyp, datentyp,pflichtfeld, &error))
         QMessageBox::warning(this, "Fehler", "Datenfeld konnte nicht geändert werden: " + error);
     else {
         if(!this->dbHandler.readCustomField(geraetetyp, &name, &datentyp, &required))
@@ -89,26 +154,6 @@ void MainWindow::saveCustomfield()
             this->ui->cb_customfieldType->setCurrentText(datentyp);
             this->ui->cb_customfieldRequired->setChecked(required);
         }
-    }
-}
-
-void MainWindow::getCategories()
-{
-    QSqlQuery qry;
-    QString error;
-
-    this->categoriesReady = false;
-    if(!this->dbHandler.getCategories(&qry, &error))
-        QMessageBox::warning(this, "Fehler", "Geraetetypen konnten nicht ausgelesen werden: " + error);
-    else
-    {
-        this->ui->cb_category->clear();
-        this->ui->cb_category->addItem(MainWindow::CREATE_OPERATOR);
-        while(qry.next())
-            this->ui->cb_category->addItem(qry.value(0).toString());
-
-        this->categoriesReady = true;
-        emit this->do_getCustomfields();
     }
 }
 
@@ -129,6 +174,7 @@ void MainWindow::getCustomFields() {
             this->ui->cb_customfield->addItem(p_qry.value(0).toString());
     }
 }
+
 
 /********************************************************************************
  *                              UI-SLOTS                                        *
@@ -167,8 +213,12 @@ void MainWindow::on_btn_categorySave_clicked()
             QMessageBox::warning(this, "Fehler", error);
     }
 
-    this->ui->edt_categoryName->clear();
-    this->getCategories();
+    if(this->ui->cb_category->currentText() == this->ui->edt_categoryName->text()) {
+        this->saveCategory();
+    }
+    else {
+        this->createCategory();
+    }
 }
 
 void MainWindow::on_btn_customfieldSave_clicked()
@@ -183,5 +233,34 @@ void MainWindow::on_cb_customfield_currentIndexChanged(const QString &arg1)
 {
     if(arg1 == MainWindow::CREATE_OPERATOR) {
         this->ui->edt_customfieldName->clear();
+        this->ui->cb_customfieldType->setCurrentIndex(0);
+        this->ui->cb_customfieldRequired->setChecked(false);
     }
+    else {
+    //@TODO auslesen der Customfield inforamtionen & setzen dieser
+    }
+}
+
+void MainWindow::on_btn_categoryDelete_clicked()
+{
+    QString error;
+
+    if(this->ui->cb_category->currentText() == MainWindow::CREATE_OPERATOR) {
+        QMessageBox::information(this, "Information", "Keine Kategorie ausgewählt.");
+        return;
+
+    }
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Kategorie löschen", "Somit wird die Kategroie und damit alle verbundenen "
+                                                             "Daten unwiederruflich gelöscht. Sind Sie sicher?",
+                                  QMessageBox::Yes|QMessageBox::No);
+
+    if (reply == QMessageBox::No)
+        return;
+
+    if(!this->dbHandler.deleteCategory(this->ui->cb_category->currentText(), &error))
+        QMessageBox::warning(this, "Fehler", "Kategorie konnte nicht gelöscht werden: " + error);
+    else
+        QMessageBox::information(this, "Information", "Kategorie wurde entfernt.");
+    this->getCategories();
 }
