@@ -194,31 +194,13 @@ void MainWindow::on_cb_category_currentIndexChanged(const QString &arg1)
 
 void MainWindow::on_btn_categorySave_clicked()
 {
-    QString error = "";
     if(this->ui->edt_categoryName->text().length() <= 0)
-    {
         QMessageBox::information(this,"Information", "Bitte Namen angeben.");
-        return;
-    }
-    else if(this->ui->cb_category->currentText() == MainWindow::CREATE_OPERATOR) {
-        if(this->dbHandler.createCategory(this->ui->edt_categoryName->text(), &error))
-            QMessageBox::information(this, "Information", "Geraetetyp wurde angelegt.");
-        else
-            QMessageBox::warning(this, "Fehler", error);
-    }
-    else {
-        if(this->dbHandler.updateCategory(this->ui->cb_category->currentText(),this->ui->edt_categoryName->text(), &error))
-            QMessageBox::information(this, "Information", "Geraetetyp wurde angelegt.");
-        else
-            QMessageBox::warning(this, "Fehler", error);
-    }
-
-    if(this->ui->cb_category->currentText() == this->ui->edt_categoryName->text()) {
-        this->saveCategory();
-    }
-    else {
+    else if(this->ui->cb_category->currentText() == MainWindow::CREATE_OPERATOR)
         this->createCategory();
-    }
+    else if(this->ui->cb_category->currentText() != this->ui->edt_categoryName->text())
+        this->saveCategory();
+
 }
 
 void MainWindow::on_btn_customfieldSave_clicked()
