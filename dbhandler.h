@@ -18,7 +18,7 @@ public:
 
     bool getCategories(QSqlQuery* p_qry, QString *error);
     bool createCategory(QString name, QString *error);
-    bool saveCategory(QString name, QString newName, QString *error);
+    bool updateCategory(QString name, QString newName, QString *error);
     bool checkCategoryExists(QString categoryName, bool* categoryExists, QString *error);
     bool deleteCategory(QString name, QString* error);
 

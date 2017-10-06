@@ -41,15 +41,15 @@ bool DBHandler::createDB()
 
         QSqlQuery query;
 
-        query.exec(tblCategories);
-        query.exec(tblCustomfields);
-        query.exec(tblDeviceData);
-        query.exec(tblDevice);
-        query.exec(tblCustomfieldDatatypes);
+        query.exec(tblGeraetetyp);
+        query.exec(tblCustomFeld);
+        query.exec(tblGeraeteData);
+        query.exec(tblFelddatentyp);
+        query.exec(tblGeraet);
 
-        QString addDatentypText = "INSERT INTO tbl_customfieldDatatypes (name) VALUES('Text')";
-        QString addDatentypBool = "INSERT INTO tbl_customfieldDatatypes (name) VALUES('Boolean')";
-        QString addDatentypPDF  = "INSERT INTO tbl_customfieldDatatypes (name) VALUES('PDF')";
+        QString addDatentypText = "INSERT INTO tbl_feldDatentypen (name) VALUES('Text')";
+        QString addDatentypBool = "INSERT INTO tbl_feldDatentypen (name) VALUES('Boolean')";
+        QString addDatentypPDF  = "INSERT INTO tbl_feldDatentypen (name) VALUES('PDF')";
         query.exec(addDatentypText);
         query.exec(addDatentypBool);
         query.exec(addDatentypPDF);
@@ -111,23 +111,23 @@ bool DBHandler::execute(QString statement, QSqlQuery *p_qry, QString *error)
 
 bool DBHandler::readSupportedDatatypes(QSqlQuery* p_qry, QString *error)
 {
-    QString statement = "SELECT name FROM tbl_customfieldDatatypes ORDER BY name ASC";
+    QString statement = "SELECT name FROM tbl_feldDatentypen ORDER BY name ASC";
     return this->execute(statement, p_qry, error);
 }
 
 bool DBHandler::getCategories(QSqlQuery* p_qry, QString* error)
 {
-    QString statement = "SELECT name FROM tbl_categories ORDER BY name ASC";
+    QString statement = "SELECT name FROM tbl_geraeteTypen ORDER BY name ASC";
     return this->execute(statement, p_qry, error);
 }
 
 bool DBHandler::createCategory(QString name,QString* error)
 {
-    QString statement = "INSERT INTO tbl_categories (name) VALUES ('" + name + "')";
+    QString statement = "INSERT INTO tbl_geraeteTypen (name) VALUES ('" + name + "')";
     return this->execute(statement, new QSqlQuery(), error);
 }
 
-bool DBHandler::saveCategory(QString name, QString newName, QString* error)
+bool DBHandler::updateCategory(QString name, QString newName, QString* error)
 {
     QString statement = "UPDATE tbl_geraeteTypen SET name='"
             + newName
@@ -170,7 +170,7 @@ bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, 
     QSqlQuery qry;
     QString statement = "SELECT name FROM tbl_customfields WHERE name='"
             + fieldName
-            + "' AND fk_category=(SELECT id FROM tbl_categories WHERE name='"
+            + "' AND fk_category=(SELECT id FROM tbl_geraeteTypen WHERE name='"
             + categoryName
             + "');";
     qDebug() << statement;
@@ -185,7 +185,7 @@ bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, 
 
 bool DBHandler::getCustomfields(QSqlQuery* p_qry, QString *error, QString gereateTyp)
 {
-    QString statement = QString("SELECT name FROM tbl_customfields WHERE fk_category=") + "(SELECT id FROM tbl_categories WHERE name='" + gereateTyp + "');";
+    QString statement = QString("SELECT name FROM tbl_customfields WHERE fk_category=") + "(SELECT id FROM tbl_geraeteTypen WHERE name='" + gereateTyp + "');";
     return this->execute(statement, p_qry, error);
 }
 
@@ -193,8 +193,8 @@ bool DBHandler::createCustomField(QString *error, QString name, QString geraeteT
 {
     QString statement = "INSERT INTO tbl_customfields (name, fk_category,fk_customfieldDatatype, required) VALUES('"
             + name + "',"
-            + "(SELECT id FROM tbl_categories WHERE name='" + geraeteTyp + "'),"
-            + "(SELECT id FROM tbl_customfieldDatatypes WHERE name='" + datentyp + "'),"
+            + "(SELECT id FROM tbl_geraeteTypen WHERE name='" + geraeteTyp + "'),"
+            + "(SELECT id FROM tbl_feldDatentypen WHERE name='" + datentyp + "'),"
             + QString::number(required)
             + ");";
     qDebug() << statement;
@@ -227,9 +227,9 @@ bool DBHandler::saveCustomField(QString name, QString gerateTyp,QString datentyp
 {
     QString statement = "UPDATE tbl_customfields SET name='"
             + name + "',"
-            + "fk_customfieldDatatype=(SELECT id FROM tbl_customfieldDatatypes WHERE name='" + datentyp + "'),"
+            + "fk_customfieldDatatype=(SELECT id FROM tbl_feldDatentypen WHERE name='" + datentyp + "'),"
             + "required=" + QString::number(required)
-            + " WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='" + gerateTyp
+            + " WHERE fk_category=(SELECT id FROM tbl_geraeteTypen WHERE name='" + gerateTyp
             + "') AND name='" + name + "'";
     return this->execute(statement, new QSqlQuery(), error);
 }

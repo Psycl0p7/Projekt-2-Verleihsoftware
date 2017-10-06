@@ -86,7 +86,7 @@ void MainWindow::saveCategory() {
         QMessageBox::warning(this, "Fehler", "Kategories konnte nicht gespeichert werden: " + error);
     else if(categoryExists)
         QMessageBox::information(this, "Information", "Kategorie bereits vorhanden.");
-    else if(!this->dbHandler.saveCategory(this->ui->cb_category->currentText(), newName, &error))
+    else if(!this->dbHandler.updateCategory(this->ui->cb_category->currentText(), newName, &error))
         QMessageBox::warning(this, "Fehler", "Kategorie konnte nicht gespeichert werden: " + error);
     else
         QMessageBox::information(this, "Information", "Kategorie wurde geändert.");
@@ -144,7 +144,7 @@ void MainWindow::saveCustomfield()
         QMessageBox::warning(this, "Fehler", error);
     else if (fieldExists)
         QMessageBox::information(this, "Information", "Feld bereits vorhanden.");
-    if(!this->dbHandler.saveCustomField(name,geraetetyp, datentyp,pflichtfeld, &error))
+    if(!this->dbHandler.saveCustomField(name,geraetetyp, datentyp,required, &error))
         QMessageBox::warning(this, "Fehler", "Datenfeld konnte nicht geändert werden: " + error);
     else {
         if(!this->dbHandler.readCustomField(geraetetyp, &name, &datentyp, &required))
