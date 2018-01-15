@@ -173,7 +173,7 @@ bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, 
             + "' AND fk_geraetetyp=(SELECT id FROM tbl_geraetetypen WHERE name='"
             + categoryName
             + "');";
-    qDebug() << statement;
+
     if(this->execute(statement, &qry, error))
     {
         ok = true;
@@ -191,7 +191,7 @@ bool DBHandler::getCustomfields(QSqlQuery* p_qry, QString *error, QString gereat
 
 bool DBHandler::createCustomField(QString *error, QString name, QString geraeteTyp, QString datentyp, bool required)
 {
-    QString statement = "INSERT INTO tbl_customfelder (name, fk_geraetetyp,fk_feldDatentyp, required) VALUES('"
+    QString statement = "INSERT INTO tbl_customfelder (name, fk_geraetetyp,fk_feldDatentyp, pflichtfeld) VALUES('"
             + name + "',"
             + "(SELECT id FROM tbl_geraetetypen WHERE name='" + geraeteTyp + "'),"
             + "(SELECT id FROM tbl_feldDatentypen WHERE name='" + datentyp + "'),"
