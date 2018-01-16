@@ -201,23 +201,20 @@ bool DBHandler::createCustomField(QString *error, QString name, QString geraeteT
     return this->execute(statement, new QSqlQuery(), error);
 }
 
-bool DBHandler::readCustomField(QString geraetetyp, QString *name, QString* datentyp, bool* required)
+bool DBHandler::readCustomField(QString geraetetyp, QString fieldname, QString *name, QString* datatype, bool* required) // commit
 {
+    bool ok = false;
     QSqlQuery qry;
     QString error;
-    QString statement = "SELECT name, pflichtfeld, fk_feldDatentyp FROM tbl_customfelder WHERE name='"
-            + *name + "' AND fk_geraetetyp=(SELECT id FROM tbl_geraetetypen WHERE name='" + geraetetyp + "');";
-    int fk_datentyp = NULL;
-    bool ok = false;
+    QString statement = "SELECT name, pflichtfeld, (SELECT name FROM tbl_feldDatentypen WHERE id=fk_feldDatentyp) FROM tbl_customfelder WHERE name='"
+            + fieldname + "' AND fk_geraetetyp=(SELECT id FROM tbl_geraetetypen WHERE name='" + geraetetyp + "');";
+
     if(this->execute(statement, &qry, &error)) {
+        qry.first();
         *name = qry.value(0).toString();
         *required = qry.value(1).toBool();
-        fk_datentyp = qry.value(2).toInt();
-        statement = "SELECT name FROM tbl_feldDatentypen WHERE id=" + QString::number(fk_datentyp);
-        if(this->execute(statement, &qry, &error)) {
-            ok = true;
-            *datentyp = qry.value(0).toString();
-        }
+        *datatype = qry.value(2).toString();
+        ok = true;
     }
 
     return ok;

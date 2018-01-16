@@ -175,6 +175,22 @@ void MainWindow::getCustomFields() {
     }
 }
 
+void MainWindow::readCustomfieldData() {
+    QString fieldname = this->ui->cb_customfield->currentText();
+    QString category = this->ui->cb_category->currentText();
+    QString datatype = NULL;
+    bool required = NULL;
+    QString error = NULL;
+
+    if(!this->dbHandler.readCustomField(category, fieldname, &fieldname, &datatype, &required)) {
+        QMessageBox::warning(this, "Fehler", "Auslesen der Feldinfrmationen nicht möglich: " + error);
+    } else {
+        this->ui->cb_customfield->setCurrentText(fieldname);
+        this->ui->cb_customfieldRequired->setChecked(required);
+        this->ui->cb_customfieldType->setCurrentText(datatype);
+    }
+}
+
 
 /********************************************************************************
  *                              UI-SLOTS                                        *
@@ -211,15 +227,15 @@ void MainWindow::on_btn_customfieldSave_clicked()
         this->saveCustomfield();
 }
 
-void MainWindow::on_cb_customfield_currentIndexChanged(const QString &arg1)
+void MainWindow::on_cb_customfield_currentIndexChanged(const QString &fieldname) // commit
 {
-    if(arg1 == MainWindow::CREATE_OPERATOR) {
+    if(fieldname == MainWindow::CREATE_OPERATOR) {
         this->ui->edt_customfieldName->clear();
         this->ui->cb_customfieldType->setCurrentIndex(0);
         this->ui->cb_customfieldRequired->setChecked(false);
     }
-    else {
-    //@TODO auslesen der Customfield inforamtionen & setzen dieser
+    else if(!this->ui->cb_customfield->currentText().isEmpty() && this->ui->cb_customfield->currentText() != MainWindow::CREATE_OPERATOR ) {
+        this->readCustomfieldData();
     }
 }
 
