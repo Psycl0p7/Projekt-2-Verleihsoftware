@@ -26,7 +26,7 @@ public:
     bool createCustomField(QString *error, QString name, QString geraeteTyp, QString datentyp, bool pflichtfeld);
     bool checkCustomfieldExists(QString fieldName, QString categoryName, bool* customfieldExists,QString *error);
     bool readCustomField(QString geraetetyp, QString fieldname, QString* name, QString *datatype, bool *pflichtfeld);
-    bool updateCustomField(QString fieldname, QString category, QString newName, QString newDatatype, bool newRequired, QString *error);
+    bool updateCustomField(QString category, QString fieldname, QString newName, QString newDatatype, bool newRequired, QString *error);
 private:
 
     QSqlDatabase db;

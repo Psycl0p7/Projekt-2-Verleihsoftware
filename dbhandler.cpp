@@ -220,13 +220,15 @@ bool DBHandler::readCustomField(QString geraetetyp, QString fieldname, QString *
     return ok;
 }
 
-bool DBHandler::updateCustomField(QString fieldname, QString category, QString newName, QString newDatatype, bool newRequired, QString *error)
+bool DBHandler::updateCustomField(QString category, QString fieldname, QString newName, QString newDatatype, bool newRequired, QString *error)
 {
     QString statement = "UPDATE tbl_customfelder SET name='"
             + newName + "',"
             + "fk_feldDatentyp=(SELECT id FROM tbl_feldDatentypen WHERE name='" + newDatatype + "'),"
-            + "required=" + QString::number(newRequired)
+            + "pflichtfeld=" + QString::number(newRequired)
             + " WHERE fk_geraetetyp=(SELECT id FROM tbl_geraetetypen WHERE name='" + category
-            + "') AND name='" + fieldname + "'";
+            + "') AND name='" + fieldname + "';";
+    qDebug() << "Statement: " << statement;
+
     return this->execute(statement, new QSqlQuery(), error);
 }

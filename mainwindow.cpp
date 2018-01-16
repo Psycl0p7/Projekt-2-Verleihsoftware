@@ -129,24 +129,25 @@ void MainWindow::saveCustomfield() {
     QString error;
     bool fieldExists;
     QString categoryName = this->ui->cb_category->currentText();
-    QString name = this->ui->edt_customfieldName->text();
+    QString currentFieldname = this->ui->cb_customfield->currentText();
+    QString newFieldname = this->ui->edt_customfieldName->text();
     QString datentyp = this->ui->cb_customfieldType->currentText();
     bool required = this->ui->cb_customfieldRequired->isChecked();
 
-    if(!this->dbHandler.checkCustomfieldExists(name, categoryName, &fieldExists, &error))
+    int currentCustomfieldIndex = this->ui->cb_customfield->currentIndex();
+
+    if(!this->dbHandler.checkCustomfieldExists(currentFieldname, categoryName, &fieldExists, &error)) {
         QMessageBox::warning(this, "Fehler", error);
-    else if (fieldExists)
-        QMessageBox::information(this, "Information", "Feld bereits vorhanden.");
-    if(!this->dbHandler.saveCustomField(name,categoryName, datentyp,required, &error))
+    }
+    else if (!fieldExists) {
+        QMessageBox::information(this, "Information", "Feld konnte nicht gespeichert werden, da es nicht gefunden werden konnte.");
+    }
+    if(!this->dbHandler.updateCustomField(categoryName, currentFieldname, newFieldname, datentyp, required, &error)) {
         QMessageBox::warning(this, "Fehler", "Datenfeld konnte nicht geändert werden: " + error);
+    }
     else {
-        if(!this->dbHandler.readCustomField(categoryName, name, &name, &datentyp, &required))
-            QMessageBox::warning(this,"Fehler", "Datenfeld konnte nicht neu geladen werden: " + error);
-        else {
-            this->ui->edt_customfieldName->setText(name);
-            this->ui->cb_customfieldType->setCurrentText(datentyp);
-            this->ui->cb_customfieldRequired->setChecked(required);
-        }
+        emit this->do_getCustomfields();
+        this->ui->cb_customfield->setCurrentIndex(currentCustomfieldIndex);
     }
 }
 
