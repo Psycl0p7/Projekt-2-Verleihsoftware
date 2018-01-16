@@ -11,11 +11,13 @@ MainWindow::MainWindow(QWidget *parent) :
     this->init();
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
     delete ui;
 }
 
-void MainWindow::init() {
+void MainWindow::init()
+{
     QObject::connect(this, SIGNAL(do_getCustomfields()), this , SLOT(getCustomFields()));
     this->ui->cb_category->addItem(MainWindow::CREATE_OPERATOR);
     this->ui->cb_customfield->addItem(MainWindow::CREATE_OPERATOR);
@@ -24,19 +26,21 @@ void MainWindow::init() {
 }
 
 
-void MainWindow::readSupportedDatatypes() {
+void MainWindow::readSupportedDatatypes()
+{
     QSqlQuery qry;
     QString error;
     if(!this->dbHandler.readSupportedDatatypes(&qry,&error))
         QMessageBox::warning(this,"Fehler", "Datentypen konnten nicht gelsen werden: " + error);
-    else {
-        this->ui->cb_customfieldType->clear();
+    else
+    {   this->ui->cb_customfieldType->clear();
         while(qry.next())
             this->ui->cb_customfieldType->addItem(qry.value(0).toString());
     }
 }
 
-void MainWindow::getCategories() {
+void MainWindow::getCategories()
+{
     QSqlQuery qry;
     QString error;
 
@@ -91,7 +95,8 @@ void MainWindow::saveCategory() {
     this->ui->cb_category->setCurrentText(newName);
 }
 
-void MainWindow::createCustomfield() {
+void MainWindow::createCustomfield()
+{
     QString error = NULL;
     bool customFieldExists = NULL;
     QString fieldName = this->ui->edt_customfieldName->text();
@@ -125,22 +130,24 @@ void MainWindow::createCustomfield() {
     }
 }
 
-void MainWindow::saveCustomfield() {
+void MainWindow::saveCustomfield()
+{
     QString error;
     bool fieldExists;
     QString categoryName = this->ui->cb_category->currentText();
     QString name = this->ui->edt_customfieldName->text();
     QString datentyp = this->ui->cb_customfieldType->currentText();
+    QString geraetetyp = this->ui->cb_category->currentText();
     bool required = this->ui->cb_customfieldRequired->isChecked();
 
     if(!this->dbHandler.checkCustomfieldExists(name, categoryName, &fieldExists, &error))
         QMessageBox::warning(this, "Fehler", error);
     else if (fieldExists)
         QMessageBox::information(this, "Information", "Feld bereits vorhanden.");
-    if(!this->dbHandler.saveCustomField(name,categoryName, datentyp,required, &error))
+    if(!this->dbHandler.saveCustomField(name,geraetetyp, datentyp,required, &error))
         QMessageBox::warning(this, "Fehler", "Datenfeld konnte nicht geändert werden: " + error);
     else {
-        if(!this->dbHandler.readCustomField(categoryName, name, &name, &datentyp, &required))
+        if(!this->dbHandler.readCustomField(geraetetyp, &name, &datentyp, &required))
             QMessageBox::warning(this,"Fehler", "Datenfeld konnte nicht neu geladen werden: " + error);
         else {
             this->ui->edt_customfieldName->setText(name);
@@ -165,22 +172,6 @@ void MainWindow::getCustomFields() {
         this->ui->cb_customfield->addItem(MainWindow::CREATE_OPERATOR);
         while(p_qry.next())
             this->ui->cb_customfield->addItem(p_qry.value(0).toString());
-    }
-}
-
-void MainWindow::readCustomfieldData() {
-    QString fieldname = this->ui->cb_customfield->currentText();
-    QString category = this->ui->cb_category->currentText();
-    QString datatype = NULL;
-    bool required = NULL;
-    QString error = NULL;
-
-    if(!this->dbHandler.readCustomField(category, fieldname, &fieldname, &datatype, &required)) {
-        QMessageBox::warning(this, "Fehler", "Auslesen der Feldinfrmationen nicht möglich: " + error);
-    } else {
-        this->ui->cb_customfield->setCurrentText(fieldname);
-        this->ui->cb_customfieldRequired->setChecked(required);
-        this->ui->cb_customfieldType->setCurrentText(datatype);
     }
 }
 
@@ -220,15 +211,16 @@ void MainWindow::on_btn_customfieldSave_clicked()
         this->saveCustomfield();
 }
 
-void MainWindow::on_cb_customfield_currentIndexChanged(const QString &fieldname) // commit
+void MainWindow::on_cb_customfield_currentIndexChanged(const QString &arg1)
 {
-    if(fieldname == MainWindow::CREATE_OPERATOR) {
+    if(arg1 == MainWindow::CREATE_OPERATOR) {
         this->ui->edt_customfieldName->clear();
         this->ui->cb_customfieldType->setCurrentIndex(0);
         this->ui->cb_customfieldRequired->setChecked(false);
     }
-    else if(!this->ui->cb_customfield->currentText().isEmpty() && this->ui->cb_customfield->currentText() != MainWindow::CREATE_OPERATOR ) {
-        this->readCustomfieldData();
+    else {
+        qDebug() << "Auslesen der felddaten"
+    //@TODO auslesen der Customfield inforamtionen & setzen dieser
     }
 }
 
