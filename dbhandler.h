@@ -8,6 +8,7 @@
 #include <QDateTime>
 #include <QCryptographicHash>
 #include <QSqlError>
+#include <QDebug>
 
 class DBHandler
 {
