@@ -5,6 +5,7 @@
 #include <dbhandler.h>
 #include <QMessageBox>
 #include <QVector>
+#include <QDebug>
 
 namespace Ui {
 class MainWindow;
