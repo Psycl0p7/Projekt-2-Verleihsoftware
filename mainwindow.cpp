@@ -98,7 +98,7 @@ void MainWindow::createCustomfield() {
     QString categoryName = this->ui->cb_category->currentText();
 
     if(fieldName.isEmpty()) {
-        QMessageBox::information(this, "Information", "Bitte Namen angeben.");
+        QMessageBox::information(this, "Information", "Bitte Bezeichnung angeben.");
         return;
     }
 
@@ -206,7 +206,7 @@ void MainWindow::on_cb_category_currentIndexChanged(const QString &arg1)
 void MainWindow::on_btn_categorySave_clicked()
 {
     if(this->ui->edt_categoryName->text().length() <= 0)
-        QMessageBox::information(this,"Information", "Bitte Namen angeben.");
+        QMessageBox::information(this,"Information", "Bitte Bezeichnung angeben.");
     else if(this->ui->cb_category->currentText() == MainWindow::CREATE_OPERATOR)
         this->createCategory();
     else if(this->ui->cb_category->currentText() != this->ui->edt_categoryName->text())
