@@ -179,6 +179,7 @@ void MainWindow::readCustomfieldData() {
         QMessageBox::warning(this, "Fehler", "Auslesen der Feldinfrmationen nicht möglich: " + error);
     } else {
         this->ui->cb_customfield->setCurrentText(fieldname);
+        this->ui->edt_customfieldName->setText(fieldname);
         this->ui->cb_customfieldRequired->setChecked(required);
         this->ui->cb_customfieldType->setCurrentText(datatype);
     }
