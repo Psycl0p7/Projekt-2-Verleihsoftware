@@ -16,8 +16,7 @@ bool DBHandler::DBExists()
 
     QFile db;
     db.setFileName("db.sqlite");
-    if(db.exists())
-    {
+    if(db.exists()) {
         dbExists = true;
     }
 
@@ -27,8 +26,7 @@ bool DBHandler::DBExists()
 bool DBHandler::createDB()
 {
     bool dbCreated = false;
-    if(!DBExists())
-    {
+    if(!DBExists()) {
         QString path = "db.sqlite";
         QString tblGeraetetyp   = "CREATE TABLE 'tbl_geraetetypen'  ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL UNIQUE )";
         QString tblCustomFeld   = "CREATE TABLE 'tbl_customfelder'  ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL, 'fk_geraetetyp' INTEGER NOT NULL, 'fk_feldDatentyp' INTEGER NOT NULL, 'pflichtfeld' BOOLEAN NOT NULL)";
@@ -58,8 +56,7 @@ bool DBHandler::createDB()
 
         dbCreated = true;
     }
-    if(DBExists())
-    {
+    if(DBExists()) {
         this->db = QSqlDatabase::addDatabase("QSQLITE");
         this->db.setDatabaseName("db.sqlite");
     }
@@ -72,8 +69,9 @@ bool DBHandler::openDB()
     bool isOpen = false;
     db.open();
 
-    if(this->db.isOpen())
+    if(this->db.isOpen()) {
         isOpen = true;
+    }
 
     return isOpen;
 }
@@ -91,14 +89,15 @@ bool DBHandler::execute(QString statement, QSqlQuery *p_qry, QString *error)
 {
     bool ok = false;
 
-    if(!this->openDB())
+    if(!this->openDB()) {
         *error = "Datenbank konnte nicht geöffnet werden.";
-    else
-    {
+    }
+    else {
         p_qry->prepare(statement);
 
-        if(!p_qry->exec())
+        if(!p_qry->exec()) {
             *error = "Datenbankabfrage konnte nicht ausgeführt werden: " + p_qry->lastError().text();
+        }
         else {
             ok = true;
         }
@@ -157,9 +156,8 @@ bool DBHandler::checkCategoryExists(QString categoryName, bool *categoryExists, 
     QString statement = "SELECT name FROM tbl_geraetetypen WHERE name='"
             + categoryName
             + "';";
-    qDebug() << statement;
-    if(this->execute(statement, &qry, error))
-    {
+
+    if(this->execute(statement, &qry, error)) {
         ok = true;
         if(qry.first())
             *categoryExists = true;
@@ -178,8 +176,7 @@ bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, 
             + categoryName
             + "');";
 
-    if(this->execute(statement, &qry, error))
-    {
+    if(this->execute(statement, &qry, error)) {
         ok = true;
         if(qry.first())
             *customfieldExists = true;
@@ -201,7 +198,7 @@ bool DBHandler::createCustomField(QString *error, QString name, QString geraeteT
             + "(SELECT id FROM tbl_feldDatentypen WHERE name='" + datentyp + "'),"
             + QString::number(required)
             + ");";
-    qDebug() << statement;
+
     return this->execute(statement, new QSqlQuery(), error);
 }
 
@@ -243,7 +240,6 @@ bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* 
             + "' AND fk_geraetetyp=(SELECT id FROM tbl_geraetetypen WHERE name='"
             + category
             + "');";
-    qDebug() << "Statement: " << statement;
 
     return this->execute(statement, new QSqlQuery(), error);
 }
