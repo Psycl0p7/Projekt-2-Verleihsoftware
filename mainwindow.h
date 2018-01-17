@@ -33,9 +33,12 @@ private:
 
     void createCategory();
     void saveCategory();
+    void deleteCategory(QString category);
+
     void createCustomfield();
     void saveCustomfield();
-    void readCustomfieldData();
+    void readCustomfield();
+    void deleteCustomfield(QString category, QString fieldname);
 
 private slots:
     void getCategories();
@@ -48,6 +51,8 @@ private slots:
     void on_cb_customfield_currentIndexChanged(const QString &fieldname);
 
     void on_btn_categoryDelete_clicked();
+
+    void on_btn_customfieldDelete_clicked();
 
 signals:
     void do_getCustomfields();

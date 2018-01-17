@@ -91,6 +91,17 @@ void MainWindow::saveCategory() {
     this->ui->cb_category->setCurrentText(newName);
 }
 
+void MainWindow::deleteCategory(QString category)
+{
+    QString error = NULL;
+
+    if(!this->dbHandler.deleteCategory(category, &error))
+        QMessageBox::warning(this, "Fehler", "Kategorie konnte nicht gelöscht werden: " + error);
+    else
+        QMessageBox::information(this, "Information", "Kategorie wurde entfernt.");
+    this->getCategories();
+}
+
 void MainWindow::createCustomfield() {
     QString error = NULL;
     bool customFieldExists = NULL;
@@ -142,7 +153,7 @@ void MainWindow::saveCustomfield() {
     else if (!fieldExists) {
         QMessageBox::information(this, "Information", "Feld konnte nicht gespeichert werden, da es nicht gefunden werden konnte.");
     }
-    if(!this->dbHandler.updateCustomField(categoryName, currentFieldname, newFieldname, datentyp, required, &error)) {
+    else if(!this->dbHandler.updateCustomField(categoryName, currentFieldname, newFieldname, datentyp, required, &error)) {
         QMessageBox::warning(this, "Fehler", "Datenfeld konnte nicht geändert werden: " + error);
     }
     else {
@@ -151,7 +162,8 @@ void MainWindow::saveCustomfield() {
     }
 }
 
-void MainWindow::getCustomFields() {
+void MainWindow::getCustomFields()
+{
     QString current = this->ui->cb_category->currentText();
     if(current.isEmpty() || current == MainWindow::CREATE_OPERATOR)
         return;
@@ -169,12 +181,12 @@ void MainWindow::getCustomFields() {
     }
 }
 
-void MainWindow::readCustomfieldData() {
+void MainWindow::readCustomfield()
+{   QString error = NULL;
     QString fieldname = this->ui->cb_customfield->currentText();
     QString category = this->ui->cb_category->currentText();
     QString datatype = NULL;
     bool required = NULL;
-    QString error = NULL;
 
     if(!this->dbHandler.readCustomField(category, fieldname, &fieldname, &datatype, &required)) {
         QMessageBox::warning(this, "Fehler", "Auslesen der Feldinfrmationen nicht möglich: " + error);
@@ -183,6 +195,17 @@ void MainWindow::readCustomfieldData() {
         this->ui->edt_customfieldName->setText(fieldname);
         this->ui->cb_customfieldRequired->setChecked(required);
         this->ui->cb_customfieldType->setCurrentText(datatype);
+    }
+}
+
+void MainWindow::deleteCustomfield(QString category, QString fieldname)
+{
+    QString error = NULL;
+    if(!this->dbHandler.deleteCustomField(category, fieldname, &error)) {
+        QMessageBox::warning(this, "Fehler", "Datenfeld konnte nicht gelöscht werden: " + error);
+    }
+    else {
+        QMessageBox::information(this, "Information", "Datenfeld erfolgreich gelöscht.");
     }
 }
 
@@ -216,10 +239,17 @@ void MainWindow::on_btn_categorySave_clicked()
 
 void MainWindow::on_btn_customfieldSave_clicked()
 {
-    if(this->ui->cb_customfield->currentText() == MainWindow::CREATE_OPERATOR)
+    if(this->ui->cb_customfield->currentText() == MainWindow::CREATE_OPERATOR) {
         this->createCustomfield();
-    else
-        this->saveCustomfield();
+    }
+    else {
+        QMessageBox::StandardButton reply = QMessageBox::question(this, "Datenfeld ändern", "Sind Sie sicher?",
+                                      QMessageBox::Yes|QMessageBox::No);
+        if(reply == QMessageBox::Yes) {
+            this->saveCustomfield();
+        }
+    }
+
 }
 
 void MainWindow::on_cb_customfield_currentIndexChanged(const QString &fieldname) // commit
@@ -230,14 +260,12 @@ void MainWindow::on_cb_customfield_currentIndexChanged(const QString &fieldname)
         this->ui->cb_customfieldRequired->setChecked(false);
     }
     else if(!this->ui->cb_customfield->currentText().isEmpty() && this->ui->cb_customfield->currentText() != MainWindow::CREATE_OPERATOR ) {
-        this->readCustomfieldData();
+        this->readCustomfield();
     }
 }
 
 void MainWindow::on_btn_categoryDelete_clicked()
 {
-    QString error;
-
     if(this->ui->cb_category->currentText() == MainWindow::CREATE_OPERATOR) {
         QMessageBox::information(this, "Information", "Keine Kategorie ausgewählt.");
         return;
@@ -248,12 +276,22 @@ void MainWindow::on_btn_categoryDelete_clicked()
                                                              "Daten unwiederruflich gelöscht. Sind Sie sicher?",
                                   QMessageBox::Yes|QMessageBox::No);
 
-    if (reply == QMessageBox::No)
-        return;
+    if (reply == QMessageBox::Yes) {
+        this->deleteCategory(this->ui->cb_category->currentText());
+    }
+}
 
-    if(!this->dbHandler.deleteCategory(this->ui->cb_category->currentText(), &error))
-        QMessageBox::warning(this, "Fehler", "Kategorie konnte nicht gelöscht werden: " + error);
-    else
-        QMessageBox::information(this, "Information", "Kategorie wurde entfernt.");
-    this->getCategories();
+void MainWindow::on_btn_customfieldDelete_clicked()
+{
+    QString category = this->ui->cb_category->currentText();
+    QString fieldname = this->ui->cb_customfield->currentText();
+
+    if(category == MainWindow::CREATE_OPERATOR || fieldname == MainWindow::CREATE_OPERATOR) {
+        QMessageBox::information(this, "Information", "Kein Feld ausgewählt.");
+    }
+    else if(QMessageBox::question(this, "Datenfeld löschen", "Datenfeld wirklich löschen?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
+        this->deleteCustomfield(category, fieldname);
+        emit this->do_getCustomfields();
+        this->ui->cb_customfield->setCurrentIndex(0);
+    }
 }

@@ -92,15 +92,17 @@ bool DBHandler::execute(QString statement, QSqlQuery *p_qry, QString *error)
     bool ok = false;
 
     if(!this->openDB())
-            *error = "Datenbank konnte nicht geöffnet werden.";
+        *error = "Datenbank konnte nicht geöffnet werden.";
     else
     {
         p_qry->prepare(statement);
 
         if(!p_qry->exec())
             *error = "Datenbankabfrage konnte nicht ausgeführt werden: " + p_qry->lastError().text();
-        else
+        else {
             ok = true;
+        }
+
     }
 
     return ok;
@@ -230,6 +232,17 @@ bool DBHandler::updateCustomField(QString category, QString fieldname, QString n
             + "pflichtfeld=" + QString::number(newRequired)
             + " WHERE fk_geraetetyp=(SELECT id FROM tbl_geraetetypen WHERE name='" + category
             + "') AND name='" + fieldname + "';";
+
+    return this->execute(statement, new QSqlQuery(), error);
+}
+
+bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* error)
+{
+    QString statement = "DELETE FROM tbl_customfelder WHERE name='"
+            + fieldname
+            + "' AND fk_geraetetyp=(SELECT id FROM tbl_geraetetypen WHERE name='"
+            + category
+            + "');";
     qDebug() << "Statement: " << statement;
 
     return this->execute(statement, new QSqlQuery(), error);
