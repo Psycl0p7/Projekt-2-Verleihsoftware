@@ -26,6 +26,7 @@ bool DBHandler::DBExists()
 
 bool DBHandler::createDB()
 {
+    bool dbCreated = false;
     if(!DBExists())
     {
         QString path = "db.sqlite";
@@ -55,14 +56,15 @@ bool DBHandler::createDB()
         query.exec(addDatentypPDF);
         db.close();
 
-        return true;
+        dbCreated = true;
     }
     if(DBExists())
     {
         this->db = QSqlDatabase::addDatabase("QSQLITE");
         this->db.setDatabaseName("db.sqlite");
-        return false;
     }
+
+    return dbCreated;
 }
 
 bool DBHandler::openDB()
