@@ -53,8 +53,9 @@ void MainWindow::getCategories()
     else {
         this->ui->cb_category->clear();
         this->ui->cb_category->addItem(MainWindow::CREATE_OPERATOR);
-        while(qry.next())
+        while(qry.next()) {
             this->ui->cb_category->addItem(qry.value(0).toString());
+        }
 
         this->categoriesReady = true;
         emit this->do_getCustomfields();
