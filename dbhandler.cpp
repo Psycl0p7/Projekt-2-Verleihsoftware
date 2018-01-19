@@ -252,3 +252,24 @@ bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* 
 
     return this->execute(statement, new QSqlQuery(), error);
 }
+
+/**
+ * Find a field in global scope or the selected category and return its value
+ * @brief findByField
+ * @param category
+ * @param fieldname
+ * @param error
+ * @return
+ */
+bool DBHandler::findByField(QString fieldValue, QString *error, QString category){
+    QString scope;
+    if(category != NULL){
+        scope = " AND fk_entry = " + category;
+    } else {
+        scope = "";
+    }
+    QString statement = "SELECT * "
+                        "FROM tbl_entrydata "
+                        "WHERE data LIKE '%" + fieldValue + "%' " + scope;
+    return this->execute(statement, new QSqlQuery(), error);
+}

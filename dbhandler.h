@@ -29,6 +29,8 @@ public:
     bool readCustomField(QString geraetetyp, QString fieldname, QString* name, QString *datatype, bool *pflichtfeld);
     bool updateCustomField(QString category, QString fieldname, QString newName, QString newDatatype, bool newRequired, QString *error);
     bool deleteCustomField(QString category, QString fieldname, QString* error);
+    bool findByField(QString fieldValue, QString *error, QString category = NULL);
+
 private:
 
     QSqlDatabase db;
