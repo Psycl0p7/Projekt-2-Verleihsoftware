@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QVector>
 #include <QDebug>
+#include "settings.h"
 
 namespace Ui {
 class MainWindow;
@@ -22,14 +23,19 @@ public:
 
 
 public slots:
+    void showWarning(QString warning, QString error);
+    void showInformation(QString information);
+
+    void showSupportedTypes(QVector<QString> supportedTypes);
+    void showCategories(QVector<Entry*> categories);
 
 private:
     Ui::MainWindow *ui;
     DBHandler dbHandler;
+    Settings *settings;
     bool categoriesReady;
 
     void init();
-    void readSupportedDatatypes();
 
     void createCategory();
     void saveCategory();
@@ -41,9 +47,6 @@ private:
     void deleteCustomfield(QString category, QString fieldname);
 
 private slots:
-    void getCategories();
-    void getCustomFields();
-
     void on_cb_category_currentIndexChanged(const QString &arg1);
     void on_btn_categorySave_clicked();
     void on_btn_customfieldSave_clicked();

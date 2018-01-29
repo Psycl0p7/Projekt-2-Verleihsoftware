@@ -18,49 +18,49 @@ MainWindow::~MainWindow()
 
 void MainWindow::init()
 {
-    QObject::connect(this, SIGNAL(do_getCustomfields()), this , SLOT(getCustomFields()));
-    this->ui->cb_category->addItem(MainWindow::CREATE_OPERATOR);
-    this->ui->cb_customfield->addItem(MainWindow::CREATE_OPERATOR);
-    this->getCategories();
-    this->readSupportedDatatypes();
-}
-
-
-void MainWindow::readSupportedDatatypes()
-{
-    QSqlQuery qry;
-    QString error;
-    if(!this->dbHandler.readSupportedDatatypes(&qry,&error)) {
-        QMessageBox::warning(this,"Fehler", "Datentypen konnten nicht gelsen werden: " + error);
-    }
-    else {
-        this->ui->cb_customfieldType->clear();
-        while(qry.next()) {
-            this->ui->cb_customfieldType->addItem(qry.value(0).toString());
-        }
-    }
-}
-
-void MainWindow::getCategories()
-{
-    QSqlQuery qry;
-    QString error;
-
+    this->settings = new Settings(&this->dbHandler);
     this->categoriesReady = false;
-    if(!this->dbHandler.getCategories(&qry, &error)) {
-        QMessageBox::warning(this, "Fehler", "Geraetetypen konnten nicht ausgelesen werden: " + error);
-    }
-    else {
-        this->ui->cb_category->clear();
-        this->ui->cb_category->addItem(MainWindow::CREATE_OPERATOR);
-        while(qry.next()) {
-            this->ui->cb_category->addItem(qry.value(0).toString());
-        }
 
-        this->categoriesReady = true;
-        emit this->do_getCustomfields();
+    QObject::connect(this->settings, SIGNAL(showInformation(QString)), this, SLOT(showInformation(QString)));
+    QObject::connect(this->settings, SIGNAL(showWarning(QString,QString)), this, SLOT(showWarning(QString,QString)));
+    QObject::connect(this->settings, SIGNAL(showSupportedTypes(QVector<QString>)), this, SLOT(showSupportedTypes(QVector<QString>)));
+    QObject::connect(this->settings, SIGNAL(showCategories(QVector<Entry*>)), this, SLOT(showCategories(QVector<Entry*>)));
+
+    this->settings->init();
+}
+
+// *** PUBLIC SLOTS **** //
+
+void MainWindow::showWarning(QString warning, QString error)
+{
+    QMessageBox::warning(this, "Fehler", warning + ": " + error);
+}
+
+void MainWindow::showInformation(QString information)
+{
+    QMessageBox::information(this, "Information", information);
+}
+
+void MainWindow::showSupportedTypes(QVector<QString> supportedTypes)
+{
+    this->ui->cb_customfieldType->clear();
+    for(int i = 0; i < supportedTypes.count();i++) {
+        this->ui->cb_customfieldType->addItem(supportedTypes.at(i));
     }
 }
+
+void MainWindow::showCategories(QVector<Entry*> categories)
+{   this->categoriesReady = false;
+    this->ui->cb_category->clear();
+    this->ui->cb_category->addItem(MainWindow::CREATE_OPERATOR);
+    for(int i = 0; i < categories.count(); i++) {
+        this->ui->cb_category->addItem(categories.at(i)->getName());
+    }
+    this->categoriesReady = true;
+}
+
+// ******************************************
+
 
 void MainWindow::createCategory()
 {
@@ -81,7 +81,7 @@ void MainWindow::createCategory()
         QMessageBox::information(this, "Information", "Gerätetyp wurde angelegt.");
     }
 
-    this->getCategories();
+    //this->getCategories();
     this->ui->cb_category->setCurrentText(newCategoryName);
 }
 
@@ -104,7 +104,7 @@ void MainWindow::saveCategory()
         QMessageBox::information(this, "Information", "Kategorie wurde geändert.");
     }
 
-    this->getCategories();
+    //this->getCategories();
     this->ui->cb_category->setCurrentText(newName);
 }
 
@@ -118,7 +118,7 @@ void MainWindow::deleteCategory(QString category)
     else {
         QMessageBox::information(this, "Information", "Kategorie wurde entfernt.");
     }
-    this->getCategories();
+    //this->getCategories();
 }
 
 void MainWindow::createCustomfield()
@@ -182,27 +182,6 @@ void MainWindow::saveCustomfield()
     else {
         emit this->do_getCustomfields();
         this->ui->cb_customfield->setCurrentIndex(currentCustomfieldIndex);
-    }
-}
-
-void MainWindow::getCustomFields()
-{
-    QString current = this->ui->cb_category->currentText();
-    QSqlQuery p_qry;
-    QString error;
-
-    if(current.isEmpty() || current == MainWindow::CREATE_OPERATOR) {
-        return;
-    }
-
-    if(!this->dbHandler.getCustomfields(&p_qry, &error, current)) {
-        QMessageBox::warning(this, "Fehler", "Auslesen der CustomFelder nicht möglich: " + error);
-    }
-    else {
-        this->ui->cb_customfield->clear();
-        this->ui->cb_customfield->addItem(MainWindow::CREATE_OPERATOR);
-        while(p_qry.next())
-            this->ui->cb_customfield->addItem(p_qry.value(0).toString());
     }
 }
 
