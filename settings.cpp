@@ -68,6 +68,7 @@ void Settings::getCustomFields()
             // this->ui->cb_customfield->addItem(MainWindow::CREATE_OPERATOR);
             while(p_qry.next()) {
                 // this->ui->cb_customfield->addItem(p_qry.value(0).toString());
+                this->categories.at(i)->addField();
             }
         }
     }
