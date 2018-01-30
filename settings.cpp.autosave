@@ -1,16 +1,16 @@
 #include "settings.h"
 
-Settings::Settings(DBHandler* dbHandler)
+SettingsController::SettingsController(DBHandler* dbHandler)
 {
     this->dbHandler = dbHandler;
 }
 
-Settings::~Settings()
+SettingsController::~SettingsController()
 {
 
 }
 
-void Settings::init()
+void SettingsController::init()
 {
     // this->ui->cb_category->addItem(MainWindow::CREATE_OPERATOR);
     // this->ui->cb_customfield->addItem(MainWindow::CREATE_OPERATOR);
@@ -19,7 +19,7 @@ void Settings::init()
     this->initCustomfields();
 }
 
-int Settings::getCategoryIndex(QString name)
+int SettingsController::getCategoryIndex(QString name)
 {
     int index = -1;
     for(int i = 0; i < this->categories.count(); i++) {
@@ -32,7 +32,7 @@ int Settings::getCategoryIndex(QString name)
 }
 
 // insertion sort
-void Settings::sortCategories()
+void SettingsController::sortCategories()
 {
     QVector<Entry*> sorted;
     QString min = NULL;
@@ -54,7 +54,7 @@ void Settings::sortCategories()
     this->categories = sorted;
 }
 
-void Settings::readSupportedDatatypes()
+void SettingsController::readSupportedDatatypes()
 {
     QSqlQuery qry;
     QString error;
@@ -69,7 +69,7 @@ void Settings::readSupportedDatatypes()
      }
 }
 
-void Settings::initCategories()
+void SettingsController::initCategories()
 {
     QSqlQuery qry;
     QString error;
@@ -86,7 +86,7 @@ void Settings::initCategories()
     }
 }
 
-void Settings::initCustomfields()
+void SettingsController::initCustomfields()
 {
     QSqlQuery qry;
     QString error;
@@ -110,7 +110,7 @@ void Settings::initCustomfields()
     }
 }
 
-void Settings::createCategory(QString categoryName)
+void SettingsController::createCategory(QString categoryName)
 {
     QString error = "";
     bool categoryExists;
@@ -135,7 +135,7 @@ void Settings::createCategory(QString categoryName)
 }
 
 
-void Settings::updateCategory(QString categoryName, QString newName)
+void SettingsController::updateCategory(QString categoryName, QString newName)
 {
     QString error = "";
     bool categoryExists = true;
@@ -159,7 +159,7 @@ void Settings::updateCategory(QString categoryName, QString newName)
     }
 }
 
-void Settings::deleteCategory(QString category)
+void SettingsController::deleteCategory(QString category)
 {
     //@TODO delete ALL entrys of given category
     QString error = NULL;
@@ -176,22 +176,22 @@ void Settings::deleteCategory(QString category)
     }
 }
 
-void Settings::createCustomfield()
+void SettingsController::createCustomfield()
 {
 
 }
 
-void Settings::saveCustomfield()
+void SettingsController::saveCustomfield()
 {
 
 }
 
-void Settings::readCustomfield()
+void SettingsController::readCustomfield()
 {
 
 }
 
-void Settings::deleteCustomfield(QString category, QString fieldname)
+void SettingsController::deleteCustomfield(QString category, QString fieldname)
 {
 
 }

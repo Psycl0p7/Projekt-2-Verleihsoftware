@@ -15,7 +15,7 @@ bool Entry::isRequired()
     return this->required;
 }
 
-int Entry::getAmountFields()
+int Entry::countFields()
 {
     return this->fields.count();
 }
@@ -24,7 +24,7 @@ bool Entry::removeField(int index)
 {
     bool ok = false;
 
-    if(index >= this->fields.count() - 1) {
+    if(index < this->fields.count()) {
         ok = true;
         this->fields.removeAt(index);
     }
@@ -37,14 +37,14 @@ void Entry::addField(Datafield* field)
     this->fields.append(field);
 }
 
-Datafield Entry::getField(int index)
+Datafield* Entry::getField(int index)
 {
     Datafield* field = NULL;
     if(index >= this->fields.count() - 1) {
         field = this->fields.at(index);
     }
 
-    return *field;
+    return field;
 }
 
 void Entry::setName(QString newName)
@@ -69,4 +69,9 @@ int Entry::getFieldIndex(QString fieldname)
 QVector<Datafield*> Entry::getAllFields()
 {
     return this->fields;
+}
+
+void Entry::setFields(QVector<Datafield*> fields)
+{
+    this->fields = fields;
 }

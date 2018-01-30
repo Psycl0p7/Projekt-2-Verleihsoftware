@@ -28,12 +28,12 @@ SOURCES += main.cpp\
     dbhandler.cpp \
     entry.cpp \
     datafield.cpp \
-    settings.cpp
+    settingscontroller.cpp
 
 HEADERS  += mainwindow.h \
     dbhandler.h \
     entry.h \
     datafield.h \
-    settings.h
+    settingscontroller.h
 
 FORMS    += mainwindow.ui

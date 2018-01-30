@@ -7,37 +7,47 @@
 #include "dbhandler.h"
 #include <QDebug>
 
-class Settings : public QObject
+class SettingsController : public QObject
 {
     Q_OBJECT
 
+
 public:
-    Settings(DBHandler* dbHandler);
-    ~Settings();
+    static const QString CREATE_OPERATOR;
+    SettingsController(DBHandler* dbHandler);
+    ~SettingsController();
 
     void init();
 
+    // categories
     int getCategoryIndex(QString name);
     void createCategory(QString categoryName);
     void updateCategory(QString categoryName, QString newName);
     void deleteCategory(QString category);
+
+    // datafields
+    int getDatafieldIndex(int categoryIndex, QString fieldname);
+    void createCustomfield(QString fieldname, QString category, int typeIndex, bool isRequired);
+    void switchCategoryDatafields(QString category);
+    void switchDatafieldAttributes(QString category, QString fieldname);
+
+    void updateCustomfield();
+
 
 private:
     QVector<Entry*> categories;
     QVector<QString> supportedDatatypes;
     DBHandler* dbHandler;
 
-    void readSupportedDatatypes();
 
     void initCategories();
     void initCustomfields();
+    void readSupportedDatatypes();
 
-    void createCustomfield();
-    void saveCustomfield();
-    void readCustomfield();
     void deleteCustomfield(QString category, QString fieldname);
 
     void sortCategories();
+    void sortDatafields(QString category);
 
 signals:
     void showWarning(QString, QString);
@@ -45,7 +55,8 @@ signals:
 
     void showSupportedTypes(QVector<QString>);
     void showCategories(QVector<Entry*>);
-    void showCustomfields(QVector<Datafield*>);
+    void showDatafields(QVector<Datafield*>);
+    void showDatafieldAttributes(QString name, int typeIndex, bool required);
 
     void setSettingsSelectedCategory(int);
     void setSettingsSelectedCustomfield(int);

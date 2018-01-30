@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-const QString MainWindow::CREATE_OPERATOR = "Neu anlegen";
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -18,18 +16,41 @@ MainWindow::~MainWindow()
 
 void MainWindow::init()
 {
-    this->settings = new Settings(&this->dbHandler);
+    this->settingsController = new SettingsController(&this->dbHandler);
     this->categoriesReady = false;
 
-    QObject::connect(this->settings, SIGNAL(setSettingsSelectedCategory(int)), this, SLOT(setSettingsSelectedCategory(int)));
-    QObject::connect(this->settings, SIGNAL(setSettingsSelectedCustomfield(int)), this, SLOT(setSettingsSelectedCustomfield(int)));
+    QObject::connect(this->settingsController, SIGNAL(setSettingsSelectedCategory(int)), this, SLOT(setSettingsSelectedCategory(int)));
+    QObject::connect(this->settingsController, SIGNAL(setSettingsSelectedCustomfield(int)), this, SLOT(setSettingsSelectedCustomfield(int)));
 
-    QObject::connect(this->settings, SIGNAL(showInformation(QString)), this, SLOT(showInformation(QString)));
-    QObject::connect(this->settings, SIGNAL(showWarning(QString,QString)), this, SLOT(showWarning(QString,QString)));
-    QObject::connect(this->settings, SIGNAL(showSupportedTypes(QVector<QString>)), this, SLOT(showSupportedTypes(QVector<QString>)));
-    QObject::connect(this->settings, SIGNAL(showCategories(QVector<Entry*>)), this, SLOT(showCategories(QVector<Entry*>)));
+    QObject::connect(this->settingsController, SIGNAL(showInformation(QString)), this, SLOT(showInformation(QString)));
+    QObject::connect(this->settingsController, SIGNAL(showWarning(QString,QString)), this, SLOT(showWarning(QString,QString)));
+    QObject::connect(this->settingsController, SIGNAL(showSupportedTypes(QVector<QString>)), this, SLOT(showSupportedTypes(QVector<QString>)));
+    QObject::connect(this->settingsController, SIGNAL(showCategories(QVector<Entry*>)), this, SLOT(showCategories(QVector<Entry*>)));
+    QObject::connect(this->settingsController, SIGNAL(showDatafields(QVector<Datafield*>)), this, SLOT(showDatafields(QVector<Datafield*>)));
+    QObject::connect(this->settingsController, SIGNAL(showDatafieldAttributes(QString,int,bool)), this, SLOT(showDatafieldAttributes(QString,int,bool)));
 
-    this->settings->init();
+    this->settingsController->init();
+}
+
+void MainWindow::toggleCategoryActivated(bool activated)
+{
+    if(activated) {
+        // enable on category functionalities
+        this->ui->btn_categoryDelete->setEnabled(activated);
+        this->ui->gb_settingsCustomfields->setEnabled(activated);
+    }
+    else {
+        // clear inputs
+        this->ui->edt_categoryName->clear();
+        this->ui->edt_customfieldName->clear();
+        this->ui->cb_customfieldRequired->setChecked(false);
+        this->ui->cb_customfield->setCurrentIndex(0);
+        this->ui->cb_customfieldType->setCurrentIndex(0);
+
+        // disable on category functionalities
+        this->ui->btn_categoryDelete->setEnabled(activated);
+        this->ui->gb_settingsCustomfields->setEnabled(activated);
+    }
 }
 
 // *** PUBLIC SLOTS **** //
@@ -53,9 +74,10 @@ void MainWindow::showSupportedTypes(QVector<QString> supportedTypes)
 }
 
 void MainWindow::showCategories(QVector<Entry*> categories)
-{   this->categoriesReady = false;
+{
+    this->categoriesReady = false;
     this->ui->cb_category->clear();
-    this->ui->cb_category->addItem(MainWindow::CREATE_OPERATOR);
+    this->ui->cb_category->addItem(SettingsController::CREATE_OPERATOR);
     for(int i = 0; i < categories.count(); i++) {
         this->ui->cb_category->addItem(categories.at(i)->getName());
     }
@@ -65,9 +87,17 @@ void MainWindow::showCategories(QVector<Entry*> categories)
 void MainWindow::showDatafields(QVector<Datafield*> fields)
 {
     this->ui->cb_customfield->clear();
-    for(int i = 0; i < fields.count();i++) {
+    this->ui->cb_customfield->addItem(SettingsController::CREATE_OPERATOR);
+    for(int i = 0; i < fields.count(); i++) {
         this->ui->cb_customfield->addItem(fields.at(i)->getName());
     }
+}
+
+void MainWindow::showDatafieldAttributes(QString name, int typeIndex, bool required)
+{
+    this->ui->edt_customfieldName->setText(name);
+    this->ui->cb_customfieldType->setCurrentIndex(typeIndex);
+    this->ui->cb_customfieldRequired->setChecked(required);
 }
 
 void MainWindow::setSettingsSelectedCategory(int index)
@@ -82,43 +112,6 @@ void MainWindow::setSettingsSelectedCustomfield(int index)
 }
 
 // ******************************************
-
-void MainWindow::createCustomfield()
-{
-    QString error = NULL;
-    bool customFieldExists = NULL;
-    QString fieldName = this->ui->edt_customfieldName->text();
-    QString categoryName = this->ui->cb_category->currentText();
-
-    if(fieldName.isEmpty()) {
-        QMessageBox::information(this, "Information", "Bitte Bezeichnung angeben.");
-        return;
-    }
-
-    if(!this->dbHandler.checkCustomfieldExists(fieldName, categoryName, &customFieldExists, &error)) {
-        QMessageBox::warning(this, "Fehler", "Custom-Feld konnte nicht erstellt werden: " + error);
-    }
-    else if(customFieldExists) {
-        QMessageBox::information(this, "Information", "Custom-Feld bereits vorhanden.");
-    }
-    else {
-        QString error;
-        QString name = this->ui->edt_customfieldName->text();
-        QString datentyp = this->ui->cb_customfieldType->currentText();
-        QString geraetetyp = this->ui->cb_category->currentText();
-        bool required = this->ui->cb_customfieldRequired->isChecked();
-
-        if(!this->dbHandler.createCustomField(&error,name,geraetetyp,datentyp,required)) {
-            QMessageBox::warning(this, "Fehler", "Feld konnte nicht angelegt werden: " + error);
-        }
-        else {
-            emit do_getCustomfields();
-            QMessageBox::information(this, "Information", "Datenfeld wurde angelegt");
-            this->ui->cb_category->setCurrentText(categoryName);
-            this->ui->cb_customfield->setCurrentText(fieldName);
-        }
-    }
-}
 
 void MainWindow::saveCustomfield()
 {
@@ -142,25 +135,8 @@ void MainWindow::saveCustomfield()
         QMessageBox::warning(this, "Fehler", "Datenfeld konnte nicht geändert werden: " + error);
     }
     else {
-        emit this->do_getCustomfields();
+        //emit this->do_getCustomfields();
         this->ui->cb_customfield->setCurrentIndex(currentCustomfieldIndex);
-    }
-}
-
-void MainWindow::readCustomfield()
-{   QString error = NULL;
-    QString fieldname = this->ui->cb_customfield->currentText();
-    QString category = this->ui->cb_category->currentText();
-    QString datatype = NULL;
-    bool required = NULL;
-
-    if(!this->dbHandler.readCustomField(category, fieldname, &fieldname, &datatype, &required)) {
-        QMessageBox::warning(this, "Fehler", "Auslesen der Feldinfrmationen nicht möglich: " + error);
-    } else {
-        this->ui->cb_customfield->setCurrentText(fieldname);
-        this->ui->edt_customfieldName->setText(fieldname);
-        this->ui->cb_customfieldRequired->setChecked(required);
-        this->ui->cb_customfieldType->setCurrentText(datatype);
     }
 }
 
@@ -180,20 +156,18 @@ void MainWindow::deleteCustomfield(QString category, QString fieldname)
  *                              UI-SLOTS                                        *
  ********************************************************************************/
 
-void MainWindow::on_cb_category_currentIndexChanged(const QString &arg1)
+void MainWindow::on_cb_category_currentIndexChanged(const QString &category)
 {
-    if(this->ui->cb_category->currentText() == MainWindow::CREATE_OPERATOR) {
-        this->ui->edt_categoryName->clear();
+
+    if(category == SettingsController::CREATE_OPERATOR) {
+        this->toggleCategoryActivated(false);
     }
     else {
-        this->ui->edt_categoryName->setText(arg1);
-    }
-
-    if(this->categoriesReady) {
-        emit this->do_getCustomfields();
+        this->ui->edt_categoryName->setText(category);
+        this->settingsController->switchCategoryDatafields(category);
+        this->toggleCategoryActivated(true);
     }
 }
-
 
 void MainWindow::on_btn_categorySave_clicked()
 {
@@ -202,19 +176,28 @@ void MainWindow::on_btn_categorySave_clicked()
     if(category_edt.length() <= 0) {
         QMessageBox::information(this,"Information", "Bitte Bezeichnung angeben.");
     }
-    else if(category_cb == MainWindow::CREATE_OPERATOR) {
-        this->settings->createCategory(category_edt);
+    else if(category_cb == SettingsController::CREATE_OPERATOR) {
+        this->settingsController->createCategory(category_edt);
     }
     else if(category_cb != category_edt) {
-        this->settings->updateCategory(category_cb, category_edt);
+        this->settingsController->updateCategory(category_cb, category_edt);
     }
-
 }
+
 
 void MainWindow::on_btn_customfieldSave_clicked()
 {
-    if(this->ui->cb_customfield->currentText() == MainWindow::CREATE_OPERATOR) {
-        this->createCustomfield();
+    QString category = this->ui->cb_category->currentText();
+    QString fieldname_cb = this->ui->cb_customfield->currentText();
+    QString fieldname_edt = this->ui->edt_customfieldName->text();
+    bool isRequired = this->ui->cb_customfieldRequired->isChecked();
+    int type = this->ui->cb_customfieldType->currentIndex();
+
+    if(fieldname_edt.isEmpty()) {
+        emit this->showInformation("Bitte Bezeichnung angeben.");
+    }
+    else if(fieldname_cb == SettingsController::CREATE_OPERATOR) {
+        this->settingsController->createCustomfield(fieldname_edt, category, type, isRequired);
     }
     else {
         QMessageBox::StandardButton reply = QMessageBox::question(this, "Datenfeld ändern", "Sind Sie sicher?",
@@ -227,20 +210,21 @@ void MainWindow::on_btn_customfieldSave_clicked()
 
 void MainWindow::on_cb_customfield_currentIndexChanged(const QString &fieldname)
 {
-    if(fieldname == MainWindow::CREATE_OPERATOR) {
+    QString category = this->ui->cb_category->currentText();
+    if(fieldname == SettingsController::CREATE_OPERATOR) {
         this->ui->edt_customfieldName->clear();
         this->ui->cb_customfieldType->setCurrentIndex(0);
         this->ui->cb_customfieldRequired->setChecked(false);
     }
-    else if(!this->ui->cb_customfield->currentText().isEmpty() && this->ui->cb_customfield->currentText() != MainWindow::CREATE_OPERATOR ) {
-        this->readCustomfield();
+    else if(!this->ui->cb_customfield->currentText().isEmpty() && this->ui->cb_customfield->currentText() != SettingsController::CREATE_OPERATOR ) {
+        this->ui->edt_customfieldName->setText(fieldname);
     }
 }
 
 void MainWindow::on_btn_categoryDelete_clicked()
 {
     QString selectedCategory = this->ui->cb_category->currentText();
-    if(selectedCategory == MainWindow::CREATE_OPERATOR) {
+    if(selectedCategory == SettingsController::CREATE_OPERATOR) {
         this->showInformation("Keine Kategorie ausgewählt.");
         return;
     }
@@ -249,7 +233,7 @@ void MainWindow::on_btn_categoryDelete_clicked()
                                                              "Daten unwiederruflich gelöscht. Sind Sie sicher?",
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
-        this->settings->deleteCategory(selectedCategory);
+        this->settingsController->deleteCategory(selectedCategory);
     }
 }
 
@@ -258,12 +242,12 @@ void MainWindow::on_btn_customfieldDelete_clicked()
     QString category = this->ui->cb_category->currentText();
     QString fieldname = this->ui->cb_customfield->currentText();
 
-    if(category == MainWindow::CREATE_OPERATOR || fieldname == MainWindow::CREATE_OPERATOR) {
+    if(category == SettingsController::CREATE_OPERATOR || fieldname == SettingsController::CREATE_OPERATOR) {
         QMessageBox::information(this, "Information", "Kein Feld ausgewählt.");
     }
     else if(QMessageBox::question(this, "Datenfeld löschen", "Datenfeld wirklich löschen?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
         this->deleteCustomfield(category, fieldname);
-        emit this->do_getCustomfields();
+        //emit this->do_getCustomfields();
         this->ui->cb_customfield->setCurrentIndex(0);
     }
 }

@@ -126,7 +126,7 @@ bool DBHandler::readSupportedDatatypes(QSqlQuery* p_qry, QString *error)
 
 bool DBHandler::getCategories(QSqlQuery* p_qry, QString* error)
 {
-    QString statement = "SELECT name FROM tbl_categories ORDER BY name ASC";
+    QString statement = "SELECT name FROM tbl_categories";
     return this->execute(statement, p_qry, error);
 }
 
@@ -184,44 +184,48 @@ bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, 
 
     if(this->execute(statement, &qry, error)) {
         ok = true;
-        if(qry.first())
-            *customfieldExists = true;
+        if(!qry.first())
+            *customfieldExists = false;
     }
     return ok;
 }
 
 bool DBHandler::getCustomfields(QSqlQuery* p_qry, QString *error, QString gereateTyp)
 {
-    QString statement = QString("SELECT name, fk_datatype FROM tbl_datafields WHERE fk_category=") + "(SELECT id FROM tbl_categories WHERE name='" + gereateTyp + "');";
+    QString statement = QString("SELECT name, fk_datatype FROM tbl_datafields WHERE fk_category="
+                                "(SELECT id FROM tbl_categories WHERE name='") + gereateTyp + "') ORDER BY name ASC;";
     return this->execute(statement, p_qry, error);
 }
 
-bool DBHandler::createCustomField(QString *error, QString name, QString geraeteTyp, QString datentyp, bool required)
+bool DBHandler::createCustomField(QString *error, QString name, QString geraeteTyp, int datentyp, bool required)
 {
     QString statement = "INSERT INTO tbl_datafields (name, fk_category,fk_datatype, required) VALUES('"
             + name + "',"
             + "(SELECT id FROM tbl_categories WHERE name='" + geraeteTyp + "'),"
-            + "(SELECT id FROM tbl_datatypes WHERE name='" + datentyp + "'),"
+            + QString::number(datentyp) + ","
             + QString::number(required)
             + ");";
+    qDebug() << "statement: " << statement;
 
     return this->execute(statement, new QSqlQuery(), error);
 }
 
-bool DBHandler::readCustomField(QString geraetetyp, QString fieldname, QString *name, QString* datatype, bool* required) // commit
+bool DBHandler::readCustomField(QString* error, QString category, QString fieldname, int *datatype, bool* required)
 {
     bool ok = false;
     QSqlQuery qry;
-    QString error;
-    QString statement = "SELECT name, required, (SELECT name FROM tbl_datatypes WHERE id=fk_datatype) FROM tbl_datafields WHERE name='"
-            + fieldname + "' AND fk_category=(SELECT id FROM tbl_categories WHERE name='" + geraetetyp + "');";
+    QString statement = "SELECT fk_datatype,required FROM tbl_datafields WHERE name='"
+            + fieldname + "' AND fk_category=(SELECT id FROM tbl_categories WHERE name='" + category + "');";
 
-    if(this->execute(statement, &qry, &error)) {
-        qry.first();
-        *name = qry.value(0).toString();
-        *required = qry.value(1).toBool();
-        *datatype = qry.value(2).toString();
-        ok = true;
+    if(this->execute(statement, &qry, error)) {
+        if(!qry.first()) {
+            *error = "Datenfeld [" + category + " - " + fieldname +"] konnte nicht gefunden werden.";
+        }
+        else {
+            *datatype = qry.value(0).toInt();
+            *required = qry.value(1).toBool();
+            ok = true;
+        }
     }
 
     return ok;
