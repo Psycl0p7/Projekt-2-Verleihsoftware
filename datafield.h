@@ -5,7 +5,9 @@
 class Datafield
 {
 public:
-    Datafield(QString name, int type, QString data);
+    static const int TYPE_TEXT = 0;
+
+    Datafield(QString name, int type, QString data = NULL);
     QString getName();
     int getType();
     QString getData();
@@ -14,10 +16,6 @@ private:
     QString name;
     QString data;
     int type;
-
-    static const int TYPE_STRING = 0;
-    static const int TYPE_BOOL = 1;
-    static const int TYPE_PATH = 2;
 
 };
 

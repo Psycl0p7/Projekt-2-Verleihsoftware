@@ -21,6 +21,9 @@ void MainWindow::init()
     this->settings = new Settings(&this->dbHandler);
     this->categoriesReady = false;
 
+    QObject::connect(this->settings, SIGNAL(setSettingsSelectedCategory(int)), this, SLOT(setSettingsSelectedCategory(int)));
+    QObject::connect(this->settings, SIGNAL(setSettingsSelectedCustomfield(int)), this, SLOT(setSettingsSelectedCustomfield(int)));
+
     QObject::connect(this->settings, SIGNAL(showInformation(QString)), this, SLOT(showInformation(QString)));
     QObject::connect(this->settings, SIGNAL(showWarning(QString,QString)), this, SLOT(showWarning(QString,QString)));
     QObject::connect(this->settings, SIGNAL(showSupportedTypes(QVector<QString>)), this, SLOT(showSupportedTypes(QVector<QString>)));
@@ -59,67 +62,26 @@ void MainWindow::showCategories(QVector<Entry*> categories)
     this->categoriesReady = true;
 }
 
+void MainWindow::showDatafields(QVector<Datafield*> fields)
+{
+    this->ui->cb_customfield->clear();
+    for(int i = 0; i < fields.count();i++) {
+        this->ui->cb_customfield->addItem(fields.at(i)->getName());
+    }
+}
+
+void MainWindow::setSettingsSelectedCategory(int index)
+{
+    // first index is always the create operator
+    this->ui->cb_category->setCurrentIndex(index + 1);
+}
+
+void MainWindow::setSettingsSelectedCustomfield(int index)
+{
+    this->ui->cb_customfield->setCurrentIndex(index);
+}
+
 // ******************************************
-
-
-void MainWindow::createCategory()
-{
-    QString error = "";
-    bool categoryExists;
-    QString newCategoryName = this->ui->edt_categoryName->text();
-
-    if(!this->dbHandler.checkCategoryExists(newCategoryName, &categoryExists,&error)) {
-        QMessageBox::warning(this,"Fehler", "Kategorie konnte nicht angelget werden: " + error);
-    }
-    else if (categoryExists) {
-        QMessageBox::information(this,"Information", "Kategorie bereits vorhanden.");
-    }
-    else if(!this->dbHandler.createCategory(newCategoryName, &error)) {
-        QMessageBox::warning(this, "Fehler", error);
-    }
-    else {
-        QMessageBox::information(this, "Information", "Gerätetyp wurde angelegt.");
-    }
-
-    //this->getCategories();
-    this->ui->cb_category->setCurrentText(newCategoryName);
-}
-
-void MainWindow::saveCategory()
-{
-    QString error = "";
-    bool categoryExists;
-    QString newName = this->ui->edt_categoryName->text();
-
-    if(!this->dbHandler.checkCategoryExists(this->ui->edt_categoryName->text(), &categoryExists, &error)) {
-        QMessageBox::warning(this, "Fehler", "Kategories konnte nicht gespeichert werden: " + error);
-    }
-    else if(categoryExists) {
-        QMessageBox::information(this, "Information", "Kategorie bereits vorhanden.");
-    }
-    else if(!this->dbHandler.updateCategory(this->ui->cb_category->currentText(), newName, &error)) {
-        QMessageBox::warning(this, "Fehler", "Kategorie konnte nicht gespeichert werden: " + error);
-    }
-    else {
-        QMessageBox::information(this, "Information", "Kategorie wurde geändert.");
-    }
-
-    //this->getCategories();
-    this->ui->cb_category->setCurrentText(newName);
-}
-
-void MainWindow::deleteCategory(QString category)
-{
-    QString error = NULL;
-
-    if(!this->dbHandler.deleteCategory(category, &error)) {
-        QMessageBox::warning(this, "Fehler", "Kategorie konnte nicht gelöscht werden: " + error);
-    }
-    else {
-        QMessageBox::information(this, "Information", "Kategorie wurde entfernt.");
-    }
-    //this->getCategories();
-}
 
 void MainWindow::createCustomfield()
 {
@@ -235,14 +197,16 @@ void MainWindow::on_cb_category_currentIndexChanged(const QString &arg1)
 
 void MainWindow::on_btn_categorySave_clicked()
 {
-    if(this->ui->edt_categoryName->text().length() <= 0) {
+    QString category_cb = this->ui->cb_category->currentText();
+    QString category_edt = this->ui->edt_categoryName->text();
+    if(category_edt.length() <= 0) {
         QMessageBox::information(this,"Information", "Bitte Bezeichnung angeben.");
     }
-    else if(this->ui->cb_category->currentText() == MainWindow::CREATE_OPERATOR) {
-        this->createCategory();
+    else if(category_cb == MainWindow::CREATE_OPERATOR) {
+        this->settings->createCategory(category_edt);
     }
-    else if(this->ui->cb_category->currentText() != this->ui->edt_categoryName->text()) {
-        this->saveCategory();
+    else if(category_cb != category_edt) {
+        this->settings->updateCategory(category_cb, category_edt);
     }
 
 }
@@ -259,7 +223,6 @@ void MainWindow::on_btn_customfieldSave_clicked()
             this->saveCustomfield();
         }
     }
-
 }
 
 void MainWindow::on_cb_customfield_currentIndexChanged(const QString &fieldname)
@@ -276,18 +239,17 @@ void MainWindow::on_cb_customfield_currentIndexChanged(const QString &fieldname)
 
 void MainWindow::on_btn_categoryDelete_clicked()
 {
-    if(this->ui->cb_category->currentText() == MainWindow::CREATE_OPERATOR) {
-        QMessageBox::information(this, "Information", "Keine Kategorie ausgewählt.");
+    QString selectedCategory = this->ui->cb_category->currentText();
+    if(selectedCategory == MainWindow::CREATE_OPERATOR) {
+        this->showInformation("Keine Kategorie ausgewählt.");
         return;
-
     }
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Kategorie löschen", "Somit wird die Kategroie und damit alle verbundenen "
                                                              "Daten unwiederruflich gelöscht. Sind Sie sicher?",
                                   QMessageBox::Yes|QMessageBox::No);
-
     if (reply == QMessageBox::Yes) {
-        this->deleteCategory(this->ui->cb_category->currentText());
+        this->settings->deleteCategory(selectedCategory);
     }
 }
 

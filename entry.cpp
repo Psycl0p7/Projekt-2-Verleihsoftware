@@ -47,6 +47,11 @@ Datafield Entry::getField(int index)
     return *field;
 }
 
+void Entry::setName(QString newName)
+{
+    this->name = newName;
+}
+
 int Entry::getFieldIndex(QString fieldname)
 {
     int index = -1;
@@ -59,4 +64,9 @@ int Entry::getFieldIndex(QString fieldname)
     }
 
     return index;
+}
+
+QVector<Datafield*> Entry::getAllFields()
+{
+    return this->fields;
 }

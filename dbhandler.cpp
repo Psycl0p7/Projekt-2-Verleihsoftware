@@ -56,11 +56,8 @@ bool DBHandler::createDB()
         query.exec(tblEntries);
 
         QString addDatentypText = "INSERT INTO tbl_datatypes (name) VALUES('Text')";
-        QString addDatentypBool = "INSERT INTO tbl_datatypes (name) VALUES('Boolean')";
-        QString addDatentypPDF  = "INSERT INTO tbl_datatypes (name) VALUES('PDF')";
+
         query.exec(addDatentypText);
-        query.exec(addDatentypBool);
-        query.exec(addDatentypPDF);
         db.close();
 
         dbCreated = true;
@@ -168,8 +165,8 @@ bool DBHandler::checkCategoryExists(QString categoryName, bool *categoryExists, 
 
     if(this->execute(statement, &qry, error)) {
         ok = true;
-        if(qry.first())
-            *categoryExists = true;
+        if(!qry.first())
+            *categoryExists = false;
     }
     return ok;
 }
@@ -195,7 +192,7 @@ bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, 
 
 bool DBHandler::getCustomfields(QSqlQuery* p_qry, QString *error, QString gereateTyp)
 {
-    QString statement = QString("SELECT name FROM tbl_datafields WHERE fk_category=") + "(SELECT id FROM tbl_categories WHERE name='" + gereateTyp + "');";
+    QString statement = QString("SELECT name, fk_datatype FROM tbl_datafields WHERE fk_category=") + "(SELECT id FROM tbl_categories WHERE name='" + gereateTyp + "');";
     return this->execute(statement, p_qry, error);
 }
 

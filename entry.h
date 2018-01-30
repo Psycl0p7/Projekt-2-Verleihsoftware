@@ -9,13 +9,15 @@ class Entry
 public:
     Entry(QString name);
     QString getName();
-    bool isRequired();
-    int getAmountFields();
-    bool removeField(int index);
-    void addField(Datafield *field);
     Datafield getField(int index);
+    QVector<Datafield*> getAllFields();
+    bool isRequired();
+    bool removeField(int index);
     bool setFieldData(QString data);
+    int getAmountFields();
     int getFieldIndex(QString fieldname);
+    void addField(Datafield *field);
+    void setName(QString newName);
 private:
     QString name;
     bool required;

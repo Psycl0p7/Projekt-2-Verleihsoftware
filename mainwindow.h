@@ -28,7 +28,10 @@ public slots:
 
     void showSupportedTypes(QVector<QString> supportedTypes);
     void showCategories(QVector<Entry*> categories);
+    void showDatafields(QVector<Datafield*> fields);
 
+    void setSettingsSelectedCategory(int index);
+    void setSettingsSelectedCustomfield(int index);
 private:
     Ui::MainWindow *ui;
     DBHandler dbHandler;
@@ -36,10 +39,6 @@ private:
     bool categoriesReady;
 
     void init();
-
-    void createCategory();
-    void saveCategory();
-    void deleteCategory(QString category);
 
     void createCustomfield();
     void saveCustomfield();

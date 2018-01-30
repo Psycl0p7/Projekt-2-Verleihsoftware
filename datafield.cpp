@@ -1,6 +1,6 @@
 #include "datafield.h"
 
-Datafield::Datafield(QString name, int type, QString data = NULL)
+Datafield::Datafield(QString name, int type, QString data)
 {
     this->name = name;
     this->type = type;
