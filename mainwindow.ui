@@ -426,7 +426,7 @@
         <string>Löschen</string>
        </property>
       </widget>
-      <widget class="QGroupBox" name="groupBox_2">
+      <widget class="QGroupBox" name="gb_settingsCustomfields">
        <property name="geometry">
         <rect>
          <x>20</x>

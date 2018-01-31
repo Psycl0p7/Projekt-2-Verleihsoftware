@@ -24,10 +24,10 @@ public:
     bool deleteCategory(QString name, QString* error);
 
     bool getCustomfields(QSqlQuery* p_qry, QString *error, QString gereateTyp);
-    bool createCustomField(QString *error, QString name, QString geraeteTyp, QString datentyp, bool pflichtfeld);
+    bool createCustomField(QString *error, QString name, QString geraeteTyp, int datentyp, bool pflichtfeld);
     bool checkCustomfieldExists(QString fieldName, QString categoryName, bool* customfieldExists,QString *error);
-    bool readCustomField(QString geraetetyp, QString fieldname, QString* name, QString *datatype, bool *pflichtfeld);
-    bool updateCustomField(QString category, QString fieldname, QString newName, QString newDatatype, bool newRequired, QString *error);
+    bool readCustomField(QString* error, QString category, QString fieldname, int* datatype, bool* required);
+    bool updateCustomField(QString category, QString fieldname, QString newName, int newDatatype, bool newRequired, QString *error);
     bool deleteCustomField(QString category, QString fieldname, QString* error);
     bool getAllDeviceTypes(QSqlQuery* p_qry, QString *error);
     bool findAndUpdateDevice(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field);
