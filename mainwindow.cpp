@@ -270,7 +270,7 @@ void MainWindow::on_deviceCat_activated(const QString &arg1)
     QString deviceName = this->ui->deviceCat->currentText();
     int i = 0;
     this->ui->tableWidget10->setColumnCount(0);
-    if(this->ui->deviceCat->currentText() == MainWindow::CREATE_OPERATOR) {
+    if(this->ui->deviceCat->currentText() == SettingsController::CREATE_OPERATOR) {
 
     } else {
         dbHandler.getCustomfields(&sql, &error, deviceName);
@@ -392,7 +392,7 @@ void MainWindow::on_deviceVerliehen_activated(const QString &arg1)
     QString deviceName = this->ui->deviceVerliehen->currentText();
     int i = 0;
     this->ui->tableVerliehen->setColumnCount(0);
-    if(this->ui->deviceVerliehen->currentText() == MainWindow::CREATE_OPERATOR) {
+    if(this->ui->deviceVerliehen->currentText() == SettingsController::CREATE_OPERATOR) {
     //TODO
     } else {
         dbHandler.getCustomfields(&sql, &error, deviceName);
