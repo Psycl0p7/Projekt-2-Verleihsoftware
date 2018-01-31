@@ -221,7 +221,7 @@ void SettingsController::deleteCategory(QString category)
 void SettingsController::createCustomfield(QString fieldname, QString category, int typeIndex, bool isRequired)
 {
     QString error;
-    bool customFieldExists = true;
+    bool customFieldExists = false;
     int categoryIndex = this->getCategoryIndex(category);
 
     if(!this->dbHandler->checkCustomfieldExists(fieldname, category, &customFieldExists, &error)) {

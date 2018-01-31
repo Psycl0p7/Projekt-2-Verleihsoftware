@@ -336,7 +336,7 @@ bool MainWindow::checkIdIsCorrect(QTableWidgetItem* itemID)
  * Sucht anhand der ID/BarCode einen Daten und Updatet diesen oder erstellt einen neuen, wenn er nicht gefunden worden ist
  * @brief MainWindow::CreateOrUpdateDatas
  * @param id - Enthält die ID des gesuchten Geräts
- * @param data - ENthält den neuen oder alten Datensatz eines Felds
+ * @param data - Enthält den neuen oder alten Datensatz eines Felds
  * @param field - Enthält das Feld, in dem es gespeichert werden soll
  */
 void MainWindow::CreateOrUpdateDatas(QString id, QString data, QString field)
