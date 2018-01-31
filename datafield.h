@@ -13,6 +13,7 @@ public:
     bool isRequired();
     QString getData();
     void setData(QString data);
+    void updateMeta(QString name, int type, bool required);
 private:
     QString name;
     QString data;

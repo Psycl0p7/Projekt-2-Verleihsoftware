@@ -173,7 +173,7 @@ void SettingsController::createCategory(QString categoryName)
     this->categories.append(new Entry(categoryName));
     this->sortCategories();
     emit this->showCategories(this->categories);
-    emit setSettingsSelectedCategory(this->getCategoryIndex(categoryName));
+    emit this->setSettingsSelectedCategory(this->getCategoryIndex(categoryName));
 }
 
 void SettingsController::updateCategory(QString categoryName, QString newName)
@@ -255,32 +255,41 @@ void SettingsController::switchDatafieldAttributes(QString category, QString fie
     emit this->showDatafieldAttributes(field->getName(), field->getType(), field->isRequired());
 }
 
-// ** not necessary anymore ** //
-//
-// void SettingsController::readCustomfield(QString fieldname, QString category)
-// {
-//     // MULTIPLE QUERY ERROR: QSqlQuery::value: not positioned on a valid record
-//     QString error = NULL;
-//     int datatype = -1;
-//     bool required = false;
-//
-//     if(!this->dbHandler->readCustomField(&error, category, fieldname, &datatype, &required)) {
-//         emit this->showWarning("Auslesen der Feldeigenschaften nicht möglich", error);
-//     } else {
-//         // this->ui->cb_customfield->setCurrentText(fieldname);
-//         // this->ui->edt_customfieldName->setText(fieldname);
-//         // this->ui->cb_customfieldRequired->setChecked(required);
-//         // this->ui->cb_customfieldType->setCurrentText(datatype);
-//     }
-// }
 
-void SettingsController::updateCustomfield()
+void SettingsController::updateCustomfield(QString category, QString currentFieldname, QString newFieldname, int newType, bool newRequired)
 {
+    QString error = NULL;
+    bool fieldExists = false;
+    int categoryIndex = this->getCategoryIndex(category);
+    int fieldIndex = this->getDatafieldIndex(categoryIndex, currentFieldname);
 
+    if(!this->dbHandler->checkCustomfieldExists(currentFieldname, category, &fieldExists, &error)) {
+        emit this->showWarning("Datenfeld konnte nicht gesucht werden", error);
+    }
+    else if (!fieldExists) {
+        emit this->showWarning("Datenfeld konnte nicht gefunden werden", error);
+    }
+    else if(!this->dbHandler->updateCustomField(category, currentFieldname, newFieldname, newType, newRequired, &error)) {
+        emit this->showWarning("Datenfeld konnte nicht geändert werden", error);
+    }
+    else {
+        this->categories.at(categoryIndex)->getField(fieldIndex)->updateMeta(newFieldname, newType, newRequired);
+        emit this->showDatafields(this->categories.at(categoryIndex)->getAllFields());
+        emit this->setSettingsSelectedCustomfield(fieldIndex);
+    }
 }
-
 
 void SettingsController::deleteCustomfield(QString category, QString fieldname)
 {
-
+    QString error = NULL;
+    int categoryIndex = this->getCategoryIndex(category);
+    int fieldIndex = this->getDatafieldIndex(categoryIndex, fieldname);
+    if(!this->dbHandler->deleteCustomField(category, fieldname, &error)) {
+        emit this->showWarning("Datenfeld konnte nicht gelöscht werden", error);
+    }
+    else {
+        this->categories.at(categoryIndex)->removeField(fieldIndex);
+        emit this->showDatafields(this->categories.at(categoryIndex)->getAllFields());
+        emit this->showInformation("Datenfeld erfolgreich gelöscht.");
+    }
 }

@@ -28,11 +28,10 @@ public:
     // datafields
     int getDatafieldIndex(int categoryIndex, QString fieldname);
     void createCustomfield(QString fieldname, QString category, int typeIndex, bool isRequired);
+    void updateCustomfield(QString category, QString currentFieldname, QString newFieldname, int newType, bool newRequired);
+    void deleteCustomfield(QString category, QString fieldname);
     void switchCategoryDatafields(QString category);
     void switchDatafieldAttributes(QString category, QString fieldname);
-
-    void updateCustomfield();
-
 
 private:
     QVector<Entry*> categories;
@@ -44,7 +43,6 @@ private:
     void initCustomfields();
     void readSupportedDatatypes();
 
-    void deleteCustomfield(QString category, QString fieldname);
 
     void sortCategories();
     void sortDatafields(QString category);

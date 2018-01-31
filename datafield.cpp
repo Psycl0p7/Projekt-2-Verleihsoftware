@@ -32,3 +32,11 @@ bool Datafield::isRequired()
 {
     return this->required;
 }
+
+// updates the meta data of datafield
+void Datafield::updateMeta(QString name, int type, bool required)
+{
+    this->name = name;
+    this->type = type;
+    this->required = required;
+}

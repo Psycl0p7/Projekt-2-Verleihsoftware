@@ -41,10 +41,6 @@ private:
     bool categoriesReady;
 
     void init();
-
-    void saveCustomfield();
-    void deleteCustomfield(QString category, QString fieldname);
-
     void toggleCategoryActivated(bool activated);
 
 private slots:

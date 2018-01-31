@@ -182,10 +182,12 @@ bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, 
             + categoryName
             + "');";
 
+    qDebug() << statement;
+
     if(this->execute(statement, &qry, error)) {
         ok = true;
-        if(!qry.first())
-            *customfieldExists = false;
+        if(qry.first())
+            *customfieldExists = true;
     }
     return ok;
 }
@@ -231,15 +233,15 @@ bool DBHandler::readCustomField(QString* error, QString category, QString fieldn
     return ok;
 }
 
-bool DBHandler::updateCustomField(QString category, QString fieldname, QString newName, QString newDatatype, bool newRequired, QString *error)
+bool DBHandler::updateCustomField(QString category, QString fieldname, QString newName, int newDatatype, bool newRequired, QString *error)
 {
     QString statement = "UPDATE tbl_datafields SET name='"
-            + newName + "',"
-            + "fk_datatype=(SELECT id FROM tbl_datatypes WHERE name='" + newDatatype + "'),"
-            + "required=" + QString::number(newRequired)
+            + newName
+            + "',fk_datatype=" + QString::number(newDatatype)
+            + ",required=" + QString::number(newRequired)
             + " WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='" + category
             + "') AND name='" + fieldname + "';";
-
+    qDebug() << statement;
     return this->execute(statement, new QSqlQuery(), error);
 }
 

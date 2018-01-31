@@ -40,7 +40,7 @@ void Entry::addField(Datafield* field)
 Datafield* Entry::getField(int index)
 {
     Datafield* field = NULL;
-    if(index >= this->fields.count() - 1) {
+    if(index < this->fields.count() && index > -1) {
         field = this->fields.at(index);
     }
 
