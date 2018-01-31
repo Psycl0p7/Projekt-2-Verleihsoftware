@@ -25,9 +25,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    dbhandler.cpp
+    dbhandler.cpp \
+    entry.cpp \
+    datafield.cpp \
+    settingscontroller.cpp
 
 HEADERS  += mainwindow.h \
-    dbhandler.h
+    dbhandler.h \
+    entry.h \
+    datafield.h \
+    settingscontroller.h
 
 FORMS    += mainwindow.ui
