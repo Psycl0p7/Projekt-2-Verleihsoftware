@@ -255,3 +255,59 @@ bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* 
 
     return this->execute(statement, new QSqlQuery(), error);
 }
+
+/** Holt sich alle erstellten Typen von Geräte aus der Datenbank. Für die Visuelle Darstellung
+ * @brief DBHandler::getAllDeviceTypes
+ * @param p_qry - Enthält den Query für die SQL Abfrage
+ * @param error - Enthält bei einem Fehler, die Fehlermeldung
+ * @return SqlQuery - Enthält alle Device Typen aus der DB
+ */
+bool DBHandler::getAllDeviceTypes(QSqlQuery* p_qry, QString* error)
+{
+    QString statement = QString("SELECT name FROM tbl_datafields WHERE category = (SELECT name FROM tbl_categories)");
+
+    return this->execute(statement, p_qry, error);
+}
+
+/**
+ * Sucht anhand der ID/BarCode einen Daten und Updatet diesen oder erstellt einen neuen, wenn er nicht gefunden worden ist
+ * @brief DBHandler::findAndUpdateDevice
+ * @param id - Enthält die ID des gesuchten Geräts
+ * @param data - ENthält den neuen oder alten Datensatz eines Felds
+ * @param field - Enthält das Feld, in dem es gespeichert werden soll
+ */
+bool DBHandler::findAndUpdateDevice(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field)
+{
+    QString statement = QString("UPDATE tbl_entrydata SET " + field + " = " + data + " WHERE ID = " + id);
+}
+
+/**
+ * Speichert neue Geräte in die Datenbank oder Updatet die Felder, wenn diese schon vorhanden sind
+ * @brief DBHandler::saveNewDeviceData
+ * @param p_qry
+ * @param error
+ * @param id - Feldname
+ * @param data - Zu speichender Wert im Feld
+ * @param field - Feldname
+ * @return
+ */
+bool DBHandler::saveNewDeviceData(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field)
+{
+    QString statement = QString("INSERT INTO tbl_entrydata(fk_entry, data) VALUES('" + field + "', ' " + data + "')");
+    return this->execute(statement, new QSqlQuery(), error);
+}
+
+/**
+ * Sucht alle Tabellen mit dem Meta begriff
+ * @brief DBHandler::findAllSearchedData
+ * @param p_qry
+ * @param error
+ * @param searchPara - Zu suchender Begriff
+ * @return
+ */
+bool DBHandler::findAllSearchedData(QSqlQuery* p_qry, QString* error, QString searchPara)
+{
+    QString statement = QString("SELECT * FROM tbl_entrydata WHERE data LIKE '%" + searchPara + "%'");
+    return this->execute(statement, p_qry, error);
+}
+

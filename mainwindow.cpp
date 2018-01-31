@@ -16,6 +16,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::init()
 {
+    GetCustomFieldsForTable();
+    setDevicesInCombiBox();
     this->settingsController = new SettingsController(&this->dbHandler);
     this->categoriesReady = false;
 
@@ -164,7 +166,7 @@ void MainWindow::on_btn_customfieldSave_clicked()
     }
     else {
         QMessageBox::StandardButton reply = QMessageBox::question(this, "Datenfeld ändern", "Sind Sie sicher?",
-                                      QMessageBox::Yes|QMessageBox::No);
+                                                                  QMessageBox::Yes|QMessageBox::No);
         if(reply == QMessageBox::Yes) {
             this->settingsController->updateCustomfield(category, fieldname_cb, fieldname_edt, type, isRequired);
         }
@@ -203,6 +205,29 @@ void MainWindow::on_btn_categoryDelete_clicked()
     }
 }
 
+/**
+ * Holt sich die Kategorien und die CustomField aus der DB und zeigt diese in der List mit allen Geräten an.
+ * @brief MainWindow::AddCustomValue
+ */
+void MainWindow::GetCustomFieldsForTable()
+{
+    QSqlQuery sql;
+    QString error;
+    int i = 0;
+
+    dbHandler.getAllDeviceTypes(&sql, &error);
+    while(sql.next()) {
+        this->ui->tableWidget10->insertRow(0);
+        this->ui->tableWidget10->insertRow(0);
+        this->ui->tableWidget10->insertColumn(i);
+        QTableWidgetItem *headerText = new QTableWidgetItem();
+
+        headerText->setText(QString(sql.value(0).toString()));
+        this->ui->tableWidget10->setHorizontalHeaderItem(i, headerText);
+        i++;
+    }
+}
+
 void MainWindow::on_btn_customfieldDelete_clicked()
 {
     QString category = this->ui->cb_category->currentText();
@@ -213,5 +238,170 @@ void MainWindow::on_btn_customfieldDelete_clicked()
     }
     else if(QMessageBox::question(this, "Datenfeld löschen", "Datenfeld wirklich löschen?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
         this->settingsController->deleteCustomfield(category, fieldname);
+    }
+}
+
+/**
+ * Holt sich alle Geräte aus der Datenbank und fügt diese in die ComboBox für eine Filterung ein.
+ * @brief MainWindow::setDevicesInCombiBox
+ */
+void MainWindow::setDevicesInCombiBox()
+{
+    QSqlQuery sql;
+    QString error;
+    dbHandler.getCategories(&sql, &error);
+    this->ui->tableWidget10->insertRow(0);
+    this->ui->tableVerliehen->insertRow(0);
+    while(sql.next()) {
+        this->ui->deviceCat->addItem(sql.value(0).toString());
+        this->ui->deviceVerliehen->addItem(sql.value(0).toString());
+    }
+}
+
+/**
+ * Holt sich alle Fields aus der Datenbank für die Ausgewählte Device-Category
+ * @brief MainWindow::on_deviceCat_activated
+ * @param arg1
+ */
+void MainWindow::on_deviceCat_activated(const QString &arg1)
+{
+    QSqlQuery sql;
+    QString error;
+    QString deviceName = this->ui->deviceCat->currentText();
+    int i = 0;
+    this->ui->tableWidget10->setColumnCount(0);
+    if(this->ui->deviceCat->currentText() == SettingsController::CREATE_OPERATOR) {
+
+    } else {
+        dbHandler.getCustomfields(&sql, &error, deviceName);
+        while(sql.next()) {
+            this->ui->tableWidget10->insertColumn(0);
+            QTableWidgetItem* header = new QTableWidgetItem;
+            header->setText(QString(sql.value(0).toString()));
+            this->ui->tableWidget10->setHorizontalHeaderItem(0, header);
+            i++;
+        }
+    }
+}
+
+/**
+ * Fügt eine neue Zeile in der Liste hinzu
+ * @brief MainWindow::on_addBtn_clicked
+ */
+void MainWindow::on_addBtn_clicked() {
+    this->ui->tableWidget10->insertRow(0);
+}
+
+/**
+ * Speichert alle eingetragene Daten in der Datenbank
+ * @brief MainWindow::on_saveBtn_clicked
+ */
+void MainWindow::on_saveBtn_clicked()
+{
+    QString ID;
+    int len = this->ui->tableWidget10->rowCount();
+    for(int i = 0; i < len; i++)
+    {
+        ID.clear();
+        int len2 = this->ui->tableWidget10->columnCount();
+        for (int j = 0; j < len2; j++)
+        {
+            QTableWidgetItem* item = this->ui->tableWidget10->item(i, j);
+            QTableWidgetItem* header = this->ui->tableWidget10->horizontalHeaderItem(j);
+            if(header->text().toUpper() == "BARCODE" || !ID.isEmpty())
+            {
+                if (checkIdIsCorrect(item)) {
+                    ID = header->text();
+                    CreateOrUpdateDatas(ID, item->text(), header->text());
+                } else if (ID.isEmpty()){
+                    QMessageBox::warning(this,"Fehler", "Es wurde keine gültiger Barcode eingetragen");
+                }else {
+                    CreateOrUpdateDatas(ID, item->text(), header->text());
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Checkt ob die eingegebene ID vorhanden ist
+ * @brief MainWindow::checkIdIsCorrect
+ */
+bool MainWindow::checkIdIsCorrect(QTableWidgetItem* itemID)
+{
+    return itemID;
+}
+
+/**
+ * Sucht anhand der ID/BarCode einen Daten und Updatet diesen oder erstellt einen neuen, wenn er nicht gefunden worden ist
+ * @brief MainWindow::CreateOrUpdateDatas
+ * @param id - Enthält die ID des gesuchten Geräts
+ * @param data - ENthält den neuen oder alten Datensatz eines Felds
+ * @param field - Enthält das Feld, in dem es gespeichert werden soll
+ */
+void MainWindow::CreateOrUpdateDatas(QString id, QString data, QString field)
+{
+    QSqlQuery sql;
+    QString error;
+    //dbHandler.findAndUpdateDevice(&sql, &error, id, data->text(), field->text());
+    if(dbHandler.saveNewDeviceData(&sql, &error, id, data, field))
+    {
+        // QMessageBox::information(this, "Gespeichert", "Daten wurden erfolgreich gespeichert");
+    } else {
+        QMessageBox::warning(this, "Fehler", error + " Feld: " + field);
+    }
+}
+
+/**
+ * Beim Verleihen wird das Gerät in der DB suchen und die Felder aktualisiert
+ * @brief MainWindow::on_verleihBtn_clicked
+ */
+void MainWindow::on_verleihBtn_clicked()
+{
+    this->ui->startTime->text();
+    this->ui->endTime->text();
+    this->ui->textVorname->text();
+    this->ui->textVorname->text();
+    this->ui->barcode->text();
+
+    this->ui->barcode->clear();
+    this->ui->barcode->focusWidget();
+}
+
+/**
+ * Sucht anhand des eingegebenen Begriffs alle Geräte aus der DB, welche den Begriff als Attribute beinhalten
+ * @brief MainWindow::on_searchBtn_clicked
+ */
+void MainWindow::on_searchBtn_clicked()
+{
+    QSqlQuery sql;
+    QString error;
+    QString searchMeta = this->ui->searchText->text();
+    dbHandler.findAllSearchedData(&sql, &error, searchMeta);
+}
+
+/**
+ * Holt sich alle Fields aus der Datenbank für die Ausgewählte Device-Category
+ * @brief MainWindow::on_deviceCat_activated
+ * @param arg1
+ */
+void MainWindow::on_deviceVerliehen_activated(const QString &arg1)
+{
+    QSqlQuery sql;
+    QString error;
+    QString deviceName = this->ui->deviceVerliehen->currentText();
+    int i = 0;
+    this->ui->tableVerliehen->setColumnCount(0);
+    if(this->ui->deviceVerliehen->currentText() == SettingsController::CREATE_OPERATOR) {
+    //TODO
+    } else {
+        dbHandler.getCustomfields(&sql, &error, deviceName);
+        while(sql.next()) {
+            this->ui->tableVerliehen->insertColumn(0);
+            QTableWidgetItem* header = new QTableWidgetItem;
+            header->setText(QString(sql.value(0).toString()));
+            this->ui->tableVerliehen->setHorizontalHeaderItem(0, header);
+            i++;
+        }
     }
 }
