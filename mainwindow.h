@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QVector>
 #include <QDebug>
+#include <QTableWidgetItem>
 
 namespace Ui {
 class MainWindow;
@@ -53,6 +54,16 @@ private slots:
     void on_btn_categoryDelete_clicked();
 
     void on_btn_customfieldDelete_clicked();
+    void GetCustomFieldsForTable();
+    void setDevicesInCombiBox();
+    void on_deviceCat_activated(const QString &arg1);
+    void on_addBtn_clicked();
+    void on_saveBtn_clicked();
+    bool checkIdIsCorrect(QTableWidgetItem* itemID);
+    void CreateOrUpdateDatas(QString id, QString data, QString field);
+    void on_verleihBtn_clicked();
+    void on_searchBtn_clicked();
+    void on_deviceVerliehen_activated(const QString &arg1);
 
 signals:
     void do_getCustomfields();
