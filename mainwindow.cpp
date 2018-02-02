@@ -279,9 +279,24 @@ void MainWindow::on_deviceCat_activated(const QString &arg1)
             QTableWidgetItem* header = new QTableWidgetItem;
             header->setText(QString(sql.value(0).toString()));
             this->ui->tableWidget10->setHorizontalHeaderItem(0, header);
+            fillField(sql.value(0).toString(), deviceName, i);
             i++;
         }
     }
+}
+
+bool MainWindow::fillField(QString fieldName, QString category, int count)
+{
+    QSqlQuery sql;
+    QString error;
+    dbHandler.getAllDevicesForACategory(&sql, &error, fieldName, category);
+    int i = 0;
+    while(sql.next())
+    {
+        this->ui->tableWidget10->insertRow(0);
+        this->ui->tableWidget10->setItem(i,count, new QTableWidgetItem(sql.value(0).toString()));
+    }
+    return true;
 }
 
 /**
@@ -298,6 +313,7 @@ void MainWindow::on_addBtn_clicked() {
  */
 void MainWindow::on_saveBtn_clicked()
 {
+    QString catgeory = this->ui->deviceCat->currentText();
     QString ID;
     int len = this->ui->tableWidget10->rowCount();
     for(int i = 0; i < len; i++)
@@ -312,15 +328,16 @@ void MainWindow::on_saveBtn_clicked()
             {
                 if (checkIdIsCorrect(item)) {
                     ID = header->text();
-                    CreateOrUpdateDatas(ID, item->text(), header->text());
+                    CreateOrUpdateDatas(ID, item->text(), header->text(), catgeory);
                 } else if (ID.isEmpty()){
                     QMessageBox::warning(this,"Fehler", "Es wurde keine gültiger Barcode eingetragen");
                 }else {
-                    CreateOrUpdateDatas(ID, item->text(), header->text());
+                    CreateOrUpdateDatas(ID, item->text(), header->text(), catgeory);
                 }
             }
         }
     }
+
 }
 
 /**
@@ -339,16 +356,22 @@ bool MainWindow::checkIdIsCorrect(QTableWidgetItem* itemID)
  * @param data - Enthält den neuen oder alten Datensatz eines Felds
  * @param field - Enthält das Feld, in dem es gespeichert werden soll
  */
-void MainWindow::CreateOrUpdateDatas(QString id, QString data, QString field)
+void MainWindow::CreateOrUpdateDatas(QString id, QString data, QString field, QString category)
 {
     QSqlQuery sql;
-    QString error;
+    QString error = NULL;
     //dbHandler.findAndUpdateDevice(&sql, &error, id, data->text(), field->text());
-    if(dbHandler.saveNewDeviceData(&sql, &error, id, data, field))
+    /*if(dbHandler.saveNewDeviceData(&sql, &error, id, data, field))
     {
         // QMessageBox::information(this, "Gespeichert", "Daten wurden erfolgreich gespeichert");
     } else {
         QMessageBox::warning(this, "Fehler", error + " Feld: " + field);
+    }*/
+dbHandler.existDeviceInDB(&sql, &error, data);
+    if(sql.first()) {
+        dbHandler.updateDevice(&sql, &error, id, data, field, category);
+    } else {
+        dbHandler.saveNewDeviceData(&sql, &error, id, data, field, category);
     }
 }
 
