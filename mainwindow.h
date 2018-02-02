@@ -65,7 +65,7 @@ private slots:
     void on_searchBtn_clicked();
     void on_deviceVerliehen_activated(const QString &arg1);
     void getAllDevicesFromDB(QString cat);
-    bool fillField(QString field, QString cat, int count);
+    void fillField(QString cat);
 
 signals:
 

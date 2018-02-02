@@ -279,24 +279,40 @@ void MainWindow::on_deviceCat_activated(const QString &arg1)
             QTableWidgetItem* header = new QTableWidgetItem;
             header->setText(QString(sql.value(0).toString()));
             this->ui->tableWidget10->setHorizontalHeaderItem(0, header);
-            fillField(sql.value(0).toString(), deviceName, i);
             i++;
         }
+        fillField(deviceName);
     }
 }
 
-bool MainWindow::fillField(QString fieldName, QString category, int count)
+/**
+ * @brief MainWindow::fillField
+ * @param category
+ */
+void MainWindow::fillField(QString category)
 {
     QSqlQuery sql;
     QString error;
-    dbHandler.getAllDevicesForACategory(&sql, &error, fieldName, category);
-    int i = 0;
-    while(sql.next())
+    int j = 0;
+
+    for (int i = 0; i < this->ui->tableWidget10->columnCount(); i++)
     {
-        this->ui->tableWidget10->insertRow(0);
-        this->ui->tableWidget10->setItem(i,count, new QTableWidgetItem(sql.value(0).toString()));
+
+        int k = 0;
+        dbHandler.getAllDevicesForACategory(&sql, &error, this->ui->tableWidget10->horizontalHeaderItem(i)->text(), category);
+         while(sql.next())
+         {
+
+
+             this->ui->tableWidget10->setItem(k,j, new QTableWidgetItem(sql.value(0).toString()));
+            k++;
+         this->ui->tableWidget10->insertRow(this->ui->tableWidget10->rowCount());
+
+         }
+
+            j++;
     }
-    return true;
+
 }
 
 /**
