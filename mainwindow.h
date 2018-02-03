@@ -60,12 +60,9 @@ private slots:
     void on_addBtn_clicked();
     void on_saveBtn_clicked();
     bool checkIdIsCorrect(QTableWidgetItem* itemID);
-    void CreateOrUpdateDatas(QString id, QString data, QString field);
     void CreateOrUpdateDatas(QString id, QString data, QString field, QString category);
-    void on_verleihBtn_clicked();
     void on_searchBtn_clicked();
     void on_deviceVerliehen_activated(const QString &arg1);
-    void getAllDevicesFromDB(QString cat);
     void fillField(QString cat);
 
     void on_cbRentEnterManually_toggled(bool checked);
