@@ -21,6 +21,8 @@ void MainWindow::init()
     this->settingsController = new SettingsController(&this->dbHandler);
     this->categoriesReady = false;
 
+    this->ui->btnRentEnterManually->setVisible(false);
+
 
     // ** SIGNAL SLOTS  **
     QObject::connect(this->settingsController, SIGNAL(setSettingsSelectedCategory(int)), this, SLOT(setSettingsSelectedCategory(int)));
@@ -392,22 +394,6 @@ dbHandler.existDeviceInDB(&sql, &error, data);
 }
 
 /**
- * Beim Verleihen wird das Gerät in der DB suchen und die Felder aktualisiert
- * @brief MainWindow::on_verleihBtn_clicked
- */
-void MainWindow::on_verleihBtn_clicked()
-{
-    this->ui->startTime->text();
-    this->ui->endTime->text();
-    this->ui->textVorname->text();
-    this->ui->textVorname->text();
-    this->ui->barcode->text();
-
-    this->ui->barcode->clear();
-    this->ui->barcode->focusWidget();
-}
-
-/**
  * Sucht anhand des eingegebenen Begriffs alle Geräte aus der DB, welche den Begriff als Attribute beinhalten
  * @brief MainWindow::on_searchBtn_clicked
  */
@@ -443,4 +429,9 @@ void MainWindow::on_deviceVerliehen_activated(const QString &arg1)
             i++;
         }
     }
+}
+
+void MainWindow::on_cbRentEnterManually_toggled(bool checked)
+{
+    this->ui->btnRentEnterManually->setVisible(checked);
 }
