@@ -45,7 +45,7 @@ void SettingsController::initCustomfields()
     int categoryIndex = -1;
 
     for(int i = 0; i < this->categories.count(); i++) {
-        currentCategory = this->categories.at(i)->getName();
+        currentCategory = this->categories.at(i)->getCategory();
         categoryIndex = this->getCategoryIndex(currentCategory);
 
         if(!this->dbHandler->getCustomfields(&qry, &error, currentCategory)) {
@@ -79,7 +79,7 @@ int SettingsController::getCategoryIndex(QString name)
 {
     int index = -1;
     for(int i = 0; i < this->categories.count(); i++) {
-        if(name == this->categories.at(i)->getName()) {
+        if(name == this->categories.at(i)->getCategory()) {
             index = i;
             break;
         }
@@ -108,10 +108,10 @@ void SettingsController::sortCategories()
 
     while(this->categories.count() > 1) {
         minIndex = 0;
-        min = this->categories.at(minIndex)->getName();
+        min = this->categories.at(minIndex)->getCategory();
         for(int i = 1; i < this->categories.count(); i++) {
-            if(min.toUpper() > this->categories.at(i)->getName().toUpper()) {
-                min = this->categories.at(i)->getName();
+            if(min.toUpper() > this->categories.at(i)->getCategory().toUpper()) {
+                min = this->categories.at(i)->getCategory();
                 minIndex = i;
             }
         }
@@ -192,7 +192,7 @@ void SettingsController::updateCategory(QString categoryName, QString newName)
         emit this->showWarning("Kategorie konnte nicht geändert werden", error);
     }
     else {
-        this->categories.at(categoryIndex)->setName(newName);
+        this->categories.at(categoryIndex)->setCategory(newName);
         this->sortCategories();
         emit this->showCategories(this->categories);
         emit this->setSettingsSelectedCategory(this->getCategoryIndex(newName));

@@ -1,10 +1,10 @@
 #include "datafield.h"
 
-Datafield::Datafield(QString name, int type, bool isRequired, QString data)
+Datafield::Datafield(QString name, int type, bool required, QString data)
 {
     this->name = name;
     this->type = type;
-    this->required = isRequired;
+    this->required = required;
     this->data = data;
 }
 

@@ -84,7 +84,7 @@ void MainWindow::showCategories(QVector<Entry*> categories)
     this->ui->cb_category->clear();
     this->ui->cb_category->addItem(SettingsController::CREATE_OPERATOR);
     for(int i = 0; i < categories.count(); i++) {
-        this->ui->cb_category->addItem(categories.at(i)->getName());
+        this->ui->cb_category->addItem(categories.at(i)->getCategory());
     }
     this->ui->cb_category->setCurrentIndex(0);
 }

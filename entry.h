@@ -7,8 +7,8 @@
 class Entry
 {
 public:
-    Entry(QString name);
-    QString getName();
+    Entry(QString category);
+    QString getCategory();
     Datafield* getField(int index);
     QVector<Datafield*> getAllFields();
     bool isRequired();
@@ -17,10 +17,10 @@ public:
     int countFields();
     int getFieldIndex(QString fieldname);
     void addField(Datafield *field);
-    void setName(QString newName);
+    void setCategory(QString newName);
     void setFields(QVector<Datafield*> fields);
 private:
-    QString name;
+    QString category;
     bool required;
     QVector<Datafield*> fields;
 };
