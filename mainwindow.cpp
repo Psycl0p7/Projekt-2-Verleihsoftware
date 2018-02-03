@@ -281,7 +281,38 @@ void MainWindow::on_deviceCat_activated(const QString &arg1)
             this->ui->tableWidget10->setHorizontalHeaderItem(0, header);
             i++;
         }
+        fillField(deviceName);
     }
+}
+
+/**
+ * @brief MainWindow::fillField
+ * @param category
+ */
+void MainWindow::fillField(QString category)
+{
+    QSqlQuery sql;
+    QString error;
+    int j = 0;
+
+    for (int i = 0; i < this->ui->tableWidget10->columnCount(); i++)
+    {
+
+        int k = 0;
+        dbHandler.getAllDevicesForACategory(&sql, &error, this->ui->tableWidget10->horizontalHeaderItem(i)->text(), category);
+         while(sql.next())
+         {
+
+
+             this->ui->tableWidget10->setItem(k,j, new QTableWidgetItem(sql.value(0).toString()));
+            k++;
+         this->ui->tableWidget10->insertRow(this->ui->tableWidget10->rowCount());
+
+         }
+
+            j++;
+    }
+
 }
 
 /**
@@ -298,6 +329,7 @@ void MainWindow::on_addBtn_clicked() {
  */
 void MainWindow::on_saveBtn_clicked()
 {
+    QString catgeory = this->ui->deviceCat->currentText();
     QString ID;
     int len = this->ui->tableWidget10->rowCount();
     for(int i = 0; i < len; i++)
@@ -312,15 +344,16 @@ void MainWindow::on_saveBtn_clicked()
             {
                 if (checkIdIsCorrect(item)) {
                     ID = header->text();
-                    CreateOrUpdateDatas(ID, item->text(), header->text());
+                    CreateOrUpdateDatas(ID, item->text(), header->text(), catgeory);
                 } else if (ID.isEmpty()){
                     QMessageBox::warning(this,"Fehler", "Es wurde keine gültiger Barcode eingetragen");
                 }else {
-                    CreateOrUpdateDatas(ID, item->text(), header->text());
+                    CreateOrUpdateDatas(ID, item->text(), header->text(), catgeory);
                 }
             }
         }
     }
+
 }
 
 /**
@@ -339,16 +372,22 @@ bool MainWindow::checkIdIsCorrect(QTableWidgetItem* itemID)
  * @param data - Enthält den neuen oder alten Datensatz eines Felds
  * @param field - Enthält das Feld, in dem es gespeichert werden soll
  */
-void MainWindow::CreateOrUpdateDatas(QString id, QString data, QString field)
+void MainWindow::CreateOrUpdateDatas(QString id, QString data, QString field, QString category)
 {
     QSqlQuery sql;
-    QString error;
+    QString error = NULL;
     //dbHandler.findAndUpdateDevice(&sql, &error, id, data->text(), field->text());
-    if(dbHandler.saveNewDeviceData(&sql, &error, id, data, field))
+    /*if(dbHandler.saveNewDeviceData(&sql, &error, id, data, field))
     {
         // QMessageBox::information(this, "Gespeichert", "Daten wurden erfolgreich gespeichert");
     } else {
         QMessageBox::warning(this, "Fehler", error + " Feld: " + field);
+    }*/
+dbHandler.existDeviceInDB(&sql, &error, data);
+    if(sql.first()) {
+        dbHandler.updateDevice(&sql, &error, id, data, field, category);
+    } else {
+        dbHandler.saveNewDeviceData(&sql, &error, id, data, field, category);
     }
 }
 
