@@ -286,6 +286,7 @@ void MainWindow::on_deviceCat_activated(const QString &arg1)
     QString deviceName = this->ui->deviceCat->currentText();
     int i = 0;
     this->ui->tableWidget10->setColumnCount(0);
+    setIDFields();
     if(this->ui->deviceCat->currentText() == SettingsController::CREATE_OPERATOR) {
 
     } else {
@@ -297,8 +298,23 @@ void MainWindow::on_deviceCat_activated(const QString &arg1)
             this->ui->tableWidget10->setHorizontalHeaderItem(0, header);
             i++;
         }
+
+
         fillField(deviceName);
     }
+}
+
+void MainWindow::setIDFields()
+{
+    QTableWidgetItem* dataField = new QTableWidgetItem;
+    QTableWidgetItem* entryID = new QTableWidgetItem;
+    dataField->setText(QString("fk_datafield"));
+    entryID->setText(QString("fk_entry"));
+    this->ui->tableWidget10->insertColumn(0);
+    this->ui->tableWidget10->setHorizontalHeaderItem(0, dataField);
+    this->ui->tableWidget10->insertColumn(0);
+    this->ui->tableWidget10->setHorizontalHeaderItem(0, entryID);
+    return;
 }
 
 /**
@@ -320,6 +336,7 @@ void MainWindow::fillField(QString category)
         dbHandler.getAllDevicesForACategory(&sql, &error, this->ui->tableWidget10->horizontalHeaderItem(i)->text(), category);
          while(sql.next())
          {
+             qDebug() << sql.value(0);
          this->ui->tableWidget10->insertRow(this->ui->tableWidget10->rowCount());
          this->ui->tableWidget10->setItem(k,j, new QTableWidgetItem(sql.value(0).toString()));
          k++;
@@ -390,18 +407,11 @@ void MainWindow::CreateOrUpdateDatas(QString id, QString data, QString field, QS
 {
     QSqlQuery sql;
     QString error = NULL;
-    //dbHandler.findAndUpdateDevice(&sql, &error, id, data->text(), field->text());
-    /*if(dbHandler.saveNewDeviceData(&sql, &error, id, data, field))
-    {
-        // QMessageBox::information(this, "Gespeichert", "Daten wurden erfolgreich gespeichert");
-    } else {
-        QMessageBox::warning(this, "Fehler", error + " Feld: " + field);
-    }*/
-dbHandler.existDeviceInDB(&sql, &error, data);
+    dbHandler.existDeviceInDB(&sql, &error, data);
     if(sql.first()) {
-        dbHandler.updateDevice(&sql, &error, id, data, field, category);
+       // dbHandler.updateDevice(&sql, &error, id, data, field, category);
     } else {
-        dbHandler.saveNewDeviceData(&sql, &error, id, data, field, category);
+
     }
 }
 
