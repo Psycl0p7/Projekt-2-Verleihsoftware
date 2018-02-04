@@ -294,9 +294,7 @@ void MainWindow::fillField(QString category)
     QSqlQuery sql;
     QString error;
     int j = 0;
-    for(int i = 0; i < this->ui->tableVerliehen->rowCount(); i++) {
-        this->ui->tableWidget10->removeRow(i-1);
-    }
+
     for (int i = 0; i < this->ui->tableWidget10->columnCount(); i++)
     {
 
@@ -304,11 +302,16 @@ void MainWindow::fillField(QString category)
         dbHandler.getAllDevicesForACategory(&sql, &error, this->ui->tableWidget10->horizontalHeaderItem(i)->text(), category);
          while(sql.next())
          {
+
+
+             this->ui->tableWidget10->setItem(k,j, new QTableWidgetItem(sql.value(0).toString()));
+            k++;
          this->ui->tableWidget10->insertRow(this->ui->tableWidget10->rowCount());
-         this->ui->tableWidget10->setItem(k,j, new QTableWidgetItem(sql.value(0).toString()));
-         k++;
+
          }
-         j++;
+         //this->ui->tableWidget10->rowAt()->;
+
+            j++;
     }
 
 }
