@@ -269,7 +269,6 @@ bool DBHandler::getFieldnamesByBarcode(QString barcode, QVector<QString>* fieldn
             " FROM tbl_datafields"
             " WHERE tbl_datafields.fk_category = (SELECT tbl_entries.fk_category FROM tbl_entries WHERE tbl_entries.barcode = '" + barcode +"')"
             " ORDER BY tbl_datafields.id ASC;";
-    qDebug() << statement;
 
     if(this->execute(statement, &qry, error)) {
         ok = true;
@@ -296,7 +295,6 @@ bool DBHandler::getEntryDataByBarcode (QString barcode, QString* category, QVect
             " WHERE barcode = '" + barcode + "'"
             " ORDER BY tbl_entrydata.fk_datafield ASC;";
 
-    qDebug() << statement;
     *category = "";
     if(this->execute(statement, &qry, error)) {
         ok = true;
