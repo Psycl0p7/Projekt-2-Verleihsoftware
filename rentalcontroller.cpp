@@ -1,32 +1,36 @@
 #include "rentalcontroller.h"
 
-RentalController::RentalController(DBHandler* dbHandler)
+RentalController::RentalController(DBHandler* dbHandler, DialogController *dialogController)
 {
     this->dbHandler = dbHandler;
+    this->dialogController = dialogController;
 }
 
 void RentalController::searchEntryByBarcode(QString barcode)
 {
     QString error;
-    QString category;
-    QVector<QString> fieldnames;
-    QVector<QString> data;
-    QVector<Datafield*> fields;
-    Entry* entry = NULL;
+    Entry* entry = new Entry();
 
-
-    if(!this->dbHandler->getFieldnamesByBarcode(barcode, &fieldnames, &error)) {
-        qDebug() << error;
-    }
-    else if(!this->dbHandler->getEntryDataByBarcode(barcode, &category, &data, &error)) {
-        qDebug() << error;
+    if(!this->dbHandler->getEntrybyBarcode(barcode, entry, &error)) {
+        this->dialogController->showWarning("Barcodesuche konte nicht durchgeführt werden", error);
     }
     else {
-        entry = new Entry(category);
-        for(int i = 0; i < fieldnames.count(); i++) {
-           entry->addField(new Datafield(fieldnames.at(i), data.at(i)));
+        QString debugBarcode = entry->getBarcode();
+
+        if(this->activeEntryBarcodes.indexOf(debugBarcode) > -1){
+            this->dialogController->showInformation("Gerät ist bereits gelistet.");
+        }
+        else {
+            this->activeEntryBarcodes.append(entry->getBarcode());
+            this->activeEntries.append(entry);
+            emit this->showRentalEntries(this->activeEntries);
         }
     }
-    this->entries.append(entry);
-    emit this->showRentalEntries(this->entries);
+}
+
+void RentalController::switchSelectedEntry(int index)
+{
+    if(index > -1 && index < this->activeEntries.length()) {
+        emit this->showSelectedEntryData(this->activeEntries.at(index)->getAllFields());
+    }
 }

@@ -34,6 +34,7 @@ public slots:
     void showDatafieldAttributes(QString name, int typeIndex, bool required);
 
     void showRentalEntries(QVector<Entry*> entries);
+    void showRentalSelectedEntryData(QVector<Datafield*> fields);
 
     void setSettingsSelectedCategory(int index);
     void setSettingsSelectedCustomfield(int index);
@@ -49,6 +50,7 @@ private:
 
     void init();
     void toggleCategoryActivated(bool activated);
+    void initRentalEntryDetailTable();
 
 private slots:
     void on_cb_category_currentIndexChanged(const QString &category);
@@ -74,6 +76,8 @@ private slots:
     void on_cbRentEnterManually_toggled(bool checked);
 
     void on_btnRentEnterManually_clicked();
+
+    void on_lwRentEntries_currentRowChanged(int currentRow);
 
 signals:
 

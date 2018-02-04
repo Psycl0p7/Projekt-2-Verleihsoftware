@@ -259,32 +259,25 @@ bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* 
     return this->execute(statement, new QSqlQuery(), error);
 }
 
-bool DBHandler::getFieldnamesByBarcode(QString barcode, QVector<QString>* fieldnames, QString* error)
+bool DBHandler::getEntrybyBarcode(QString barcode, Entry* entry, QString* error)
 {
-    bool ok = false;
+    bool ok = true;
     QSqlQuery qry;
 
-    QString statement = "SELECT"
+    // entry construction data
+    QString category;
+
+    // fetch in same order to allaw synchronious merging
+    QVector<QString> fieldnames;
+    QVector<QString> data;
+
+    QString statementGetFieldnames = "SELECT"
             " tbl_datafields.name"
             " FROM tbl_datafields"
             " WHERE tbl_datafields.fk_category = (SELECT tbl_entries.fk_category FROM tbl_entries WHERE tbl_entries.barcode = '" + barcode +"')"
             " ORDER BY tbl_datafields.id ASC;";
 
-    if(this->execute(statement, &qry, error)) {
-        ok = true;
-        while(qry.next()) {
-            fieldnames->append(qry.value(0).toString());
-        }
-    }
-
-    return ok;
-}
-
-bool DBHandler::getEntryDataByBarcode (QString barcode, QString* category, QVector<QString>* data, QString *error)
-{
-    bool ok = false;
-    QSqlQuery qry;
-    QString statement = "SELECT"
+    QString statementGetData = "SELECT"
             " tbl_categories.name AS category,"
             " tbl_entrydata.data"
             " FROM tbl_entries"
@@ -295,14 +288,42 @@ bool DBHandler::getEntryDataByBarcode (QString barcode, QString* category, QVect
             " WHERE barcode = '" + barcode + "'"
             " ORDER BY tbl_entrydata.fk_datafield ASC;";
 
-    *category = "";
-    if(this->execute(statement, &qry, error)) {
-        ok = true;
+    if(!this->execute(statementGetFieldnames, &qry, error)) {
+        ok = false;
+    }
+    else {
         while(qry.next()) {
-            if(category->isEmpty()) {
-                *category = qry.value(0).toString();
+            fieldnames.append(qry.value(0).toString());
+        }
+        qry.finish();
+
+        if(!this->execute(statementGetData, &qry, error)) {
+            ok = false;
+        }
+        else {
+            // get category in first record
+            if(qry.first()) {
+                category = qry.value(0).toString();
+                data.append(qry.value(1).toString());
             }
-            data->append(qry.value(1).toString());
+
+            // fetch rest of data
+            while(qry.next()) {
+                data.append(qry.value(1).toString());
+            }
+
+            if(fieldnames.length() != data.length()) {
+                ok = false;
+                *error = "invalid entry data";
+            }
+            else {
+                // create Entry object
+                entry->setBarcode(barcode);
+                entry->setCategory(category);
+                for(int i = 0; i < fieldnames.length(); i++) {
+                    entry->addField(new Datafield(fieldnames.at(i), data.at(i)));
+                }
+            }
         }
     }
 

@@ -19,7 +19,7 @@ void MainWindow::init()
     GetCustomFieldsForTable();
     setDevicesInCombiBox();
     this->settingsController = new SettingsController(&this->dbHandler, &this->dialogController);
-    this->rentalController = new RentalController(&this->dbHandler);
+    this->rentalController = new RentalController(&this->dbHandler, &this->dialogController);
     this->categoriesReady = false;
 
     this->ui->btnRentEnterManually->setVisible(false);
@@ -38,9 +38,18 @@ void MainWindow::init()
     QObject::connect(this->settingsController, SIGNAL(showDatafieldAttributes(QString,int,bool)), this, SLOT(showDatafieldAttributes(QString,int,bool)));
     // rental controller
     QObject::connect(this->rentalController, SIGNAL(showRentalEntries(QVector<Entry*>)), this, SLOT(showRentalEntries(QVector<Entry*>)));
-
+    QObject::connect(this->rentalController, SIGNAL(showSelectedEntryData(QVector<Datafield*>)), this, SLOT(showRentalSelectedEntryData(QVector<Datafield*>)));
 
     this->settingsController->init();
+    this->initRentalEntryDetailTable();
+}
+
+void MainWindow::initRentalEntryDetailTable()
+{
+    this->ui->twRentDetails->insertColumn(0);
+    this->ui->twRentDetails->insertColumn(1);
+    this->ui->twRentDetails->setHorizontalHeaderItem(0, new QTableWidgetItem("Feld"));
+    this->ui->twRentDetails->setHorizontalHeaderItem(1, new QTableWidgetItem("Inhalt"));
 }
 
 void MainWindow::toggleCategoryActivated(bool activated)
@@ -257,6 +266,33 @@ void MainWindow::on_btn_customfieldDelete_clicked()
     }
 }
 
+void MainWindow::showRentalSelectedEntryData(QVector<Datafield*> fields)
+{
+    int countRows = this->ui->twRentDetails->rowCount();
+    int countFields = fields.length();
+    int neededOperations = 0;
+    this->ui->twRentDetails->clearContents();
+
+    // adjust amount of rows
+    if(countRows < countFields) {
+        neededOperations = countFields - countRows;
+        for(int i = 0; i < neededOperations; i++) {
+            this->ui->twRentDetails->insertRow(0);
+        }
+    }
+    else if(countRows > countFields) {
+        neededOperations = countRows - countFields;
+        for(int i = 0; i < neededOperations; i++) {
+            this->ui->twRentDetails->removeRow(0);
+        }
+    }
+
+    for(int i = 0; i < fields.count(); i++) {
+        this->ui->twRentDetails->setItem(i, 0, new QTableWidgetItem(fields.at(i)->getName()));
+        this->ui->twRentDetails->setItem(i, 1, new QTableWidgetItem(fields.at(i)->getData()));
+    }
+}
+
 /**
  * Holt sich alle Geräte aus der Datenbank und fügt diese in die ComboBox für eine Filterung ein.
  * @brief MainWindow::setDevicesInCombiBox
@@ -454,4 +490,9 @@ void MainWindow::on_btnRentEnterManually_clicked()
 {
     this->rentalController->searchEntryByBarcode(this->ui->edtRentBarcode->text());
 
+}
+
+void MainWindow::on_lwRentEntries_currentRowChanged(int currentRow)
+{
+    this->rentalController->switchSelectedEntry(currentRow);
 }

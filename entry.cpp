@@ -1,8 +1,9 @@
 #include "entry.h"
 
-Entry::Entry(QString category)
+Entry::Entry(QString category, QString barcode)
 {
     this->category = category;
+    this->barcode = barcode;
 }
 
 QString Entry::getCategory()
@@ -75,3 +76,15 @@ void Entry::setFields(QVector<Datafield*> fields)
 {
     this->fields = fields;
 }
+
+
+QString Entry::getBarcode()
+{
+    return this->barcode;
+}
+
+void Entry::setBarcode(QString barcode)
+{
+    this->barcode = barcode;
+}
+
