@@ -259,7 +259,7 @@ bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* 
     return this->execute(statement, new QSqlQuery(), error);
 }
 
-bool DBHandler::getEntrybyBarcode(QString barcode, Entry* entry, QString* error)
+bool DBHandler::getEntrybyBarcode(QString barcode, Entry* entry, bool *found, QString* error)
 {
     bool ok = true;
     QSqlQuery qry;
@@ -288,13 +288,19 @@ bool DBHandler::getEntrybyBarcode(QString barcode, Entry* entry, QString* error)
             " WHERE barcode = '" + barcode + "'"
             " ORDER BY tbl_entrydata.fk_datafield ASC;";
 
+    *found = false;
+
     if(!this->execute(statementGetFieldnames, &qry, error)) {
         ok = false;
     }
-    else {
+    else if(qry.first()) {
+        *found = true;
+
+        fieldnames.append(qry.value(0).toString());
         while(qry.next()) {
             fieldnames.append(qry.value(0).toString());
         }
+
         qry.finish();
 
         if(!this->execute(statementGetData, &qry, error)) {

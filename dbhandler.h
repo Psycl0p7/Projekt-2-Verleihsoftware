@@ -32,7 +32,7 @@ public:
     bool updateCustomField(QString category, QString fieldname, QString newName, int newDatatype, bool newRequired, QString *error);
     bool deleteCustomField(QString category, QString fieldname, QString* error);
 
-    bool getEntrybyBarcode(QString barcode, Entry* entry, QString* error);
+    bool getEntrybyBarcode(QString barcode, Entry* entry, bool *found, QString* error);
 
     bool getAllDeviceTypes(QSqlQuery* p_qry, QString *error);
     bool findAndUpdateDevice(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field);

@@ -39,6 +39,8 @@ void MainWindow::init()
     // rental controller
     QObject::connect(this->rentalController, SIGNAL(showRentalEntries(QVector<Entry*>)), this, SLOT(showRentalEntries(QVector<Entry*>)));
     QObject::connect(this->rentalController, SIGNAL(showSelectedEntryData(QVector<Datafield*>)), this, SLOT(showRentalSelectedEntryData(QVector<Datafield*>)));
+    QObject::connect(this->rentalController, SIGNAL(setSelectedEntryIndex(int)), this, SLOT(setSelectedEntryIndex(int)));
+    QObject::connect(this->rentalController, SIGNAL(addRentalEntry(QString)), this, SLOT(addRentalEntry(QString)));
 
     this->settingsController->init();
     this->initRentalEntryDetailTable();
@@ -138,6 +140,17 @@ void MainWindow::showRentalEntries(QVector<Entry *> entries)
         this->ui->lwRentEntries->addItem(entries.at(i)->getCategory());
 
     }
+}
+void MainWindow::setSelectedEntryIndex(int index)
+{
+    if(index < this->ui->lwRentEntries->count()) {
+        this->ui->lwRentEntries->setCurrentRow(index);
+    }
+}
+
+void MainWindow::addRentalEntry(QString entry)
+{
+    this->ui->lwRentEntries->addItem(entry);
 }
 
 /********************************************************************************
@@ -271,6 +284,8 @@ void MainWindow::showRentalSelectedEntryData(QVector<Datafield*> fields)
     int countRows = this->ui->twRentDetails->rowCount();
     int countFields = fields.length();
     int neededOperations = 0;
+
+    //clear data (clear() would remove header data)
     this->ui->twRentDetails->clearContents();
 
     // adjust amount of rows
@@ -287,6 +302,7 @@ void MainWindow::showRentalSelectedEntryData(QVector<Datafield*> fields)
         }
     }
 
+    // fill rows with data
     for(int i = 0; i < fields.count(); i++) {
         this->ui->twRentDetails->setItem(i, 0, new QTableWidgetItem(fields.at(i)->getName()));
         this->ui->twRentDetails->setItem(i, 1, new QTableWidgetItem(fields.at(i)->getData()));
@@ -435,7 +451,7 @@ void MainWindow::CreateOrUpdateDatas(QString id, QString data, QString field, QS
     } else {
         QMessageBox::warning(this, "Fehler", error + " Feld: " + field);
     }*/
-dbHandler.existDeviceInDB(&sql, &error, data);
+    dbHandler.existDeviceInDB(&sql, &error, data);
     if(sql.first()) {
         dbHandler.updateDevice(&sql, &error, id, data, field, category);
     } else {
@@ -488,11 +504,21 @@ void MainWindow::on_cbRentEnterManually_toggled(bool checked)
 
 void MainWindow::on_btnRentEnterManually_clicked()
 {
-    this->rentalController->searchEntryByBarcode(this->ui->edtRentBarcode->text());
-
+    this->rentalController->tryAddEntryByBarcode(this->ui->edtRentBarcode->text());
 }
 
 void MainWindow::on_lwRentEntries_currentRowChanged(int currentRow)
 {
     this->rentalController->switchSelectedEntry(currentRow);
+}
+
+void MainWindow::on_btnRentApply_clicked()
+{
+
+}
+
+void MainWindow::on_btnRentRemove_clicked()
+{
+    int selectedIndex = this->ui->lwRentEntries->currentRow();
+    this->rentalController->removeSelectedEntry(selectedIndex);
 }

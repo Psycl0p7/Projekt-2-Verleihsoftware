@@ -12,16 +12,20 @@ class RentalController : public QObject
 public:
     RentalController(DBHandler* dbHandler, DialogController* dialogController);
 
-    void searchEntryByBarcode(QString barcode);
+    void tryAddEntryByBarcode(QString barcode);
     void switchSelectedEntry(int index);
+    void removeSelectedEntry(int index);
 private:
     DBHandler* dbHandler;
     DialogController* dialogController;
     QVector<QString> activeEntryBarcodes;
     QVector<Entry*> activeEntries;
+    Entry* searchEntryByBarcode(QString barcode);
 signals:
     void showRentalEntries(QVector<Entry*>);
+    void addRentalEntry(QString entry);
     void showSelectedEntryData(QVector<Datafield*>);
+    void setSelectedEntryIndex(int);
 };
 
 #endif // RENTALCONTROLLER_H

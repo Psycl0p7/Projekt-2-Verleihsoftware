@@ -25,19 +25,29 @@ public:
 
 
 public slots:
+
+    // *** UI - Controlling *** //
+
+    // dialogs
     void showWarning(QString warning, QString error);
     void showInformation(QString information);
 
+    // settings view
     void showSupportedTypes(QVector<QString> supportedTypes);
     void showCategories(QVector<Entry*> categories);
     void showDatafields(QVector<Datafield*> fields);
     void showDatafieldAttributes(QString name, int typeIndex, bool required);
+    void setSettingsSelectedCategory(int index);
+    void setSettingsSelectedCustomfield(int index);
 
+    // rental view
+    void setSelectedEntryIndex(int index);
+    void addRentalEntry(QString entryCategory);
     void showRentalEntries(QVector<Entry*> entries);
     void showRentalSelectedEntryData(QVector<Datafield*> fields);
 
-    void setSettingsSelectedCategory(int index);
-    void setSettingsSelectedCustomfield(int index);
+    // ***                  *** //
+
 private:
     Ui::MainWindow *ui;
 
@@ -78,6 +88,10 @@ private slots:
     void on_btnRentEnterManually_clicked();
 
     void on_lwRentEntries_currentRowChanged(int currentRow);
+
+    void on_btnRentApply_clicked();
+
+    void on_btnRentRemove_clicked();
 
 signals:
 
