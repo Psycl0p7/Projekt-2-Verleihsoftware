@@ -21,8 +21,7 @@ void MainWindow::init()
     this->settingsController = new SettingsController(&this->dbHandler, &this->dialogController);
     this->rentalController = new RentalController(&this->dbHandler, &this->dialogController);
     this->categoriesReady = false;
-
-    this->ui->btnRentEnterManually->setVisible(false);
+    this->enterBarcodeManually = false;
 
     // ** SIGNAL SLOTS  **
     // dialog controller
@@ -499,12 +498,7 @@ void MainWindow::on_deviceVerliehen_activated(const QString &arg1)
 
 void MainWindow::on_cbRentEnterManually_toggled(bool checked)
 {
-    this->ui->btnRentEnterManually->setVisible(checked);
-}
-
-void MainWindow::on_btnRentEnterManually_clicked()
-{
-    this->rentalController->tryAddEntryByBarcode(this->ui->edtRentBarcode->text());
+    this->enterBarcodeManually = checked;
 }
 
 void MainWindow::on_lwRentEntries_currentRowChanged(int currentRow)
@@ -521,4 +515,16 @@ void MainWindow::on_btnRentRemove_clicked()
 {
     int selectedIndex = this->ui->lwRentEntries->currentRow();
     this->rentalController->removeSelectedEntry(selectedIndex);
+}
+
+void MainWindow::on_edtRentBarcode_returnPressed()
+{
+    this->rentalController->tryAddEntryByBarcode(this->ui->edtRentBarcode->text());
+}
+
+void MainWindow::on_edtRentBarcode_textChanged(const QString &changedText)
+{
+    if(!this->enterBarcodeManually && !changedText.isEmpty()) {
+        this->rentalController->tryAddEntryByBarcode(changedText);
+    }
 }

@@ -436,26 +436,12 @@
        <string>Verleih bestätigen</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="btnRentEnterManually">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>390</y>
-        <width>121</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Eingeben</string>
-      </property>
-     </widget>
      <zorder>groupBox_2</zorder>
      <zorder>groupBox_3</zorder>
      <zorder>edtRentBarcode</zorder>
      <zorder>label_13</zorder>
      <zorder>cbRentEnterManually</zorder>
      <zorder>btnRentApply</zorder>
-     <zorder>btnRentEnterManually</zorder>
      <zorder>edtRentExtra</zorder>
     </widget>
     <widget class="QWidget" name="tab_einstellungen">
