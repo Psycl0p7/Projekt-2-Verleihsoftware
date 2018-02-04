@@ -40,8 +40,11 @@ void MainWindow::init()
     QObject::connect(this->rentalController, SIGNAL(showSelectedEntryData(QVector<Datafield*>)), this, SLOT(showRentalSelectedEntryData(QVector<Datafield*>)));
     QObject::connect(this->rentalController, SIGNAL(setSelectedEntryIndex(int)), this, SLOT(setSelectedEntryIndex(int)));
     QObject::connect(this->rentalController, SIGNAL(addRentalEntry(QString)), this, SLOT(addRentalEntry(QString)));
+    QObject::connect(this->rentalController, SIGNAL(adjustEntryDataTableRows(int)), this, SLOT(adjustEntryDataTableRows(int)));
+
 
     this->settingsController->init();
+    this->resetRentalView();
     this->initRentalEntryDetailTable();
 }
 
@@ -72,6 +75,45 @@ void MainWindow::toggleCategoryActivated(bool activated)
         this->ui->btn_categoryDelete->setEnabled(activated);
         this->ui->gb_settingsCustomfields->setEnabled(activated);
     }
+}
+
+void MainWindow::adjustEntryDataTableRows(int countFields)
+{
+    int countRows = this->ui->twRentDetails->rowCount();
+    int neededOperations = 0;
+
+    // adjust amount of rows
+    if(countRows < countFields) {
+        neededOperations = countFields - countRows;
+        for(int i = 0; i < neededOperations; i++) {
+            this->ui->twRentDetails->insertRow(0);
+        }
+    }
+    else if(countRows > countFields) {
+        neededOperations = countRows - countFields;
+        for(int i = 0; i < neededOperations; i++) {
+            this->ui->twRentDetails->removeRow(0);
+        }
+    }
+}
+
+void MainWindow::resetRentalView()
+{
+    QDateTime now = QDateTime::currentDateTime();
+
+    this->ui->dtRentStart->setDateTime(now);
+    this->ui->dtRentEnd->setDateTime(now);
+    // clear line edits
+    this->ui->edtRentBarcode->clear();
+    this->ui->edtRentExtra->clear();
+    this->ui->edtRentFirstname->clear();
+    this->ui->edtRentLastname->clear();
+
+    // clear lists
+    this->ui->lwRentEntries->clear();
+
+    // init controller
+    this->rentalController->init();
 }
 
 // *** PUBLIC SLOTS **** //
@@ -280,27 +322,8 @@ void MainWindow::on_btn_customfieldDelete_clicked()
 
 void MainWindow::showRentalSelectedEntryData(QVector<Datafield*> fields)
 {
-    int countRows = this->ui->twRentDetails->rowCount();
-    int countFields = fields.length();
-    int neededOperations = 0;
-
-    //clear data (clear() would remove header data)
+    //clear data, table adjustment already triggered by controller
     this->ui->twRentDetails->clearContents();
-
-    // adjust amount of rows
-    if(countRows < countFields) {
-        neededOperations = countFields - countRows;
-        for(int i = 0; i < neededOperations; i++) {
-            this->ui->twRentDetails->insertRow(0);
-        }
-    }
-    else if(countRows > countFields) {
-        neededOperations = countRows - countFields;
-        for(int i = 0; i < neededOperations; i++) {
-            this->ui->twRentDetails->removeRow(0);
-        }
-    }
-
     // fill rows with data
     for(int i = 0; i < fields.count(); i++) {
         this->ui->twRentDetails->setItem(i, 0, new QTableWidgetItem(fields.at(i)->getName()));
@@ -526,5 +549,15 @@ void MainWindow::on_edtRentBarcode_textChanged(const QString &changedText)
 {
     if(!this->enterBarcodeManually && !changedText.isEmpty()) {
         this->rentalController->tryAddEntryByBarcode(changedText);
+    }
+}
+
+void MainWindow::on_btnRentNew_clicked()
+{
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Verleih verwerfen", "Wirklich zurücksetzen?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        this->resetRentalView();
     }
 }

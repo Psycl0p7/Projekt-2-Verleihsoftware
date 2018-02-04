@@ -45,6 +45,7 @@ public slots:
     void addRentalEntry(QString entryCategory);
     void showRentalEntries(QVector<Entry*> entries);
     void showRentalSelectedEntryData(QVector<Datafield*> fields);
+    void adjustEntryDataTableRows(int countFields);
 
     // ***                  *** //
 
@@ -60,12 +61,15 @@ private:
     bool enterBarcodeManually;
 
     void init();
+    void resetRentalView();
     void toggleCategoryActivated(bool activated);
     void initRentalEntryDetailTable();
 
 private slots:
     void on_cb_category_currentIndexChanged(const QString &category);
+
     void on_btn_categorySave_clicked();
+
     void on_btn_customfieldSave_clicked();
 
     void on_cb_customfield_currentIndexChanged(const QString &fieldname);
@@ -105,6 +109,8 @@ private slots:
     void on_edtRentBarcode_returnPressed();
 
     void on_edtRentBarcode_textChanged(const QString &changedText);
+
+    void on_btnRentNew_clicked();
 
 signals:
 

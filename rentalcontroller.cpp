@@ -45,7 +45,7 @@ Entry* RentalController::searchEntryByBarcode(QString barcode)
 void RentalController::switchSelectedEntry(int index)
 {
     if(index > -1 && index < this->activeEntries.length()) {
-        emit this->showSelectedEntryData(this->activeEntries.at(index)->getAllFields());
+        emit this->updateEntryDataTable(this->activeEntries.at(index)->getAllFields());
     }
 }
 
@@ -59,10 +59,25 @@ void RentalController::removeSelectedEntry(int index)
         emit this->showRentalEntries(this->activeEntries);
 
         if(this->activeEntries.count() < 1) {
-            emit this->showSelectedEntryData(QVector<Datafield*>());
+            // clear with empty vector
+            emit this->updateEntryDataTable(QVector<Datafield*>());
         }
         else {
-            emit this->setSelectedEntryIndex(this->activeEntries.count() - 1);
+            emit this->setSelectedEntryIndex(index - 1);
         }
     }
+}
+
+void RentalController::updateEntryDataTable(QVector<Datafield *> fields)
+{
+    emit this->adjustEntryDataTableRows(fields.count());
+    emit this->showSelectedEntryData(fields);
+}
+
+void RentalController::init()
+{
+    this->activeEntries.clear();
+    this->activeEntryBarcodes.clear();
+    this->updateEntryDataTable(QVector<Datafield*>());
+    emit this->showRentalEntries(QVector<Entry*>());
 }
