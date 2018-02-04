@@ -9,6 +9,7 @@
 #include <QTableWidgetItem>
 #include "settingscontroller.h"
 #include "rentalcontroller.h"
+#include "dialogcontroller.h"
 
 namespace Ui {
 class MainWindow;
@@ -40,6 +41,7 @@ private:
     Ui::MainWindow *ui;
 
     DBHandler dbHandler;
+    DialogController dialogController;
     SettingsController *settingsController;
     RentalController* rentalController;
 

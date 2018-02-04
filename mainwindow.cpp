@@ -18,23 +18,25 @@ void MainWindow::init()
 {
     GetCustomFieldsForTable();
     setDevicesInCombiBox();
-    this->settingsController = new SettingsController(&this->dbHandler);
+    this->settingsController = new SettingsController(&this->dbHandler, &this->dialogController);
     this->rentalController = new RentalController(&this->dbHandler);
     this->categoriesReady = false;
 
     this->ui->btnRentEnterManually->setVisible(false);
 
-
     // ** SIGNAL SLOTS  **
+    // dialog controller
+    QObject::connect(&this->dialogController, SIGNAL(si_showInformation(QString)), this, SLOT(showInformation(QString)));
+    QObject::connect(&this->dialogController, SIGNAL(si_showWarning(QString,QString)), this, SLOT(showWarning(QString,QString)));
+
+    // settings controller
     QObject::connect(this->settingsController, SIGNAL(setSettingsSelectedCategory(int)), this, SLOT(setSettingsSelectedCategory(int)));
     QObject::connect(this->settingsController, SIGNAL(setSettingsSelectedCustomfield(int)), this, SLOT(setSettingsSelectedCustomfield(int)));
-
-    QObject::connect(this->settingsController, SIGNAL(showInformation(QString)), this, SLOT(showInformation(QString)));
-    QObject::connect(this->settingsController, SIGNAL(showWarning(QString,QString)), this, SLOT(showWarning(QString,QString)));
     QObject::connect(this->settingsController, SIGNAL(showSupportedTypes(QVector<QString>)), this, SLOT(showSupportedTypes(QVector<QString>)));
     QObject::connect(this->settingsController, SIGNAL(showCategories(QVector<Entry*>)), this, SLOT(showCategories(QVector<Entry*>)));
     QObject::connect(this->settingsController, SIGNAL(showDatafields(QVector<Datafield*>)), this, SLOT(showDatafields(QVector<Datafield*>)));
     QObject::connect(this->settingsController, SIGNAL(showDatafieldAttributes(QString,int,bool)), this, SLOT(showDatafieldAttributes(QString,int,bool)));
+    // rental controller
     QObject::connect(this->rentalController, SIGNAL(showRentalEntries(QVector<Entry*>)), this, SLOT(showRentalEntries(QVector<Entry*>)));
 
 
