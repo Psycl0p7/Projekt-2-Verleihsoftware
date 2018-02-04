@@ -52,8 +52,17 @@ void RentalController::switchSelectedEntry(int index)
 void RentalController::removeSelectedEntry(int index)
 {
     if(index > -1 && index < this->activeEntries.count()) {
+        delete this->activeEntries.at(index);
         this->activeEntries.removeAt(index);
         this->activeEntryBarcodes.removeAt(index);
+
         emit this->showRentalEntries(this->activeEntries);
+
+        if(this->activeEntries.count() < 1) {
+            emit this->showSelectedEntryData(QVector<Datafield*>());
+        }
+        else {
+            emit this->setSelectedEntryIndex(this->activeEntries.count() - 1);
+        }
     }
 }
