@@ -8,6 +8,8 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets sql
 
+INCLUDEPATH +="framelesswindow"
+
 TARGET = Verleihsoftware
 TEMPLATE = app
 
@@ -28,12 +30,30 @@ SOURCES += main.cpp\
     dbhandler.cpp \
     entry.cpp \
     datafield.cpp \
-    settingscontroller.cpp
+    settingscontroller.cpp \
+    framelesswindow/framelesswindow.cpp \
+    framelesswindow/windowdragger.cpp \
+    DarkStyle.cpp \
+    rental.cpp \
+    rentalcontroller.cpp \
+    dialogcontroller.cpp
+
 
 HEADERS  += mainwindow.h \
     dbhandler.h \
     entry.h \
     datafield.h \
-    settingscontroller.h
+    settingscontroller.h \
+    framelesswindow/framelesswindow.h \
+    framelesswindow/windowdragger.h \
+    DarkStyle.h \
+    rental.h \
+    rentalcontroller.h \
+    dialogcontroller.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+               framelesswindow/framelesswindow.ui
+
+RESOURCES += \
+    darkstyle.qrc \
+    framelesswindow.qrc

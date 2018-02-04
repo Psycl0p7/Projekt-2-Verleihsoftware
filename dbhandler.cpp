@@ -37,11 +37,13 @@ bool DBHandler::createDB()
     bool dbCreated = false;
     if(!DBExists()) {
         QString path = "db.sqlite";
-        QString tblCategories   = "CREATE TABLE 'tbl_categories' ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL UNIQUE )";
-        QString tblDatafields   = "CREATE TABLE 'tbl_datafields' ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL, 'fk_category' INTEGER NOT NULL, 'fk_datatype' INTEGER NOT NULL, 'required' BOOLEAN NOT NULL)";
+        QString tblCategories = "CREATE TABLE 'tbl_categories' ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL UNIQUE )";
+        QString tblDatafields = "CREATE TABLE 'tbl_datafields' ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL, 'fk_category' INTEGER NOT NULL, 'fk_datatype' INTEGER NOT NULL, 'required' BOOLEAN NOT NULL)";
         QString tblEntrydata  = "CREATE TABLE 'tbl_entrydata'  ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'fk_datafield' INTEGER, 'fk_entry' INTEGER NOT NULL, 'data' TEXT)";
-        QString tblDatatypes = "CREATE TABLE 'tbl_datatypes'  ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'name' TEXT);";
-        QString tblEntries       = "CREATE TABLE 'tbl_entries'    ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,'fk_category' INTEGER);";
+        QString tblDatatypes  = "CREATE TABLE 'tbl_datatypes'  ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'name' TEXT);";
+        QString tblEntries    = "CREATE TABLE 'tbl_entries'    ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'fk_category' INTEGER, 'barcode' TEXT NOT NULL UNIQUE);";
+        QString tblRentals    = "CREATE TABLE 'tbl_rentals'    ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'firstname' TEXT NOT NULL, 'lastname' TEXT NOT NULL, 'extra' TEXT, 'start' TEXT, end TEXT);";
+
 
         this->db = QSqlDatabase::addDatabase("QSQLITE");
         this->db.setDatabaseName(path);
@@ -54,6 +56,7 @@ bool DBHandler::createDB()
         query.exec(tblEntrydata);
         query.exec(tblDatatypes);
         query.exec(tblEntries);
+        query.exec(tblRentals);
 
         QString addDatentypText = "INSERT INTO tbl_datatypes (name) VALUES('Text')";
 
@@ -255,6 +258,59 @@ bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* 
 
     return this->execute(statement, new QSqlQuery(), error);
 }
+
+bool DBHandler::getFieldnamesByBarcode(QString barcode, QVector<QString>* fieldnames, QString* error)
+{
+    bool ok = false;
+    QSqlQuery qry;
+
+    QString statement = "SELECT"
+            " tbl_datafields.name"
+            " FROM tbl_datafields"
+            " WHERE tbl_datafields.fk_category = (SELECT tbl_entries.fk_category FROM tbl_entries WHERE tbl_entries.barcode = '" + barcode +"')"
+            " ORDER BY tbl_datafields.id ASC;";
+    qDebug() << statement;
+
+    if(this->execute(statement, &qry, error)) {
+        ok = true;
+        while(qry.next()) {
+            fieldnames->append(qry.value(0).toString());
+        }
+    }
+
+    return ok;
+}
+
+bool DBHandler::getEntryDataByBarcode (QString barcode, QString* category, QVector<QString>* data, QString *error)
+{
+    bool ok = false;
+    QSqlQuery qry;
+    QString statement = "SELECT"
+            " tbl_categories.name AS category,"
+            " tbl_entrydata.data"
+            " FROM tbl_entries"
+            " INNER JOIN tbl_categories"
+            " ON tbl_categories.id = tbl_entries.fk_category"
+            " INNER JOIN tbl_entrydata"
+            " ON tbl_entrydata.fk_entry = tbl_entries.id"
+            " WHERE barcode = '" + barcode + "'"
+            " ORDER BY tbl_entrydata.fk_datafield ASC;";
+
+    qDebug() << statement;
+    *category = "";
+    if(this->execute(statement, &qry, error)) {
+        ok = true;
+        while(qry.next()) {
+            if(category->isEmpty()) {
+                *category = qry.value(0).toString();
+            }
+            data->append(qry.value(1).toString());
+        }
+    }
+
+    return ok;
+}
+
 
 /** Holt sich alle erstellten Typen von Geräte aus der Datenbank. Für die Visuelle Darstellung
  * @brief DBHandler::getAllDeviceTypes

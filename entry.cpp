@@ -1,13 +1,13 @@
 #include "entry.h"
 
-Entry::Entry(QString name)
+Entry::Entry(QString category)
 {
-    this->name = name;
+    this->category = category;
 }
 
-QString Entry::getName()
+QString Entry::getCategory()
 {
-    return this->name;
+    return this->category;
 }
 
 bool Entry::isRequired()
@@ -47,9 +47,9 @@ Datafield* Entry::getField(int index)
     return field;
 }
 
-void Entry::setName(QString newName)
+void Entry::setCategory(QString newName)
 {
-    this->name = newName;
+    this->category = newName;
 }
 
 int Entry::getFieldIndex(QString fieldname)

@@ -10,6 +10,8 @@
 #include <QSqlError>
 #include <QDebug>
 
+#include "entry.h"
+
 class DBHandler
 {
 public:
@@ -29,6 +31,10 @@ public:
     bool readCustomField(QString* error, QString category, QString fieldname, int* datatype, bool* required);
     bool updateCustomField(QString category, QString fieldname, QString newName, int newDatatype, bool newRequired, QString *error);
     bool deleteCustomField(QString category, QString fieldname, QString* error);
+
+    bool getFieldnamesByBarcode(QString barcode, QVector<QString>* fieldnames, QString *error);
+    bool getEntryDataByBarcode (QString barcode, QString* category, QVector<QString>* data, QString *error);
+
     bool getAllDeviceTypes(QSqlQuery* p_qry, QString *error);
     bool findAndUpdateDevice(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field);
     bool saveNewDeviceData(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category);

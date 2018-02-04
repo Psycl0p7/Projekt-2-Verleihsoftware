@@ -18,20 +18,27 @@ void MainWindow::init()
 {
     GetCustomFieldsForTable();
     setDevicesInCombiBox();
-    this->settingsController = new SettingsController(&this->dbHandler);
+    this->settingsController = new SettingsController(&this->dbHandler, &this->dialogController);
+    this->rentalController = new RentalController(&this->dbHandler);
     this->categoriesReady = false;
 
+    this->ui->btnRentEnterManually->setVisible(false);
 
     // ** SIGNAL SLOTS  **
+    // dialog controller
+    QObject::connect(&this->dialogController, SIGNAL(si_showInformation(QString)), this, SLOT(showInformation(QString)));
+    QObject::connect(&this->dialogController, SIGNAL(si_showWarning(QString,QString)), this, SLOT(showWarning(QString,QString)));
+
+    // settings controller
     QObject::connect(this->settingsController, SIGNAL(setSettingsSelectedCategory(int)), this, SLOT(setSettingsSelectedCategory(int)));
     QObject::connect(this->settingsController, SIGNAL(setSettingsSelectedCustomfield(int)), this, SLOT(setSettingsSelectedCustomfield(int)));
-
-    QObject::connect(this->settingsController, SIGNAL(showInformation(QString)), this, SLOT(showInformation(QString)));
-    QObject::connect(this->settingsController, SIGNAL(showWarning(QString,QString)), this, SLOT(showWarning(QString,QString)));
     QObject::connect(this->settingsController, SIGNAL(showSupportedTypes(QVector<QString>)), this, SLOT(showSupportedTypes(QVector<QString>)));
     QObject::connect(this->settingsController, SIGNAL(showCategories(QVector<Entry*>)), this, SLOT(showCategories(QVector<Entry*>)));
     QObject::connect(this->settingsController, SIGNAL(showDatafields(QVector<Datafield*>)), this, SLOT(showDatafields(QVector<Datafield*>)));
     QObject::connect(this->settingsController, SIGNAL(showDatafieldAttributes(QString,int,bool)), this, SLOT(showDatafieldAttributes(QString,int,bool)));
+    // rental controller
+    QObject::connect(this->rentalController, SIGNAL(showRentalEntries(QVector<Entry*>)), this, SLOT(showRentalEntries(QVector<Entry*>)));
+
 
     this->settingsController->init();
 }
@@ -82,7 +89,7 @@ void MainWindow::showCategories(QVector<Entry*> categories)
     this->ui->cb_category->clear();
     this->ui->cb_category->addItem(SettingsController::CREATE_OPERATOR);
     for(int i = 0; i < categories.count(); i++) {
-        this->ui->cb_category->addItem(categories.at(i)->getName());
+        this->ui->cb_category->addItem(categories.at(i)->getCategory());
     }
     this->ui->cb_category->setCurrentIndex(0);
 }
@@ -113,6 +120,15 @@ void MainWindow::setSettingsSelectedCategory(int index)
 void MainWindow::setSettingsSelectedCustomfield(int index)
 {
     this->ui->cb_customfield->setCurrentIndex(index);
+}
+
+void MainWindow::showRentalEntries(QVector<Entry *> entries)
+{
+    this->ui->lwRentEntries->clear();
+    for(int i = 0; i < entries.count(); i++) {
+        this->ui->lwRentEntries->addItem(entries.at(i)->getCategory());
+
+    }
 }
 
 /********************************************************************************
@@ -390,22 +406,6 @@ dbHandler.existDeviceInDB(&sql, &error, data);
 }
 
 /**
- * Beim Verleihen wird das Gerät in der DB suchen und die Felder aktualisiert
- * @brief MainWindow::on_verleihBtn_clicked
- */
-void MainWindow::on_verleihBtn_clicked()
-{
-    this->ui->startTime->text();
-    this->ui->endTime->text();
-    this->ui->textVorname->text();
-    this->ui->textVorname->text();
-    this->ui->barcode->text();
-
-    this->ui->barcode->clear();
-    this->ui->barcode->focusWidget();
-}
-
-/**
  * Sucht anhand des eingegebenen Begriffs alle Geräte aus der DB, welche den Begriff als Attribute beinhalten
  * @brief MainWindow::on_searchBtn_clicked
  */
@@ -441,4 +441,15 @@ void MainWindow::on_deviceVerliehen_activated(const QString &arg1)
             i++;
         }
     }
+}
+
+void MainWindow::on_cbRentEnterManually_toggled(bool checked)
+{
+    this->ui->btnRentEnterManually->setVisible(checked);
+}
+
+void MainWindow::on_btnRentEnterManually_clicked()
+{
+    this->rentalController->searchEntryByBarcode(this->ui->edtRentBarcode->text());
+
 }

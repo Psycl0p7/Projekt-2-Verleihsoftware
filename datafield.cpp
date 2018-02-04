@@ -1,11 +1,19 @@
 #include "datafield.h"
 
-Datafield::Datafield(QString name, int type, bool isRequired, QString data)
+Datafield::Datafield(QString name, int type, bool required, QString data)
 {
     this->name = name;
     this->type = type;
-    this->required = isRequired;
+    this->required = required;
     this->data = data;
+}
+
+Datafield::Datafield(QString name, QString data)
+{
+    this->name = name;
+    this->data = data;
+    this->type = Datafield::TYPE_UNDEFINED;
+    this->required = false;
 }
 
 QString Datafield::getName()
