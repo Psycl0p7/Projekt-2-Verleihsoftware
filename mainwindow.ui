@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>841</width>
-    <height>666</height>
+    <width>831</width>
+    <height>627</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab_uebersicht">
      <attribute name="title">
@@ -149,8 +149,8 @@
      <widget class="QGroupBox" name="groupBox_2">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>10</y>
+        <x>30</x>
+        <y>20</y>
         <width>361</width>
         <height>281</height>
        </rect>
@@ -283,8 +283,8 @@
      <widget class="QGroupBox" name="groupBox_3">
       <property name="geometry">
        <rect>
-        <x>430</x>
-        <y>10</y>
+        <x>421</x>
+        <y>20</y>
         <width>381</width>
         <height>281</height>
        </rect>
@@ -426,14 +426,27 @@
      <widget class="QPushButton" name="btnRentApply">
       <property name="geometry">
        <rect>
-        <x>560</x>
+        <x>650</x>
         <y>510</y>
-        <width>241</width>
+        <width>151</width>
         <height>51</height>
        </rect>
       </property>
       <property name="text">
        <string>Verleih bestätigen</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnRentNew">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>510</y>
+        <width>81</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Neu</string>
       </property>
      </widget>
      <zorder>groupBox_2</zorder>
@@ -443,6 +456,7 @@
      <zorder>cbRentEnterManually</zorder>
      <zorder>btnRentApply</zorder>
      <zorder>edtRentExtra</zorder>
+     <zorder>btnRentNew</zorder>
     </widget>
     <widget class="QWidget" name="tab_einstellungen">
      <attribute name="title">
@@ -451,11 +465,16 @@
      <widget class="QGroupBox" name="groupBox">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>30</x>
         <y>20</y>
         <width>381</width>
         <height>381</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="title">
        <string>Kategorien</string>
@@ -654,18 +673,21 @@
        </widget>
       </widget>
      </widget>
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>20</y>
+        <width>361</width>
+        <height>201</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Infos</string>
+      </property>
+     </widget>
     </widget>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>841</width>
-     <height>20</height>
-    </rect>
-   </property>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
