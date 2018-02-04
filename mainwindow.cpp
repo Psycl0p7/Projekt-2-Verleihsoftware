@@ -19,6 +19,7 @@ void MainWindow::init()
     GetCustomFieldsForTable();
     setDevicesInCombiBox();
     this->settingsController = new SettingsController(&this->dbHandler);
+    this->rentalController = new RentalController(&this->dbHandler);
     this->categoriesReady = false;
 
     this->ui->btnRentEnterManually->setVisible(false);
@@ -34,6 +35,8 @@ void MainWindow::init()
     QObject::connect(this->settingsController, SIGNAL(showCategories(QVector<Entry*>)), this, SLOT(showCategories(QVector<Entry*>)));
     QObject::connect(this->settingsController, SIGNAL(showDatafields(QVector<Datafield*>)), this, SLOT(showDatafields(QVector<Datafield*>)));
     QObject::connect(this->settingsController, SIGNAL(showDatafieldAttributes(QString,int,bool)), this, SLOT(showDatafieldAttributes(QString,int,bool)));
+    QObject::connect(this->rentalController, SIGNAL(showRentalEntries(QVector<Entry*>)), this, SLOT(showRentalEntries(QVector<Entry*>)));
+
 
     this->settingsController->init();
 }
@@ -115,6 +118,15 @@ void MainWindow::setSettingsSelectedCategory(int index)
 void MainWindow::setSettingsSelectedCustomfield(int index)
 {
     this->ui->cb_customfield->setCurrentIndex(index);
+}
+
+void MainWindow::showRentalEntries(QVector<Entry *> entries)
+{
+    this->ui->lwRentEntries->clear();
+    for(int i = 0; i < entries.count(); i++) {
+        this->ui->lwRentEntries->addItem(entries.at(i)->getCategory());
+
+    }
 }
 
 /********************************************************************************
@@ -434,4 +446,10 @@ void MainWindow::on_deviceVerliehen_activated(const QString &arg1)
 void MainWindow::on_cbRentEnterManually_toggled(bool checked)
 {
     this->ui->btnRentEnterManually->setVisible(checked);
+}
+
+void MainWindow::on_btnRentEnterManually_clicked()
+{
+    this->rentalController->searchEntryByBarcode(this->ui->edtRentBarcode->text());
+
 }

@@ -8,6 +8,14 @@ Datafield::Datafield(QString name, int type, bool required, QString data)
     this->data = data;
 }
 
+Datafield::Datafield(QString name, QString data)
+{
+    this->name = name;
+    this->data = data;
+    this->type = Datafield::TYPE_UNDEFINED;
+    this->required = false;
+}
+
 QString Datafield::getName()
 {
     return this->name;

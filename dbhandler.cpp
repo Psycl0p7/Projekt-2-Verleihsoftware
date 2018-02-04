@@ -259,6 +259,59 @@ bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* 
     return this->execute(statement, new QSqlQuery(), error);
 }
 
+bool DBHandler::getFieldnamesByBarcode(QString barcode, QVector<QString>* fieldnames, QString* error)
+{
+    bool ok = false;
+    QSqlQuery qry;
+
+    QString statement = "SELECT"
+            " tbl_datafields.name"
+            " FROM tbl_datafields"
+            " WHERE tbl_datafields.fk_category = (SELECT tbl_entries.fk_category FROM tbl_entries WHERE tbl_entries.barcode = '" + barcode +"')"
+            " ORDER BY tbl_datafields.id ASC;";
+    qDebug() << statement;
+
+    if(this->execute(statement, &qry, error)) {
+        ok = true;
+        while(qry.next()) {
+            fieldnames->append(qry.value(0).toString());
+        }
+    }
+
+    return ok;
+}
+
+bool DBHandler::getEntryDataByBarcode (QString barcode, QString* category, QVector<QString>* data, QString *error)
+{
+    bool ok = false;
+    QSqlQuery qry;
+    QString statement = "SELECT"
+            " tbl_categories.name AS category,"
+            " tbl_entrydata.data"
+            " FROM tbl_entries"
+            " INNER JOIN tbl_categories"
+            " ON tbl_categories.id = tbl_entries.fk_category"
+            " INNER JOIN tbl_entrydata"
+            " ON tbl_entrydata.fk_entry = tbl_entries.id"
+            " WHERE barcode = '" + barcode + "'"
+            " ORDER BY tbl_entrydata.fk_datafield ASC;";
+
+    qDebug() << statement;
+    *category = "";
+    if(this->execute(statement, &qry, error)) {
+        ok = true;
+        while(qry.next()) {
+            if(category->isEmpty()) {
+                *category = qry.value(0).toString();
+            }
+            data->append(qry.value(1).toString());
+        }
+    }
+
+    return ok;
+}
+
+
 /** Holt sich alle erstellten Typen von Geräte aus der Datenbank. Für die Visuelle Darstellung
  * @brief DBHandler::getAllDeviceTypes
  * @param p_qry - Enthält den Query für die SQL Abfrage

@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QTableWidgetItem>
 #include "settingscontroller.h"
+#include "rentalcontroller.h"
 
 namespace Ui {
 class MainWindow;
@@ -31,6 +32,8 @@ public slots:
     void showDatafields(QVector<Datafield*> fields);
     void showDatafieldAttributes(QString name, int typeIndex, bool required);
 
+    void showRentalEntries(QVector<Entry*> entries);
+
     void setSettingsSelectedCategory(int index);
     void setSettingsSelectedCustomfield(int index);
 private:
@@ -38,6 +41,7 @@ private:
 
     DBHandler dbHandler;
     SettingsController *settingsController;
+    RentalController* rentalController;
 
     bool categoriesReady;
 
@@ -66,6 +70,8 @@ private slots:
     void fillField(QString cat);
 
     void on_cbRentEnterManually_toggled(bool checked);
+
+    void on_btnRentEnterManually_clicked();
 
 signals:
 

@@ -34,7 +34,8 @@ SOURCES += main.cpp\
     framelesswindow/framelesswindow.cpp \
     framelesswindow/windowdragger.cpp \
     DarkStyle.cpp \
-    rental.cpp
+    rental.cpp \
+    rentalcontroller.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -45,7 +46,8 @@ HEADERS  += mainwindow.h \
     framelesswindow/framelesswindow.h \
     framelesswindow/windowdragger.h \
     DarkStyle.h \
-    rental.h
+    rental.h \
+    rentalcontroller.h
 
 FORMS    += mainwindow.ui \
                framelesswindow/framelesswindow.ui

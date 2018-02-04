@@ -522,7 +522,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Gerätetyp:</string>
+        <string>Kategorie:</string>
        </property>
       </widget>
       <widget class="QPushButton" name="btn_categoryDelete">
