@@ -44,33 +44,41 @@ qint64 Rental::getTimeLeft()
     return secondsLeft;
 }
 
-int Rental::countEntries()
+int Rental::countObjects()
 {
-    return this->entries.count();
+    return this->objects.count();
 }
 
 Object* Rental::getObject(int index)
 {
     Object* object = NULL;
-    if(index < this->entries.count()) {
-        object = this->entries.at(index);
+    if(index < this->objects.count()) {
+        object = this->objects.at(index);
     }
     return object;
 }
 
 void Rental::addObject(Object* object)
 {
-    this->entries.append(object);
+    this->objects.append(object);
 }
 
 bool Rental::removeObject(int index)
 {
     bool ok = false;
-    if(index < this->entries.count()) {
-        this->entries.removeAt(index);
+    if(index < this->objects.count()) {
+        this->objects.removeAt(index);
         ok = true;
     }
     return ok;
 }
 
+bool Rental::includesObject(QString barcode)
+{
+    bool includesIt = false;
+}
 
+QVector<Object*> Rental::getAllObjects()
+{
+    return this->objects;
+}

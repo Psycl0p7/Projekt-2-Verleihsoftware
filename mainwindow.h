@@ -43,7 +43,7 @@ public slots:
     // rental view
     void setSelectedObjectIndex(int index);
     void addRentalObject(QString objectCategory);
-    void showRentalEntries(QVector<Object*> entries);
+    void showRentalEntries(QVector<Object*> objects);
     void showRentalSelectedObjectData(QVector<Datafield*> fields);
     void adjustObjectDataTableRows(int countFields);
 

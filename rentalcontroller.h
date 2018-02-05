@@ -5,7 +5,7 @@
 #include "object.h"
 #include <QObject>
 #include "dialogcontroller.h"
-
+#include "rental.h"
 class RentalController : public QObject
 {
     Q_OBJECT
@@ -16,13 +16,12 @@ public:
     void tryAddObjectByBarcode(QString barcode);
     void switchSelectedObject(int index);
     void removeSelectedObject(int index);
-    void confirmActiveRental();
+    void confirmActiveRental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QDateTime now);
 
 private:
     DBHandler* dbHandler;
     DialogController* dialogController;
-    QVector<QString> activeObjectBarcodes;
-    QVector<Object*> activeEntries;
+    Rental* activeRental;
     Object* searchObjectByBarcode(QString barcode);
     void updateObjectDataTable(QVector<Datafield*> fields);
 signals:

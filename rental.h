@@ -14,13 +14,15 @@ public:
     QDateTime getStart();
     QDateTime getEnd();
     qint64 getTimeLeft();
+    bool includesObject(QString barcode);
 
-    int countEntries();
+    int countObjects();
+    QVector<Object*> getAllObjects();
     Object* getObject(int index);
     void addObject(Object* object);
     bool removeObject(int index);
 private:
-    QVector<Object*> entries;
+    QVector<Object*> objects;
 
     QString firstname;
     QString lastname;

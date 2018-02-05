@@ -173,11 +173,11 @@ void MainWindow::setSettingsSelectedCustomfield(int index)
     this->ui->cb_customfield->setCurrentIndex(index);
 }
 
-void MainWindow::showRentalEntries(QVector<Object *> entries)
+void MainWindow::showRentalEntries(QVector<Object *> objects)
 {
     this->ui->lwRentEntries->clear();
-    for(int i = 0; i < entries.count(); i++) {
-        this->ui->lwRentEntries->addItem(entries.at(i)->getCategory());
+    for(int i = 0; i < objects.count(); i++) {
+        this->ui->lwRentEntries->addItem(objects.at(i)->getCategory());
 
     }
 }
@@ -347,5 +347,11 @@ void MainWindow::on_btnRentNew_clicked()
 
 void MainWindow::on_btnRentalConfirm_clicked()
 {
-
+    QString firstname = this->ui->edtRentFirstname->text();
+    QString lastname = this->ui->edtRentLastname->text();
+    QString extra = this->ui->edtRentExtra->toPlainText();
+    QDateTime now = QDateTime::currentDateTime();
+    QDateTime start = this->ui->dtRentStart->dateTime();
+    QDateTime end = this->ui->dtRentEnd->dateTime();
+    this->rentalController->confirmActiveRental(firstname, lastname, extra, start, end, now);
 }

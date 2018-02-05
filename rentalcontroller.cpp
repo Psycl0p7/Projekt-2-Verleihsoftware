@@ -10,16 +10,15 @@ void RentalController::tryAddObjectByBarcode(QString barcode)
 {
     Object* object = NULL;
 
-    if(this->activeObjectBarcodes.indexOf(barcode) > -1) {
+    if(this->activeRental->includesObject(barcode)) {
         emit this->dialogController->showInformation("Eintrag ist bereits gelistet.");
     }
     else {
         object = this->searchObjectByBarcode(barcode);
         if(object != NULL) {
-            this->activeEntries.append(object);
-            this->activeObjectBarcodes.append(object->getBarcode());
+            this->activeRental->addObject(object);
             emit this->addRentalObject(object->getCategory());
-            emit this->setSelectedObjectIndex(this->activeEntries.count() - 1);
+            emit this->setSelectedObjectIndex(this->activeRental->countObjects() - 1);
         }
     }
 }
@@ -44,21 +43,20 @@ Object* RentalController::searchObjectByBarcode(QString barcode)
 
 void RentalController::switchSelectedObject(int index)
 {
-    if(index > -1 && index < this->activeEntries.length()) {
-        emit this->updateObjectDataTable(this->activeEntries.at(index)->getAllFields());
+    if(index > -1 && index < this->activeRental->countObjects()) {
+        emit this->updateObjectDataTable(this->activeRental->getObject(index)->getAllFields());
     }
 }
 
 void RentalController::removeSelectedObject(int index)
 {
-    if(index > -1 && index < this->activeEntries.count()) {
-        delete this->activeEntries.at(index);
-        this->activeEntries.removeAt(index);
-        this->activeObjectBarcodes.removeAt(index);
+    if(index > -1 && index < this->activeRental->countObjects()) {
+        this->activeRental->getObject(index);
+        this->activeRental->removeObject(index);
 
-        emit this->showRentalEntries(this->activeEntries);
+        emit this->showRentalEntries(this->activeRental->getAllObjects());
 
-        if(this->activeEntries.count() < 1) {
+        if(this->activeRental->countObjects() < 1) {
             // clear with empty vector
             emit this->updateObjectDataTable(QVector<Datafield*>());
         }
@@ -76,8 +74,24 @@ void RentalController::updateObjectDataTable(QVector<Datafield *> fields)
 
 void RentalController::init()
 {
-    this->activeEntries.clear();
-    this->activeObjectBarcodes.clear();
+    this->activeRental = NULL;
     this->updateObjectDataTable(QVector<Datafield*>());
     emit this->showRentalEntries(QVector<Object*>());
+}
+
+void RentalController::confirmActiveRental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QDateTime now)
+{
+    Rental* rental = NULL;
+    qint64 nowSecs = now.toSecsSinceEpoch();
+    qint64 startSecs = start.toSecsSinceEpoch();
+    qint64 endSecs = end.toSecsSinceEpoch();
+
+    if(endSecs - startSecs < 0 || startSecs < nowSecs) {
+        emit this->dialogController->showInformation("Ungültige Zeitspanne");
+    }
+    else {
+        rental = new Rental(firstname, lastname, extra, start, end);
+        for(int i = 0; i < this->activeRental->countObjects(); i++) {
+        }
+    }
 }
