@@ -19,10 +19,9 @@ void MainWindow::init()
     GetCustomFieldsForTable();
     setDevicesInCombiBox();
     this->settingsController = new SettingsController(&this->dbHandler, &this->dialogController);
-    this->rentalController = new RentalController(&this->dbHandler);
+    this->rentalController = new RentalController(&this->dbHandler, &this->dialogController);
     this->categoriesReady = false;
-
-    this->ui->btnRentEnterManually->setVisible(false);
+    this->enterBarcodeManually = false;
 
     // ** SIGNAL SLOTS  **
     // dialog controller
@@ -38,9 +37,23 @@ void MainWindow::init()
     QObject::connect(this->settingsController, SIGNAL(showDatafieldAttributes(QString,int,bool)), this, SLOT(showDatafieldAttributes(QString,int,bool)));
     // rental controller
     QObject::connect(this->rentalController, SIGNAL(showRentalEntries(QVector<Entry*>)), this, SLOT(showRentalEntries(QVector<Entry*>)));
+    QObject::connect(this->rentalController, SIGNAL(showSelectedEntryData(QVector<Datafield*>)), this, SLOT(showRentalSelectedEntryData(QVector<Datafield*>)));
+    QObject::connect(this->rentalController, SIGNAL(setSelectedEntryIndex(int)), this, SLOT(setSelectedEntryIndex(int)));
+    QObject::connect(this->rentalController, SIGNAL(addRentalEntry(QString)), this, SLOT(addRentalEntry(QString)));
+    QObject::connect(this->rentalController, SIGNAL(adjustEntryDataTableRows(int)), this, SLOT(adjustEntryDataTableRows(int)));
 
 
     this->settingsController->init();
+    this->resetRentalView();
+    this->initRentalEntryDetailTable();
+}
+
+void MainWindow::initRentalEntryDetailTable()
+{
+    this->ui->twRentDetails->insertColumn(0);
+    this->ui->twRentDetails->insertColumn(1);
+    this->ui->twRentDetails->setHorizontalHeaderItem(0, new QTableWidgetItem("Feld"));
+    this->ui->twRentDetails->setHorizontalHeaderItem(1, new QTableWidgetItem("Inhalt"));
 }
 
 void MainWindow::toggleCategoryActivated(bool activated)
@@ -62,6 +75,45 @@ void MainWindow::toggleCategoryActivated(bool activated)
         this->ui->btn_categoryDelete->setEnabled(activated);
         this->ui->gb_settingsCustomfields->setEnabled(activated);
     }
+}
+
+void MainWindow::adjustEntryDataTableRows(int countFields)
+{
+    int countRows = this->ui->twRentDetails->rowCount();
+    int neededOperations = 0;
+
+    // adjust amount of rows
+    if(countRows < countFields) {
+        neededOperations = countFields - countRows;
+        for(int i = 0; i < neededOperations; i++) {
+            this->ui->twRentDetails->insertRow(0);
+        }
+    }
+    else if(countRows > countFields) {
+        neededOperations = countRows - countFields;
+        for(int i = 0; i < neededOperations; i++) {
+            this->ui->twRentDetails->removeRow(0);
+        }
+    }
+}
+
+void MainWindow::resetRentalView()
+{
+    QDateTime now = QDateTime::currentDateTime();
+
+    this->ui->dtRentStart->setDateTime(now);
+    this->ui->dtRentEnd->setDateTime(now);
+    // clear line edits
+    this->ui->edtRentBarcode->clear();
+    this->ui->edtRentExtra->clear();
+    this->ui->edtRentFirstname->clear();
+    this->ui->edtRentLastname->clear();
+
+    // clear lists
+    this->ui->lwRentEntries->clear();
+
+    // init controller
+    this->rentalController->init();
 }
 
 // *** PUBLIC SLOTS **** //
@@ -129,6 +181,17 @@ void MainWindow::showRentalEntries(QVector<Entry *> entries)
         this->ui->lwRentEntries->addItem(entries.at(i)->getCategory());
 
     }
+}
+void MainWindow::setSelectedEntryIndex(int index)
+{
+    if(index < this->ui->lwRentEntries->count()) {
+        this->ui->lwRentEntries->setCurrentRow(index);
+    }
+}
+
+void MainWindow::addRentalEntry(QString entry)
+{
+    this->ui->lwRentEntries->addItem(entry);
 }
 
 /********************************************************************************
@@ -254,6 +317,17 @@ void MainWindow::on_btn_customfieldDelete_clicked()
     }
     else if(QMessageBox::question(this, "Datenfeld löschen", "Datenfeld wirklich löschen?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
         this->settingsController->deleteCustomfield(category, fieldname);
+    }
+}
+
+void MainWindow::showRentalSelectedEntryData(QVector<Datafield*> fields)
+{
+    //clear data, table adjustment already triggered by controller
+    this->ui->twRentDetails->clearContents();
+    // fill rows with data
+    for(int i = 0; i < fields.count(); i++) {
+        this->ui->twRentDetails->setItem(i, 0, new QTableWidgetItem(fields.at(i)->getName()));
+        this->ui->twRentDetails->setItem(i, 1, new QTableWidgetItem(fields.at(i)->getData()));
     }
 }
 
@@ -393,6 +467,13 @@ void MainWindow::CreateOrUpdateDatas(QString id, QString data, QString field, QS
 {
     QSqlQuery sql;
     QString error = NULL;
+    //dbHandler.findAndUpdateDevice(&sql, &error, id, data->text(), field->text());
+    /*if(dbHandler.saveNewDeviceData(&sql, &error, id, data, field))
+    {
+        // QMessageBox::information(this, "Gespeichert", "Daten wurden erfolgreich gespeichert");
+    } else {
+        QMessageBox::warning(this, "Fehler", error + " Feld: " + field);
+    }*/
     dbHandler.existDeviceInDB(&sql, &error, data);
     if(sql.first()) {
        // dbHandler.updateDevice(&sql, &error, id, data, field, category);
@@ -441,11 +522,43 @@ void MainWindow::on_deviceVerliehen_activated(const QString &arg1)
 
 void MainWindow::on_cbRentEnterManually_toggled(bool checked)
 {
-    this->ui->btnRentEnterManually->setVisible(checked);
+    this->enterBarcodeManually = checked;
 }
 
-void MainWindow::on_btnRentEnterManually_clicked()
+void MainWindow::on_lwRentEntries_currentRowChanged(int currentRow)
 {
-    this->rentalController->searchEntryByBarcode(this->ui->edtRentBarcode->text());
+    this->rentalController->switchSelectedEntry(currentRow);
+}
 
+void MainWindow::on_btnRentApply_clicked()
+{
+
+}
+
+void MainWindow::on_btnRentRemove_clicked()
+{
+    int selectedIndex = this->ui->lwRentEntries->currentRow();
+    this->rentalController->removeSelectedEntry(selectedIndex);
+}
+
+void MainWindow::on_edtRentBarcode_returnPressed()
+{
+    this->rentalController->tryAddEntryByBarcode(this->ui->edtRentBarcode->text());
+}
+
+void MainWindow::on_edtRentBarcode_textChanged(const QString &changedText)
+{
+    if(!this->enterBarcodeManually && !changedText.isEmpty()) {
+        this->rentalController->tryAddEntryByBarcode(changedText);
+    }
+}
+
+void MainWindow::on_btnRentNew_clicked()
+{
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Verleih verwerfen", "Wirklich zurücksetzen?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        this->resetRentalView();
+    }
 }

@@ -7,10 +7,12 @@
 class Entry
 {
 public:
-    Entry(QString category);
+    Entry(QString category = NULL, QString barcode = NULL);
     QString getCategory();
     Datafield* getField(int index);
     QVector<Datafield*> getAllFields();
+    QString getBarcode();
+    void setBarcode(QString barcode);
     bool isRequired();
     bool removeField(int index);
     bool setFieldData(QString data);
@@ -23,6 +25,7 @@ private:
     QString category;
     bool required;
     QVector<Datafield*> fields;
+    QString barcode;
 };
 
 #endif // ENTRY_H
