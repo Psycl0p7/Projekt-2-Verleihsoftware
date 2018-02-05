@@ -23,8 +23,14 @@
       <height>711</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_overview">
      <attribute name="title">
@@ -39,6 +45,11 @@
         <height>16</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+       </font>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -49,16 +60,17 @@
         <x>20</x>
         <y>20</y>
         <width>301</width>
-        <height>571</height>
+        <height>541</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
        </font>
       </property>
       <property name="title">
-       <string>Verleihe</string>
+       <string>Leihnehmer</string>
       </property>
       <widget class="QListWidget" name="listWidget">
        <property name="geometry">
@@ -66,18 +78,28 @@
          <x>20</x>
          <y>40</y>
          <width>261</width>
-         <height>451</height>
+         <height>421</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton">
        <property name="geometry">
         <rect>
          <x>19</x>
-         <y>510</y>
+         <y>480</y>
          <width>261</width>
          <height>41</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Verleih beenden</string>
@@ -90,12 +112,13 @@
         <x>340</x>
         <y>20</y>
         <width>501</width>
-        <height>281</height>
+        <height>291</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
         <stylestrategy>PreferAntialias</stylestrategy>
        </font>
       </property>
@@ -105,21 +128,31 @@
       <widget class="QDateTimeEdit" name="dtRentStart_2">
        <property name="geometry">
         <rect>
-         <x>199</x>
-         <y>50</y>
+         <x>319</x>
+         <y>60</y>
          <width>161</width>
-         <height>22</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label_16">
        <property name="geometry">
         <rect>
-         <x>200</x>
-         <y>32</y>
+         <x>320</x>
+         <y>30</y>
          <width>61</width>
-         <height>16</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Beginn:</string>
@@ -128,11 +161,16 @@
       <widget class="QLabel" name="label_17">
        <property name="geometry">
         <rect>
-         <x>200</x>
-         <y>82</y>
+         <x>320</x>
+         <y>100</y>
          <width>51</width>
-         <height>16</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Ende:</string>
@@ -141,31 +179,46 @@
       <widget class="QDateTimeEdit" name="dtRentEnd_2">
        <property name="geometry">
         <rect>
-         <x>199</x>
-         <y>100</y>
+         <x>319</x>
+         <y>130</y>
          <width>161</width>
-         <height>22</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLineEdit" name="edtRentFirstname_2">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>50</y>
-         <width>161</width>
-         <height>21</height>
+         <y>60</y>
+         <width>281</width>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label_18">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>31</y>
+         <y>29</y>
          <width>101</width>
-         <height>16</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Vorname:</string>
@@ -175,10 +228,15 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>81</y>
+         <y>98</y>
          <width>101</width>
-         <height>16</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Nachname:</string>
@@ -188,20 +246,30 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>100</y>
-         <width>161</width>
-         <height>21</height>
+         <y>130</y>
+         <width>281</width>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label_20">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>140</y>
+         <y>170</y>
          <width>71</width>
-         <height>16</height>
+         <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Zusatz:</string>
@@ -211,10 +279,15 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>160</y>
+         <y>200</y>
          <width>461</width>
-         <height>101</height>
+         <height>71</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
      </widget>
@@ -222,15 +295,17 @@
       <property name="geometry">
        <rect>
         <x>340</x>
-        <y>310</y>
+        <y>330</y>
         <width>501</width>
-        <height>281</height>
+        <height>231</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
         <stylestrategy>PreferAntialias</stylestrategy>
+        <kerning>true</kerning>
        </font>
       </property>
       <property name="title">
@@ -240,20 +315,30 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>50</y>
+         <y>60</y>
          <width>121</width>
-         <height>201</height>
+         <height>151</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label_21">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>30</y>
+         <y>27</y>
          <width>91</width>
-         <height>16</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Einträge:</string>
@@ -263,20 +348,30 @@
        <property name="geometry">
         <rect>
          <x>160</x>
-         <y>50</y>
+         <y>60</y>
          <width>321</width>
-         <height>211</height>
+         <height>151</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label_22">
        <property name="geometry">
         <rect>
          <x>160</x>
-         <y>30</y>
+         <y>33</y>
          <width>91</width>
-         <height>16</height>
+         <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Details:</string>
@@ -286,16 +381,21 @@
     </widget>
     <widget class="QWidget" name="tab_entries">
      <attribute name="title">
-      <string>Geräte</string>
+      <string>Einträge</string>
      </attribute>
      <widget class="QTableWidget" name="tableWidget10">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>90</y>
-        <width>811</width>
-        <height>491</height>
+        <x>150</x>
+        <y>91</y>
+        <width>681</width>
+        <height>471</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+       </font>
       </property>
       <property name="columnCount">
        <number>0</number>
@@ -306,9 +406,14 @@
        <rect>
         <x>20</x>
         <y>40</y>
-        <width>81</width>
+        <width>111</width>
         <height>31</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+       </font>
       </property>
       <property name="maxVisibleItems">
        <number>100</number>
@@ -317,24 +422,36 @@
      <widget class="QPushButton" name="saveBtn">
       <property name="geometry">
        <rect>
-        <x>230</x>
-        <y>40</y>
-        <width>101</width>
-        <height>31</height>
+        <x>20</x>
+        <y>270</y>
+        <width>111</width>
+        <height>41</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
       <property name="text">
-       <string>Speichern</string>
+       <string>Eintrag löschen</string>
       </property>
      </widget>
      <widget class="QPushButton" name="addBtn">
       <property name="geometry">
        <rect>
-        <x>120</x>
-        <y>40</y>
-        <width>91</width>
-        <height>31</height>
+        <x>20</x>
+        <y>150</y>
+        <width>111</width>
+        <height>41</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
+       </font>
       </property>
       <property name="text">
        <string>Neuer Eintrag</string>
@@ -343,24 +460,76 @@
      <widget class="QLineEdit" name="searchText">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>150</x>
         <y>40</y>
-        <width>281</width>
+        <width>541</width>
         <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
+        <family>Segoe UI</family>
         <pointsize>10</pointsize>
        </font>
       </property>
      </widget>
-     <widget class="QPushButton" name="searchBtn">
+     <widget class="QLabel" name="label_14">
       <property name="geometry">
        <rect>
-        <x>729</x>
+        <x>21</x>
+        <y>13</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Kategorie:</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>100</y>
+        <width>131</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Nur verliehen</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="addBtn_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>210</y>
+        <width>111</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Speichern</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="geometry">
+       <rect>
+        <x>710</x>
         <y>40</y>
-        <width>101</width>
+        <width>121</width>
         <height>31</height>
        </rect>
       </property>
@@ -368,23 +537,10 @@
        <string>Suchen</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_14">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>20</y>
-        <width>71</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Kategorie:</string>
-      </property>
-     </widget>
     </widget>
     <widget class="QWidget" name="tab_rental">
      <attribute name="title">
-      <string>Gerät Verleihen</string>
+      <string>Verleihen</string>
      </attribute>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="geometry">
@@ -392,12 +548,13 @@
         <x>30</x>
         <y>20</y>
         <width>371</width>
-        <height>281</height>
+        <height>321</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
         <stylestrategy>PreferAntialias</stylestrategy>
        </font>
       </property>
@@ -408,20 +565,30 @@
        <property name="geometry">
         <rect>
          <x>199</x>
-         <y>50</y>
+         <y>59</y>
          <width>161</width>
-         <height>22</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label_2">
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>32</y>
+         <y>33</y>
          <width>61</width>
-         <height>16</height>
+         <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Beginn:</string>
@@ -431,10 +598,15 @@
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>82</y>
+         <y>103</y>
          <width>51</width>
-         <height>16</height>
+         <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Ende:</string>
@@ -444,30 +616,45 @@
        <property name="geometry">
         <rect>
          <x>199</x>
-         <y>100</y>
+         <y>129</y>
          <width>161</width>
-         <height>22</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLineEdit" name="edtRentFirstname">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>50</y>
+         <y>61</y>
          <width>161</width>
-         <height>21</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label_8">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>31</y>
+         <y>32</y>
          <width>101</width>
-         <height>16</height>
+         <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Vorname:</string>
@@ -477,10 +664,15 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>81</y>
+         <y>103</y>
          <width>101</width>
-         <height>16</height>
+         <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Nachname:</string>
@@ -490,20 +682,30 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>100</y>
+         <y>130</y>
          <width>161</width>
-         <height>21</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label_10">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>140</y>
+         <y>172</y>
          <width>71</width>
-         <height>16</height>
+         <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
        <property name="text">
         <string>Zusatz:</string>
@@ -513,10 +715,15 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>160</y>
+         <y>200</y>
          <width>331</width>
          <height>101</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
      </widget>
@@ -525,13 +732,14 @@
        <rect>
         <x>421</x>
         <y>20</y>
-        <width>401</width>
-        <height>281</height>
+        <width>411</width>
+        <height>321</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
         <stylestrategy>PreferAntialias</stylestrategy>
        </font>
       </property>
@@ -542,20 +750,31 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>50</y>
+         <y>60</y>
          <width>121</width>
-         <height>171</height>
+         <height>191</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label_11">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>30</y>
+         <y>32</y>
          <width>91</width>
-         <height>16</height>
+         <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>9</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Einträge:</string>
@@ -565,20 +784,31 @@
        <property name="geometry">
         <rect>
          <x>160</x>
-         <y>50</y>
-         <width>221</width>
-         <height>211</height>
+         <y>60</y>
+         <width>231</width>
+         <height>241</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label_12">
        <property name="geometry">
         <rect>
          <x>160</x>
-         <y>30</y>
+         <y>32</y>
          <width>91</width>
-         <height>16</height>
+         <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>9</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Details:</string>
@@ -588,10 +818,16 @@
        <property name="geometry">
         <rect>
          <x>19</x>
-         <y>230</y>
+         <y>270</y>
          <width>121</width>
          <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>9</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Entfernen</string>
@@ -602,13 +838,14 @@
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>390</y>
+        <y>410</y>
         <width>791</width>
         <height>61</height>
        </rect>
       </property>
       <property name="font">
        <font>
+        <family>Segoe UI</family>
         <pointsize>18</pointsize>
        </font>
       </property>
@@ -620,13 +857,14 @@
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>350</y>
+        <y>367</y>
         <width>791</width>
         <height>41</height>
        </rect>
       </property>
       <property name="font">
        <font>
+        <family>Segoe UI</family>
         <pointsize>16</pointsize>
         <weight>75</weight>
         <bold>true</bold>
@@ -643,14 +881,15 @@
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>360</y>
+        <y>380</y>
         <width>241</width>
         <height>20</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
        </font>
       </property>
       <property name="text">
@@ -672,6 +911,11 @@
         <height>51</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+       </font>
+      </property>
       <property name="text">
        <string>Verleih bestätigen</string>
       </property>
@@ -684,6 +928,11 @@
         <width>101</width>
         <height>51</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+       </font>
       </property>
       <property name="text">
        <string>Neu</string>
@@ -705,7 +954,8 @@
       </property>
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
        </font>
       </property>
       <property name="title">
@@ -715,10 +965,16 @@
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>100</y>
+         <y>113</y>
          <width>221</width>
          <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>9</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Speichern</string>
@@ -727,21 +983,33 @@
       <widget class="QLineEdit" name="edt_categoryName">
        <property name="geometry">
         <rect>
-         <x>210</x>
-         <y>56</y>
+         <x>200</x>
+         <y>63</y>
          <width>151</width>
-         <height>24</height>
+         <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>9</pointsize>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label">
        <property name="geometry">
         <rect>
-         <x>213</x>
-         <y>30</y>
+         <x>200</x>
+         <y>36</y>
          <width>111</width>
          <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>9</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Bezeichnung:</string>
@@ -751,20 +1019,32 @@
        <property name="geometry">
         <rect>
          <x>16</x>
-         <y>54</y>
+         <y>63</y>
          <width>171</width>
          <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>9</pointsize>
+        </font>
        </property>
       </widget>
       <widget class="QLabel" name="label_4">
        <property name="geometry">
         <rect>
          <x>17</x>
-         <y>33</y>
+         <y>35</y>
          <width>101</width>
-         <height>16</height>
+         <height>21</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>9</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Kategorie:</string>
@@ -774,10 +1054,16 @@
        <property name="geometry">
         <rect>
          <x>18</x>
-         <y>100</y>
+         <y>113</y>
          <width>111</width>
          <height>31</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>9</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Löschen</string>
@@ -787,10 +1073,16 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>230</y>
+         <y>210</y>
          <width>341</width>
-         <height>211</height>
+         <height>231</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>9</pointsize>
+        </font>
        </property>
        <property name="title">
         <string>Datenfelder</string>
@@ -799,10 +1091,16 @@
         <property name="geometry">
          <rect>
           <x>13</x>
-          <y>33</y>
+          <y>36</y>
           <width>81</width>
           <height>13</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>9</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>Datenfeld:</string>
@@ -811,21 +1109,33 @@
        <widget class="QLineEdit" name="edt_customfieldName">
         <property name="geometry">
          <rect>
-          <x>171</x>
-          <y>55</y>
-          <width>141</width>
-          <height>20</height>
+          <x>180</x>
+          <y>60</y>
+          <width>151</width>
+          <height>31</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>9</pointsize>
+         </font>
         </property>
        </widget>
        <widget class="QLabel" name="label_5">
         <property name="geometry">
          <rect>
-          <x>16</x>
-          <y>87</y>
+          <x>15</x>
+          <y>99</y>
           <width>117</width>
-          <height>16</height>
+          <height>21</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>9</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>Typ:</string>
@@ -835,20 +1145,32 @@
         <property name="geometry">
          <rect>
           <x>13</x>
-          <y>112</y>
+          <y>130</y>
           <width>141</width>
           <height>31</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>9</pointsize>
+         </font>
         </property>
        </widget>
        <widget class="QLabel" name="label_6">
         <property name="geometry">
          <rect>
-          <x>172</x>
+          <x>180</x>
           <y>32</y>
           <width>117</width>
           <height>21</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>9</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>Bezeichnung:</string>
@@ -857,11 +1179,17 @@
        <widget class="QCheckBox" name="cb_customfieldRequired">
         <property name="geometry">
          <rect>
-          <x>210</x>
-          <y>110</y>
+          <x>229</x>
+          <y>130</y>
           <width>101</width>
           <height>22</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>9</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>Pflichtfeld</string>
@@ -871,20 +1199,32 @@
         <property name="geometry">
          <rect>
           <x>12</x>
-          <y>53</y>
+          <y>60</y>
           <width>141</width>
           <height>31</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>9</pointsize>
+         </font>
         </property>
        </widget>
        <widget class="QPushButton" name="btn_customfieldDelete">
         <property name="geometry">
          <rect>
-          <x>14</x>
-          <y>160</y>
-          <width>111</width>
+          <x>13</x>
+          <y>180</y>
+          <width>121</width>
           <height>31</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>9</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>Löschen</string>
@@ -893,11 +1233,17 @@
        <widget class="QPushButton" name="btn_customfieldSave">
         <property name="geometry">
          <rect>
-          <x>140</x>
-          <y>160</y>
-          <width>181</width>
+          <x>207</x>
+          <y>180</y>
+          <width>121</width>
           <height>31</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>9</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>Speichern</string>
@@ -914,6 +1260,12 @@
         <height>461</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
       <property name="title">
        <string>Infos</string>
       </property>
@@ -926,11 +1278,17 @@
          <height>401</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
        <property name="html">
         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:14pt; font-weight:600;&quot;&gt;FES-Verleihsystem &lt;/span&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:10pt;&quot;&gt;v1.0&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;Das FES-Verleihsystem ist das Ergebnis einer Projektarbeit, der Friedrich-Ebert-Schule Wiesbaden, im Bereich Fachinformatik.&lt;/span&gt;&lt;/p&gt;
