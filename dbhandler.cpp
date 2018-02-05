@@ -67,7 +67,7 @@ bool DBHandler::createDB()
 
         dbCreated = true;
     }
-    if(DBExists()) {
+    else if(DBExists()) {
         this->db = QSqlDatabase::addDatabase("QSQLITE");
         this->db.setDatabaseName("db.sqlite");
     }
