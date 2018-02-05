@@ -35,6 +35,7 @@ public:
 
     bool getObjectByBarcode(QString barcode, Object* object, bool *found, QString* error);
 
+    bool checkObjectAvailability(QString barcode, bool *isAvailable, QString* error);
     bool createRental(Rental* rental, QString* error);
 
 private:

@@ -8,10 +8,18 @@ RentalController::RentalController(DBHandler* dbHandler, DialogController *dialo
 
 void RentalController::tryAddObjectByBarcode(QString barcode)
 {
+    QString error;
     Object* object = NULL;
+    bool objectIsAvailable = false;
 
     if(this->activeRental->includesObject(barcode)) {
         emit this->dialogController->showInformation("Eintrag ist bereits gelistet.");
+    }
+    else if(!this->dbHandler->checkObjectAvailability(barcode, &objectIsAvailable, &error)) {
+        emit this->dialogController->showWarning("Objektverfügbarkeit konnte nicht geprüft werden", error);
+    }
+    else if(!objectIsAvailable){
+        emit this->dialogController->showInformation("Objekt bereits verliehen.");
     }
     else {
         object = this->searchObjectByBarcode(barcode);
@@ -93,7 +101,8 @@ void RentalController::confirmActiveRental(QString firstname, QString lastname, 
             this->dialogController->showWarning("Verleih konnte nicht angelegt werden", error);
         }
         else {
-            // emit this->resetRentalView();
+            emit this->dialogController->showInformation("Verleih wurde eingetragen.");
+            emit this->resetRentalView();
         }
     }
 }

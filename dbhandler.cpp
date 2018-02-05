@@ -381,3 +381,22 @@ bool DBHandler::createRental(Rental* rental, QString* error)
 
     return ok;
 }
+
+bool DBHandler::checkObjectAvailability(QString barcode, bool* isAvailable, QString *error)
+{
+    QSqlQuery* qry= new QSqlQuery();
+    bool ok = false;
+    QString statement = "SELECT COUNT(fk_object) FROM tbl_rental_object WHERE fk_object="
+            "(SELECT id FROM tbl_objects WHERE barcode='" + barcode + "');";
+
+    *isAvailable = false;
+    if(this->execute(statement, qry, error)) {
+        if(qry->first()) {
+            ok = true;
+            if(qry->value(0).toInt() < 1) {
+                *isAvailable = true;
+            }
+        }
+    }
+    return ok;
+}

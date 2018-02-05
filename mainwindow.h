@@ -46,6 +46,7 @@ public slots:
     void showRentalEntries(QVector<Object*> objects);
     void showRentalSelectedObjectData(QVector<Datafield*> fields);
     void adjustObjectDataTableRows(int countFields);
+    void resetRentalView();
 
     // ***                  *** //
 
@@ -61,7 +62,6 @@ private:
     bool enterBarcodeManually;
 
     void init();
-    void resetRentalView();
     void toggleCategoryActivated(bool activated);
     void initRentalObjectDetailTable();
 

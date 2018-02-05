@@ -31,6 +31,7 @@ signals:
     void showSelectedObjectData(QVector<Datafield*>);
     void setSelectedObjectIndex(int);
     void adjustObjectDataTableRows(int);
+    void resetRentalView();
 };
 
 #endif // RENTALCONTROLLER_H

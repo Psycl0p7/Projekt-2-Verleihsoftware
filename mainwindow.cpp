@@ -40,6 +40,7 @@ void MainWindow::init()
     QObject::connect(this->rentalController, SIGNAL(setSelectedObjectIndex(int)), this, SLOT(setSelectedObjectIndex(int)));
     QObject::connect(this->rentalController, SIGNAL(addRentalObject(QString)), this, SLOT(addRentalObject(QString)));
     QObject::connect(this->rentalController, SIGNAL(adjustObjectDataTableRows(int)), this, SLOT(adjustObjectDataTableRows(int)));
+    QObject::connect(this->rentalController, SIGNAL(resetRentalView()), this, SLOT(resetRentalView()));
 
 
     this->settingsController->init();
@@ -356,4 +357,3 @@ void MainWindow::on_btnRentalConfirm_clicked()
     QDateTime end = this->ui->dtRentEnd->dateTime();
     this->rentalController->confirmActiveRental(firstname, lastname, extra, start, end);
 }
-
