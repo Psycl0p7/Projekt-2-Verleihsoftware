@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>853</width>
-    <height>665</height>
+    <width>866</width>
+    <height>618</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_overview">
      <attribute name="title">
@@ -738,7 +738,7 @@
        </size>
       </property>
      </widget>
-     <widget class="QPushButton" name="btnRentalConfirm">
+     <widget class="QPushButton" name="btnRentAppl">
       <property name="geometry">
        <rect>
         <x>650</x>
@@ -1303,7 +1303,6 @@ p, li { white-space: pre-wrap; }
     </widget>
    </widget>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
