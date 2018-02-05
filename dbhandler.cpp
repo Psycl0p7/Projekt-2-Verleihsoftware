@@ -362,6 +362,11 @@ bool DBHandler::findAndUpdateDevice(QSqlQuery* p_qry, QString* error, QString id
     QString statement = QString("UPDATE tbl_entrydata SET " + field + " = " + data + " WHERE ID = " + id);
 }
 
+
+
+
+
+
 /**
  * Speichert neue Geräte in die Datenbank oder Updatet die Felder, wenn diese schon vorhanden sind
  * @brief DBHandler::saveNewDeviceData
@@ -372,16 +377,30 @@ bool DBHandler::findAndUpdateDevice(QSqlQuery* p_qry, QString* error, QString id
  * @param field - Feldname
  * @return
  */
-bool DBHandler::saveNewDeviceData(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category)
+bool DBHandler::saveNewDeviceDataGetID(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category)
 {
-    QString statement = QString("INSERT INTO tbl_entrydata(fk_entry, data) VALUES('" + field + "', ' " + data + "')");
-    return this->execute(statement, new QSqlQuery(), error);
+    QString statement = QString("SELECT id from tbl_categories where tbl_categories.name = '" + category + "'");
+    return this->execute(statement, p_qry, error);
 }
 
-bool DBHandler::updateDevice(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category)
+/**
+ * @brief DBHandler::saveNewDeviceDataGetNextID
+ * @param p_qry
+ * @param error
+ * @param id
+ * @param data
+ * @param field
+ * @param category
+ * @return
+ */
+bool DBHandler::saveNewDeviceDataGetNextID(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category)
 {
-
+    QString statement = QString("SELECT id FROM tbl_datafields "
+                                "WHERE tbl_datafields.fk_category = '" + id + "' AND tbl_datafields.name = '" + field + "'");
+    return this->execute(statement, p_qry, error);
 }
+
+
 
 /**
  * Sucht alle Tabellen mit dem Meta begriff
@@ -435,7 +454,7 @@ bool DBHandler::existDeviceInDB(QSqlQuery* p_qry, QString* error, QString ID)
 
 bool DBHandler::getAllDevicesForACategory(QSqlQuery* p_qry, QString* error, QString field, QString cat)
 {
-    QString statement = QString("SELECT tbl_entrydata.data "
+    QString statement = QString("SELECT tbl_entrydata.data, tbl_entrydata.fk_datafield, tbl_entrydata.fk_entry "
                                 "FROM tbl_datafields, tbl_entrydata, tbl_entries "
                                 "LEFT JOIN tbl_categories ON tbl_entries.id = tbl_entrydata.fk_entry "
                                 "WHERE tbl_datafields.id = tbl_entrydata.fk_datafield "
