@@ -286,7 +286,6 @@ void MainWindow::on_deviceCat_activated(const QString &arg1)
     QString deviceName = this->ui->deviceCat->currentText();
     int i = 0;
     this->ui->tableWidget10->setColumnCount(0);
-    setIDFields();
     if(this->ui->deviceCat->currentText() == SettingsController::CREATE_OPERATOR) {
 
     } else {
@@ -302,19 +301,6 @@ void MainWindow::on_deviceCat_activated(const QString &arg1)
 
         fillField(deviceName);
     }
-}
-
-void MainWindow::setIDFields()
-{
-    QTableWidgetItem* dataField = new QTableWidgetItem;
-    QTableWidgetItem* entryID = new QTableWidgetItem;
-    dataField->setText(QString("fk_datafield"));
-    entryID->setText(QString("fk_entry"));
-    this->ui->tableWidget10->insertColumn(0);
-    this->ui->tableWidget10->setHorizontalHeaderItem(0, dataField);
-    this->ui->tableWidget10->insertColumn(0);
-    this->ui->tableWidget10->setHorizontalHeaderItem(0, entryID);
-    return;
 }
 
 /**

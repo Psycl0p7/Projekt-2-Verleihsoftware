@@ -70,7 +70,6 @@ private slots:
     void on_searchBtn_clicked();
     void on_deviceVerliehen_activated(const QString &arg1);
     void fillField(QString cat);
-    void setIDFields();
 
     void on_cbRentEnterManually_toggled(bool checked);
 
