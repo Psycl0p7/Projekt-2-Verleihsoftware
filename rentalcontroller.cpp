@@ -79,13 +79,13 @@ void RentalController::init()
     emit this->showRentalEntries(QVector<Object*>());
 }
 
-void RentalController::confirmActiveRental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QDateTime now)
+void RentalController::confirmActiveRental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end)
 {
-    qint64 nowSecs = now.toSecsSinceEpoch();
     qint64 startSecs = start.toSecsSinceEpoch();
     qint64 endSecs = end.toSecsSinceEpoch();
+    qint64 difEndStart = endSecs - startSecs;
 
-    if(endSecs - startSecs < 0 || startSecs < nowSecs) {
+    if(difEndStart <= 0) {
         emit this->dialogController->showInformation("Ungültige Zeitspanne");
     }
     else {

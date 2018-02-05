@@ -16,7 +16,7 @@ public:
     void tryAddObjectByBarcode(QString barcode);
     void switchSelectedObject(int index);
     void removeSelectedObject(int index);
-    void confirmActiveRental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QDateTime now);
+    void confirmActiveRental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end);
 
 private:
     DBHandler* dbHandler;

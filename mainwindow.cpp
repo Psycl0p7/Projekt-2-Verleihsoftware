@@ -101,7 +101,9 @@ void MainWindow::resetRentalView()
     QDateTime now = QDateTime::currentDateTime();
 
     this->ui->dtRentStart->setDateTime(now);
+    this->ui->dtRentStart->setMinimumDateTime(now);
     this->ui->dtRentEnd->setDateTime(now);
+    this->ui->dtRentEnd->setMinimumDateTime(now);
     // clear line edits
     this->ui->edtRentBarcode->clear();
     this->ui->edtRentExtra->clear();
@@ -350,8 +352,9 @@ void MainWindow::on_btnRentalConfirm_clicked()
     QString firstname = this->ui->edtRentFirstname->text();
     QString lastname = this->ui->edtRentLastname->text();
     QString extra = this->ui->edtRentExtra->toPlainText();
-    QDateTime now = QDateTime::currentDateTime();
     QDateTime start = this->ui->dtRentStart->dateTime();
     QDateTime end = this->ui->dtRentEnd->dateTime();
-    this->rentalController->confirmActiveRental(firstname, lastname, extra, start, end, now);
+    QDateTime now = QDateTime::currentDateTime();
+    this->rentalController->confirmActiveRental(firstname, lastname, extra, start, end);
 }
+
