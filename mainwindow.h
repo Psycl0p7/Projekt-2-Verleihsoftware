@@ -78,26 +78,6 @@ private slots:
 
     void on_btn_customfieldDelete_clicked();
 
-    void GetCustomFieldsForTable();
-
-    void setDevicesInCombiBox();
-
-    void on_deviceCat_activated(const QString &arg1);
-
-    void on_addBtn_clicked();
-
-    void on_saveBtn_clicked();
-
-    bool checkIdIsCorrect(QTableWidgetItem* itemID);
-
-    void CreateOrUpdateDatas(QString id, QString data, QString field, QString category);
-
-    void on_searchBtn_clicked();
-
-    void on_deviceVerliehen_activated(const QString &arg1);
-
-    void fillField(QString cat);
-
     void on_cbRentEnterManually_toggled(bool checked);
 
     void on_lwRentEntries_currentRowChanged(int currentRow);
