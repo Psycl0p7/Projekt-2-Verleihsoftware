@@ -16,6 +16,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::init()
 {
+    this->setFixedSize(this->width(),this->height());
     this->settingsController = new SettingsController(&this->dbHandler, &this->dialogController);
     this->rentalController = new RentalController(&this->dbHandler, &this->dialogController);
     this->categoriesReady = false;
