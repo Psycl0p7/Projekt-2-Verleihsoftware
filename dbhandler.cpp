@@ -39,11 +39,11 @@ bool DBHandler::createDB()
         QString path = "db.sqlite";
         QString tblCategories  = "CREATE TABLE 'tbl_categories'   ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL UNIQUE )";
         QString tblDatafields  = "CREATE TABLE 'tbl_datafields'   ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL, 'fk_category' INTEGER NOT NULL, 'fk_datatype' INTEGER NOT NULL, 'required' BOOLEAN NOT NULL)";
-        QString tblEntrydata   = "CREATE TABLE 'tbl_objectdata'   ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'fk_datafield' INTEGER, 'fk_entry' INTEGER NOT NULL, 'data' TEXT)";
+        QString tblObjectdata   = "CREATE TABLE 'tbl_objectdata'   ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'fk_datafield' INTEGER, 'fk_object' INTEGER NOT NULL, 'data' TEXT)";
         QString tblDatatypes   = "CREATE TABLE 'tbl_datatypes'    ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'name' TEXT);";
         QString tblEntries     = "CREATE TABLE 'tbl_objects'      ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'fk_category' INTEGER, 'barcode' TEXT NOT NULL UNIQUE);";
         QString tblRentals     = "CREATE TABLE 'tbl_rentals'      ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'firstname' TEXT NOT NULL, 'lastname' TEXT NOT NULL, 'extra' TEXT, 'start' TEXT, end TEXT);";
-        QString tblRentalEntry = "CREATE TABLE 'tbl_rental_entry' ( 'fk_rental' INTEGER NOT NULL, 'fk_object' INTEGER NOT NULL);";
+        QString tblRentalObject = "CREATE TABLE 'tbl_rental_object' ( 'fk_rental' INTEGER NOT NULL, 'fk_object' INTEGER NOT NULL);";
 
 
         this->db = QSqlDatabase::addDatabase("QSQLITE");
@@ -54,11 +54,11 @@ bool DBHandler::createDB()
 
         query.exec(tblCategories);
         query.exec(tblDatafields);
-        query.exec(tblEntrydata);
+        query.exec(tblObjectdata);
         query.exec(tblDatatypes);
         query.exec(tblEntries);
         query.exec(tblRentals);
-        query.exec(tblRentalEntry);
+        query.exec(tblRentalObject);
 
         QString addDatentypText = "INSERT INTO tbl_datatypes (name) VALUES('Text')";
 
@@ -112,7 +112,6 @@ bool DBHandler::execute(QString statement, QSqlQuery *p_qry, QString *error)
         else {
             ok = true;
         }
-
     }
 
     return ok;
@@ -257,12 +256,12 @@ bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* 
     return this->execute(statement, new QSqlQuery(), error);
 }
 
-bool DBHandler::getEntrybyBarcode(QString barcode, Entry* entry, bool *found, QString* error)
+bool DBHandler::getObjectByBarcode(QString barcode, Object *object, bool *found, QString* error)
 {
     bool ok = true;
     QSqlQuery qry;
 
-    // entry construction data
+    // object construction data
     QString category;
 
     // fetch in same order to allaw synchronious merging
@@ -282,7 +281,7 @@ bool DBHandler::getEntrybyBarcode(QString barcode, Entry* entry, bool *found, QS
             " INNER JOIN tbl_categories"
             " ON tbl_categories.id = tbl_objects.fk_category"
             " INNER JOIN tbl_objectdata"
-            " ON tbl_objectdata.fk_entry = tbl_objects.id"
+            " ON tbl_objectdata.fk_object = tbl_objects.id"
             " WHERE barcode = '" + barcode + "'"
             " ORDER BY tbl_objectdata.fk_datafield ASC;";
 
@@ -318,14 +317,14 @@ bool DBHandler::getEntrybyBarcode(QString barcode, Entry* entry, bool *found, QS
 
             if(fieldnames.length() != data.length()) {
                 ok = false;
-                *error = "invalid entry data";
+                *error = "invalid object data";
             }
             else {
-                // create Entry object
-                entry->setBarcode(barcode);
-                entry->setCategory(category);
+                // create Object object
+                object->setBarcode(barcode);
+                object->setCategory(category);
                 for(int i = 0; i < fieldnames.length(); i++) {
-                    entry->addField(new Datafield(fieldnames.at(i), data.at(i)));
+                    object->addField(new Datafield(fieldnames.at(i), data.at(i)));
                 }
             }
         }
@@ -439,9 +438,9 @@ bool DBHandler::existDeviceInDB(QSqlQuery* p_qry, QString* error, QString ID)
  */
 /*bool DBHandler::getAllDevicesForACategory(QSqlQuery* p_qry, QString* error, QString cat)
 {
-    QString statement = QString("SELECT tbl_objectdata.fk_entry, tbl_datafields.name, tbl_objectdata.data "
+    QString statement = QString("SELECT tbl_objectdata.fk_object, tbl_datafields.name, tbl_objectdata.data "
                                    "FROM tbl_datafields, tbl_objectdata, tbl_objects"
-                                   "LEFT JOIN tbl_categories ON tbl_objects.id = tbl_objectdata.fk_entry"
+                                   "LEFT JOIN tbl_categories ON tbl_objects.id = tbl_objectdata.fk_object"
                                    "WHERE tbl_datafields.id = tbl_objectdata.fk_datafield AND tbl_categories.name = " + cat +"");
     return this->execute(statement, p_qry, error);
 }*/
@@ -452,12 +451,12 @@ bool DBHandler::existDeviceInDB(QSqlQuery* p_qry, QString* error, QString ID)
 
 bool DBHandler::getAllDevicesForACategory(QSqlQuery* p_qry, QString* error, QString field, QString cat)
 {
-    QString statement = QString("SELECT tbl_objectdata.data, tbl_objectdata.fk_datafield, tbl_objectdata.fk_entry "
+    QString statement = QString("SELECT tbl_objectdata.data, tbl_objectdata.fk_datafield, tbl_objectdata.fk_object "
                                 "FROM tbl_datafields, tbl_objectdata, tbl_objects "
-                                "LEFT JOIN tbl_categories ON tbl_objects.id = tbl_objectdata.fk_entry "
+                                "LEFT JOIN tbl_categories ON tbl_objects.id = tbl_objectdata.fk_object "
                                 "WHERE tbl_datafields.id = tbl_objectdata.fk_datafield "
                                 "AND tbl_categories.name = '" + cat +"' AND tbl_datafields.name = '" + field + "' "
-                                "ORDER BY tbl_objectdata.fk_entry");
+                                "ORDER BY tbl_objectdata.fk_object");
     return this->execute(statement, p_qry, error);
 }
 

@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QVector>
-#include "entry.h"
+#include "object.h"
 #include "dbhandler.h"
 #include <dialogcontroller.h>
 #include <QDebug>
@@ -35,7 +35,7 @@ public:
     void switchDatafieldAttributes(QString category, QString fieldname);
 
 private:
-    QVector<Entry*> categories;
+    QVector<Object*> categories;
     QVector<QString> supportedDatatypes;
     DBHandler* dbHandler;
     DialogController* dialogController;
@@ -54,7 +54,7 @@ signals:
     void showInformation(QString);
 
     void showSupportedTypes(QVector<QString>);
-    void showCategories(QVector<Entry*>);
+    void showCategories(QVector<Object*>);
     void showDatafields(QVector<Datafield*>);
     void showDatafieldAttributes(QString name, int typeIndex, bool required);
 

@@ -28,7 +28,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         mainwindow.cpp \
     dbhandler.cpp \
-    entry.cpp \
     datafield.cpp \
     settingscontroller.cpp \
     framelesswindow/framelesswindow.cpp \
@@ -36,12 +35,12 @@ SOURCES += main.cpp\
     DarkStyle.cpp \
     rental.cpp \
     rentalcontroller.cpp \
-    dialogcontroller.cpp
+    dialogcontroller.cpp \
+    object.cpp
 
 
 HEADERS  += mainwindow.h \
     dbhandler.h \
-    entry.h \
     datafield.h \
     settingscontroller.h \
     framelesswindow/framelesswindow.h \
@@ -49,7 +48,8 @@ HEADERS  += mainwindow.h \
     DarkStyle.h \
     rental.h \
     rentalcontroller.h \
-    dialogcontroller.h
+    dialogcontroller.h \
+    object.h
 
 FORMS    += mainwindow.ui \
                framelesswindow/framelesswindow.ui

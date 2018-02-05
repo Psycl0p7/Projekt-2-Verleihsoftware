@@ -6,78 +6,78 @@ RentalController::RentalController(DBHandler* dbHandler, DialogController *dialo
     this->dialogController = dialogController;
 }
 
-void RentalController::tryAddEntryByBarcode(QString barcode)
+void RentalController::tryAddObjectByBarcode(QString barcode)
 {
-    Entry* entry = NULL;
+    Object* object = NULL;
 
-    if(this->activeEntryBarcodes.indexOf(barcode) > -1) {
+    if(this->activeObjectBarcodes.indexOf(barcode) > -1) {
         emit this->dialogController->showInformation("Eintrag ist bereits gelistet.");
     }
     else {
-        entry = this->searchEntryByBarcode(barcode);
-        if(entry != NULL) {
-            this->activeEntries.append(entry);
-            this->activeEntryBarcodes.append(entry->getBarcode());
-            emit this->addRentalEntry(entry->getCategory());
-            emit this->setSelectedEntryIndex(this->activeEntries.count() - 1);
+        object = this->searchObjectByBarcode(barcode);
+        if(object != NULL) {
+            this->activeEntries.append(object);
+            this->activeObjectBarcodes.append(object->getBarcode());
+            emit this->addRentalObject(object->getCategory());
+            emit this->setSelectedObjectIndex(this->activeEntries.count() - 1);
         }
     }
 }
 
-Entry* RentalController::searchEntryByBarcode(QString barcode)
+Object* RentalController::searchObjectByBarcode(QString barcode)
 {
     QString error;
     bool found = false;
-    Entry* entry = new Entry();
+    Object* object = new Object();
 
-    if(!this->dbHandler->getEntrybyBarcode(barcode, entry, &found, &error)) {
-        entry = NULL;
+    if(!this->dbHandler->getObjectByBarcode(barcode, object, &found, &error)) {
+        object = NULL;
         this->dialogController->showWarning("Barcodesuche konte nicht durchgeführt werden", error);
     }
     else if(!found) {
-        entry = NULL;
+        object = NULL;
         this->dialogController->showInformation("Kein Eintrag gefunden.");
     }
 
-    return entry;
+    return object;
 }
 
-void RentalController::switchSelectedEntry(int index)
+void RentalController::switchSelectedObject(int index)
 {
     if(index > -1 && index < this->activeEntries.length()) {
-        emit this->updateEntryDataTable(this->activeEntries.at(index)->getAllFields());
+        emit this->updateObjectDataTable(this->activeEntries.at(index)->getAllFields());
     }
 }
 
-void RentalController::removeSelectedEntry(int index)
+void RentalController::removeSelectedObject(int index)
 {
     if(index > -1 && index < this->activeEntries.count()) {
         delete this->activeEntries.at(index);
         this->activeEntries.removeAt(index);
-        this->activeEntryBarcodes.removeAt(index);
+        this->activeObjectBarcodes.removeAt(index);
 
         emit this->showRentalEntries(this->activeEntries);
 
         if(this->activeEntries.count() < 1) {
             // clear with empty vector
-            emit this->updateEntryDataTable(QVector<Datafield*>());
+            emit this->updateObjectDataTable(QVector<Datafield*>());
         }
         else {
-            emit this->setSelectedEntryIndex(index - 1);
+            emit this->setSelectedObjectIndex(index - 1);
         }
     }
 }
 
-void RentalController::updateEntryDataTable(QVector<Datafield *> fields)
+void RentalController::updateObjectDataTable(QVector<Datafield *> fields)
 {
-    emit this->adjustEntryDataTableRows(fields.count());
-    emit this->showSelectedEntryData(fields);
+    emit this->adjustObjectDataTableRows(fields.count());
+    emit this->showSelectedObjectData(fields);
 }
 
 void RentalController::init()
 {
     this->activeEntries.clear();
-    this->activeEntryBarcodes.clear();
-    this->updateEntryDataTable(QVector<Datafield*>());
-    emit this->showRentalEntries(QVector<Entry*>());
+    this->activeObjectBarcodes.clear();
+    this->updateObjectDataTable(QVector<Datafield*>());
+    emit this->showRentalEntries(QVector<Object*>());
 }

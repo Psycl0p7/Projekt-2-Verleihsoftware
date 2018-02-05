@@ -49,21 +49,21 @@ int Rental::countEntries()
     return this->entries.count();
 }
 
-Entry* Rental::getEntry(int index)
+Object* Rental::getObject(int index)
 {
-    Entry* entry = NULL;
+    Object* object = NULL;
     if(index < this->entries.count()) {
-        entry = this->entries.at(index);
+        object = this->entries.at(index);
     }
-    return entry;
+    return object;
 }
 
-void Rental::addEntry(Entry* entry)
+void Rental::addObject(Object* object)
 {
-    this->entries.append(entry);
+    this->entries.append(object);
 }
 
-bool Rental::removeEntry(int index)
+bool Rental::removeObject(int index)
 {
     bool ok = false;
     if(index < this->entries.count()) {

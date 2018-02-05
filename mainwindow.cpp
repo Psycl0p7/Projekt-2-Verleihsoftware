@@ -31,23 +31,23 @@ void MainWindow::init()
     QObject::connect(this->settingsController, SIGNAL(setSettingsSelectedCategory(int)), this, SLOT(setSettingsSelectedCategory(int)));
     QObject::connect(this->settingsController, SIGNAL(setSettingsSelectedCustomfield(int)), this, SLOT(setSettingsSelectedCustomfield(int)));
     QObject::connect(this->settingsController, SIGNAL(showSupportedTypes(QVector<QString>)), this, SLOT(showSupportedTypes(QVector<QString>)));
-    QObject::connect(this->settingsController, SIGNAL(showCategories(QVector<Entry*>)), this, SLOT(showCategories(QVector<Entry*>)));
+    QObject::connect(this->settingsController, SIGNAL(showCategories(QVector<Object*>)), this, SLOT(showCategories(QVector<Object*>)));
     QObject::connect(this->settingsController, SIGNAL(showDatafields(QVector<Datafield*>)), this, SLOT(showDatafields(QVector<Datafield*>)));
     QObject::connect(this->settingsController, SIGNAL(showDatafieldAttributes(QString,int,bool)), this, SLOT(showDatafieldAttributes(QString,int,bool)));
     // rental controller
-    QObject::connect(this->rentalController, SIGNAL(showRentalEntries(QVector<Entry*>)), this, SLOT(showRentalEntries(QVector<Entry*>)));
-    QObject::connect(this->rentalController, SIGNAL(showSelectedEntryData(QVector<Datafield*>)), this, SLOT(showRentalSelectedEntryData(QVector<Datafield*>)));
-    QObject::connect(this->rentalController, SIGNAL(setSelectedEntryIndex(int)), this, SLOT(setSelectedEntryIndex(int)));
-    QObject::connect(this->rentalController, SIGNAL(addRentalEntry(QString)), this, SLOT(addRentalEntry(QString)));
-    QObject::connect(this->rentalController, SIGNAL(adjustEntryDataTableRows(int)), this, SLOT(adjustEntryDataTableRows(int)));
+    QObject::connect(this->rentalController, SIGNAL(showRentalEntries(QVector<Object*>)), this, SLOT(showRentalEntries(QVector<Object*>)));
+    QObject::connect(this->rentalController, SIGNAL(showSelectedObjectData(QVector<Datafield*>)), this, SLOT(showRentalSelectedObjectData(QVector<Datafield*>)));
+    QObject::connect(this->rentalController, SIGNAL(setSelectedObjectIndex(int)), this, SLOT(setSelectedObjectIndex(int)));
+    QObject::connect(this->rentalController, SIGNAL(addRentalObject(QString)), this, SLOT(addRentalObject(QString)));
+    QObject::connect(this->rentalController, SIGNAL(adjustObjectDataTableRows(int)), this, SLOT(adjustObjectDataTableRows(int)));
 
 
     this->settingsController->init();
     this->resetRentalView();
-    this->initRentalEntryDetailTable();
+    this->initRentalObjectDetailTable();
 }
 
-void MainWindow::initRentalEntryDetailTable()
+void MainWindow::initRentalObjectDetailTable()
 {
     this->ui->twRentDetails->insertColumn(0);
     this->ui->twRentDetails->insertColumn(1);
@@ -76,7 +76,7 @@ void MainWindow::toggleCategoryActivated(bool activated)
     }
 }
 
-void MainWindow::adjustEntryDataTableRows(int countFields)
+void MainWindow::adjustObjectDataTableRows(int countFields)
 {
     int countRows = this->ui->twRentDetails->rowCount();
     int neededOperations = 0;
@@ -135,7 +135,7 @@ void MainWindow::showSupportedTypes(QVector<QString> supportedTypes)
     }
 }
 
-void MainWindow::showCategories(QVector<Entry*> categories)
+void MainWindow::showCategories(QVector<Object*> categories)
 {
     this->ui->cb_category->clear();
     this->ui->cb_category->addItem(SettingsController::CREATE_OPERATOR);
@@ -173,7 +173,7 @@ void MainWindow::setSettingsSelectedCustomfield(int index)
     this->ui->cb_customfield->setCurrentIndex(index);
 }
 
-void MainWindow::showRentalEntries(QVector<Entry *> entries)
+void MainWindow::showRentalEntries(QVector<Object *> entries)
 {
     this->ui->lwRentEntries->clear();
     for(int i = 0; i < entries.count(); i++) {
@@ -181,16 +181,16 @@ void MainWindow::showRentalEntries(QVector<Entry *> entries)
 
     }
 }
-void MainWindow::setSelectedEntryIndex(int index)
+void MainWindow::setSelectedObjectIndex(int index)
 {
     if(index < this->ui->lwRentEntries->count()) {
         this->ui->lwRentEntries->setCurrentRow(index);
     }
 }
 
-void MainWindow::addRentalEntry(QString entry)
+void MainWindow::addRentalObject(QString object)
 {
-    this->ui->lwRentEntries->addItem(entry);
+    this->ui->lwRentEntries->addItem(object);
 }
 
 /********************************************************************************
@@ -296,7 +296,7 @@ void MainWindow::on_btn_customfieldDelete_clicked()
     }
 }
 
-void MainWindow::showRentalSelectedEntryData(QVector<Datafield*> fields)
+void MainWindow::showRentalSelectedObjectData(QVector<Datafield*> fields)
 {
     //clear data, table adjustment already triggered by controller
     this->ui->twRentDetails->clearContents();
@@ -314,29 +314,24 @@ void MainWindow::on_cbRentEnterManually_toggled(bool checked)
 
 void MainWindow::on_lwRentEntries_currentRowChanged(int currentRow)
 {
-    this->rentalController->switchSelectedEntry(currentRow);
-}
-
-void MainWindow::on_btnRentApply_clicked()
-{
-
+    this->rentalController->switchSelectedObject(currentRow);
 }
 
 void MainWindow::on_btnRentRemove_clicked()
 {
     int selectedIndex = this->ui->lwRentEntries->currentRow();
-    this->rentalController->removeSelectedEntry(selectedIndex);
+    this->rentalController->removeSelectedObject(selectedIndex);
 }
 
 void MainWindow::on_edtRentBarcode_returnPressed()
 {
-    this->rentalController->tryAddEntryByBarcode(this->ui->edtRentBarcode->text());
+    this->rentalController->tryAddObjectByBarcode(this->ui->edtRentBarcode->text());
 }
 
 void MainWindow::on_edtRentBarcode_textChanged(const QString &changedText)
 {
     if(!this->enterBarcodeManually && !changedText.isEmpty()) {
-        this->rentalController->tryAddEntryByBarcode(changedText);
+        this->rentalController->tryAddObjectByBarcode(changedText);
     }
 }
 
@@ -348,4 +343,9 @@ void MainWindow::on_btnRentNew_clicked()
     if (reply == QMessageBox::Yes) {
         this->resetRentalView();
     }
+}
+
+void MainWindow::on_btnRentalConfirm_clicked()
+{
+
 }

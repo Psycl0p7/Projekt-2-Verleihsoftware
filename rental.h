@@ -2,7 +2,7 @@
 #define RENTAL_H
 
 #include <QDateTime>
-#include "entry.h"
+#include "object.h"
 
 class Rental
 {
@@ -16,11 +16,11 @@ public:
     qint64 getTimeLeft();
 
     int countEntries();
-    Entry* getEntry(int index);
-    void addEntry(Entry* entry);
-    bool removeEntry(int index);
+    Object* getObject(int index);
+    void addObject(Object* object);
+    bool removeObject(int index);
 private:
-    QVector<Entry*> entries;
+    QVector<Object*> entries;
 
     QString firstname;
     QString lastname;

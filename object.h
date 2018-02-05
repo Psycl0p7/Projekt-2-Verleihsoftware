@@ -4,10 +4,10 @@
 #include "datafield.h"
 #include <QVector>
 
-class Entry
+class Object
 {
 public:
-    Entry(QString category = NULL, QString barcode = NULL);
+    Object(QString category = NULL, QString barcode = NULL);
     QString getCategory();
     Datafield* getField(int index);
     QVector<Datafield*> getAllFields();

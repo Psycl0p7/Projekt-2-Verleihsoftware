@@ -1,16 +1,16 @@
 #include "category.h"
 
-Entry::Entry(QString name)
+Object::Object(QString name)
 {
     this->name = name;
 }
 
-int Entry::getAmountFields()
+int Object::getAmountFields()
 {
     return this->fields.count();
 }
 
-bool Entry::removeField(int index)
+bool Object::removeField(int index)
 {
     bool ok = false;
 
@@ -22,12 +22,12 @@ bool Entry::removeField(int index)
     return ok;
 }
 
-void Entry::addField(Datafield field)
+void Object::addField(Datafield field)
 {
     this->fields.append(field);
 }
 
-Datafield Entry::getField(int index)
+Datafield Object::getField(int index)
 {
     Datafield field = NULL;
 
@@ -38,7 +38,7 @@ Datafield Entry::getField(int index)
     return field;
 }
 
-int Entry::getFieldIndex(QString fieldname)
+int Object::getFieldIndex(QString fieldname)
 {
     int index = -1;
 

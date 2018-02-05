@@ -29,7 +29,7 @@ void SettingsController::initCategories()
         this->dialogController->showWarning("Kategorien konnten nicht ausgelesen werden", error); }
     else {
         while(qry.next()) {
-            this->categories.append(new Entry(qry.value(0).toString()));
+            this->categories.append(new Object(qry.value(0).toString()));
         }
         emit this->showCategories(this->categories);
         this->initCustomfields();
@@ -102,7 +102,7 @@ int SettingsController::getDatafieldIndex(int categoryIndex, QString fieldname)
 // insertion sort
 void SettingsController::sortCategories()
 {
-    QVector<Entry*> sorted;
+    QVector<Object*> sorted;
     QString min = NULL;
     int minIndex = -1;
 
@@ -170,7 +170,7 @@ void SettingsController::createCategory(QString categoryName)
         this->dialogController->showInformation("Gerätetyp wurde angelegt.");
     }
 
-    this->categories.append(new Entry(categoryName));
+    this->categories.append(new Object(categoryName));
     this->sortCategories();
     emit this->showCategories(this->categories);
     emit this->setSettingsSelectedCategory(this->getCategoryIndex(categoryName));
@@ -202,7 +202,7 @@ void SettingsController::updateCategory(QString categoryName, QString newName)
 
 void SettingsController::deleteCategory(QString category)
 {
-    //@TODO delete ALL entrys of given category
+    //@TODO delete ALL objects of given category
     QString error = NULL;
     int categoryIndex = this->getCategoryIndex(category);
 

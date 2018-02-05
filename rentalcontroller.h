@@ -2,7 +2,7 @@
 #define RENTALCONTROLLER_H
 
 #include "dbhandler.h"
-#include "entry.h"
+#include "object.h"
 #include <QObject>
 #include "dialogcontroller.h"
 
@@ -12,24 +12,25 @@ class RentalController : public QObject
 public:
     RentalController(DBHandler* dbHandler, DialogController* dialogController);
 
-    void tryAddEntryByBarcode(QString barcode);
-    void switchSelectedEntry(int index);
-    void removeSelectedEntry(int index);
     void init();
+    void tryAddObjectByBarcode(QString barcode);
+    void switchSelectedObject(int index);
+    void removeSelectedObject(int index);
+    void confirmActiveRental();
 
 private:
     DBHandler* dbHandler;
     DialogController* dialogController;
-    QVector<QString> activeEntryBarcodes;
-    QVector<Entry*> activeEntries;
-    Entry* searchEntryByBarcode(QString barcode);
-    void updateEntryDataTable(QVector<Datafield*> fields);
+    QVector<QString> activeObjectBarcodes;
+    QVector<Object*> activeEntries;
+    Object* searchObjectByBarcode(QString barcode);
+    void updateObjectDataTable(QVector<Datafield*> fields);
 signals:
-    void showRentalEntries(QVector<Entry*>);
-    void addRentalEntry(QString entry);
-    void showSelectedEntryData(QVector<Datafield*>);
-    void setSelectedEntryIndex(int);
-    void adjustEntryDataTableRows(int);
+    void showRentalEntries(QVector<Object*>);
+    void addRentalObject(QString object);
+    void showSelectedObjectData(QVector<Datafield*>);
+    void setSelectedObjectIndex(int);
+    void adjustObjectDataTableRows(int);
 };
 
 #endif // RENTALCONTROLLER_H
