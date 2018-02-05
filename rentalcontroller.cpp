@@ -92,8 +92,3 @@ void RentalController::confirmActiveRental(QString firstname, QString lastname, 
         // db handler create Rental
     }
 }
-
-bool createRental(Rental* rental)
-{
-
-}

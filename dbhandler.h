@@ -11,6 +11,7 @@
 #include <QDebug>
 
 #include "object.h"
+#include "rental.h"
 
 class DBHandler
 {
@@ -34,16 +35,7 @@ public:
 
     bool getObjectByBarcode(QString barcode, Object* object, bool *found, QString* error);
 
-    bool createRental(Rental* rental);
-
-    bool getAllDeviceTypes(QSqlQuery* p_qry, QString *error);
-    bool findAndUpdateDevice(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field);
-    bool saveNewDeviceDataGetID(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category);
-    bool saveNewDeviceDataGetNextID(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category);
-    bool findAllSearchedData(QSqlQuery* p_qry, QString* error, QString searchPara);
-    bool existDeviceInDB(QSqlQuery* p_qry, QString* error, QString ID);
-    bool updateDevice(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category);
-    bool getAllDevicesForACategory(QSqlQuery* p_qry, QString *error, QString field, QString cat);
+    bool createRental(Rental* rental, QString* error);
 
 private:
 
