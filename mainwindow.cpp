@@ -354,7 +354,6 @@ void MainWindow::on_btnRentalConfirm_clicked()
     QString extra = this->ui->edtRentExtra->toPlainText();
     QDateTime start = this->ui->dtRentStart->dateTime();
     QDateTime end = this->ui->dtRentEnd->dateTime();
-    QDateTime now = QDateTime::currentDateTime();
     this->rentalController->confirmActiveRental(firstname, lastname, extra, start, end);
 }
 

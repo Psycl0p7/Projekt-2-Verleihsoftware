@@ -30,7 +30,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_overview">
      <attribute name="title">
@@ -738,7 +738,7 @@
        </size>
       </property>
      </widget>
-     <widget class="QPushButton" name="btnRentAppl">
+     <widget class="QPushButton" name="btnRentalConfirm">
       <property name="geometry">
        <rect>
         <x>650</x>
@@ -1249,7 +1249,7 @@
      <widget class="QGroupBox" name="groupBox_4">
       <property name="geometry">
        <rect>
-        <x>440</x>
+        <x>450</x>
         <y>20</y>
         <width>381</width>
         <height>461</height>

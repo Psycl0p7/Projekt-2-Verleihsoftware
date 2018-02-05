@@ -74,21 +74,26 @@ void RentalController::updateObjectDataTable(QVector<Datafield *> fields)
 
 void RentalController::init()
 {
-    this->activeRental = NULL;
+    this->activeRental = new Rental();
     this->updateObjectDataTable(QVector<Datafield*>());
     emit this->showRentalEntries(QVector<Object*>());
 }
 
 void RentalController::confirmActiveRental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end)
 {
+    QString error = NULL;
     qint64 startSecs = start.toSecsSinceEpoch();
     qint64 endSecs = end.toSecsSinceEpoch();
-    qint64 difEndStart = endSecs - startSecs;
 
-    if(difEndStart <= 0) {
+    if(endSecs - startSecs <= 0) {
         emit this->dialogController->showInformation("Ungültige Zeitspanne");
     }
     else {
-        // db handler create Rental
+        if(!this->dbHandler->createRental(new Rental(firstname, lastname, extra, start, end, this->activeRental->getAllObjects()), &error)) {
+            this->dialogController->showWarning("Verleih konnte nicht angelegt werden", error);
+        }
+        else {
+            // emit this->resetRentalView();
+        }
     }
 }

@@ -209,7 +209,6 @@ bool DBHandler::createCustomField(QString *error, QString name, QString geraeteT
             + QString::number(datentyp) + ","
             + QString::number(required)
             + ");";
-    qDebug() << "statement: " << statement;
 
     return this->execute(statement, new QSqlQuery(), error);
 }
@@ -327,6 +326,56 @@ bool DBHandler::getObjectByBarcode(QString barcode, Object *object, bool *found,
                     object->addField(new Datafield(fieldnames.at(i), data.at(i)));
                 }
             }
+        }
+    }
+
+    return ok;
+}
+
+bool DBHandler::createRental(Rental* rental, QString* error)
+{
+    // human readable date time format
+    bool ok = true;
+    QSqlQuery qry;
+
+    QString dateTimeFormat = "dd.MM.yyyy hh:mm";
+    QString rentalId = "";
+
+    // create rental entry
+    QString statement = "INSERT INTO tbl_rentals(firstname, lastname, extra, start, end) VALUES('"
+            + rental->getFirstname() + "', '"
+            + rental->getLastname()  + "', '"
+            + rental->getExtra()     + "', '"
+            + rental->getStart().toString(dateTimeFormat) + "', '"
+            + rental->getEnd().toString(dateTimeFormat) + "');";
+
+    if(!this->execute(statement, new QSqlQuery(), error)) {
+        ok = false;
+    }
+    else if(!this->execute("SELECT MAX(id) FROM tbl_rentals;", &qry, error)){
+        ok = false;
+    }
+    else if(!qry.first()) {
+        ok = false;
+    }
+    else {
+        // fetch id of inserted rental entry
+        rentalId = QString::number(qry.value(0).toInt());
+        // link objects
+        statement = "INSERT INTO tbl_rental_object(fk_rental, fk_object) VALUES";
+
+        for(int i = 0; i < rental->countObjects(); i++) {
+            statement += "(" + rentalId + ", (SELECT id FROM tbl_objects WHERE barcode='" + rental->getObject(i)->getBarcode() + "'))";
+
+            if(i < rental->countObjects() -1) {
+                statement += ", ";
+            } else {
+                statement += ";";
+            }
+        }
+
+        if(!this->execute(statement, new QSqlQuery(), error)) {
+            ok = false;
         }
     }
 

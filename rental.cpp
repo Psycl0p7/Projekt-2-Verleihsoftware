@@ -1,5 +1,10 @@
 #include "rental.h"
 
+Rental::Rental()
+{
+
+}
+
 Rental::Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end)
 {
     this->firstname = firstname;

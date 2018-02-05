@@ -18,6 +18,7 @@ public:
     void removeSelectedObject(int index);
     void confirmActiveRental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end);
 
+
 private:
     DBHandler* dbHandler;
     DialogController* dialogController;
