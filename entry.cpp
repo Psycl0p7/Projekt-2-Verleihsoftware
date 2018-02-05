@@ -1,13 +1,14 @@
 #include "entry.h"
 
-Entry::Entry(QString name)
+Entry::Entry(QString category, QString barcode)
 {
-    this->name = name;
+    this->category = category;
+    this->barcode = barcode;
 }
 
-QString Entry::getName()
+QString Entry::getCategory()
 {
-    return this->name;
+    return this->category;
 }
 
 bool Entry::isRequired()
@@ -47,9 +48,9 @@ Datafield* Entry::getField(int index)
     return field;
 }
 
-void Entry::setName(QString newName)
+void Entry::setCategory(QString newName)
 {
-    this->name = newName;
+    this->category = newName;
 }
 
 int Entry::getFieldIndex(QString fieldname)
@@ -75,3 +76,15 @@ void Entry::setFields(QVector<Datafield*> fields)
 {
     this->fields = fields;
 }
+
+
+QString Entry::getBarcode()
+{
+    return this->barcode;
+}
+
+void Entry::setBarcode(QString barcode)
+{
+    this->barcode = barcode;
+}
+

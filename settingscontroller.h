@@ -5,6 +5,7 @@
 #include <QVector>
 #include "entry.h"
 #include "dbhandler.h"
+#include <dialogcontroller.h>
 #include <QDebug>
 
 class SettingsController : public QObject
@@ -14,7 +15,7 @@ class SettingsController : public QObject
 
 public:
     static const QString CREATE_OPERATOR;
-    SettingsController(DBHandler* dbHandler);
+    SettingsController(DBHandler* dbHandler, DialogController* dialogController);
     ~SettingsController();
 
     void init();
@@ -37,6 +38,7 @@ private:
     QVector<Entry*> categories;
     QVector<QString> supportedDatatypes;
     DBHandler* dbHandler;
+    DialogController* dialogController;
 
 
     void initCategories();

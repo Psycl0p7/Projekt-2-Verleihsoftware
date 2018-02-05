@@ -7,22 +7,25 @@
 class Entry
 {
 public:
-    Entry(QString name);
-    QString getName();
+    Entry(QString category = NULL, QString barcode = NULL);
+    QString getCategory();
     Datafield* getField(int index);
     QVector<Datafield*> getAllFields();
+    QString getBarcode();
+    void setBarcode(QString barcode);
     bool isRequired();
     bool removeField(int index);
     bool setFieldData(QString data);
     int countFields();
     int getFieldIndex(QString fieldname);
     void addField(Datafield *field);
-    void setName(QString newName);
+    void setCategory(QString newName);
     void setFields(QVector<Datafield*> fields);
 private:
-    QString name;
+    QString category;
     bool required;
     QVector<Datafield*> fields;
+    QString barcode;
 };
 
 #endif // ENTRY_H
