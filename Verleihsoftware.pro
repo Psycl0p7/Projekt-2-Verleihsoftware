@@ -57,3 +57,8 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     darkstyle.qrc \
     framelesswindow.qrc
+
+DISTFILES += \
+    icon.rc
+
+RC_FILE = icon.rc
