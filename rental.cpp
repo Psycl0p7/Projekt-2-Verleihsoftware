@@ -9,6 +9,16 @@ Rental::Rental(QString firstname, QString lastname, QString extra, QDateTime sta
     this->end = end;
 }
 
+Rental::Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QVector<Object *> objects)
+{
+    this->firstname = firstname;
+    this->lastname = lastname;
+    this->extra = extra;
+    this->start = start;
+    this->end = end;
+    this->objects = objects;
+}
+
 QString Rental::getFirstname()
 {
     return this->firstname;
@@ -74,8 +84,16 @@ bool Rental::removeObject(int index)
 }
 
 bool Rental::includesObject(QString barcode)
-{
+{   
     bool includesIt = false;
+
+    for(int i = 0; i < this->objects.count(); i++) {
+        if(barcode == this->objects.at(i)->getBarcode()) {
+            includesIt = true;
+        }
+    }
+
+    return includesIt;
 }
 
 QVector<Object*> Rental::getAllObjects()

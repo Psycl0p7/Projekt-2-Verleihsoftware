@@ -34,6 +34,8 @@ public:
 
     bool getObjectByBarcode(QString barcode, Object* object, bool *found, QString* error);
 
+    bool createRental(Rental* rental);
+
     bool getAllDeviceTypes(QSqlQuery* p_qry, QString *error);
     bool findAndUpdateDevice(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field);
     bool saveNewDeviceDataGetID(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category);

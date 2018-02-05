@@ -81,7 +81,6 @@ void RentalController::init()
 
 void RentalController::confirmActiveRental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QDateTime now)
 {
-    Rental* rental = NULL;
     qint64 nowSecs = now.toSecsSinceEpoch();
     qint64 startSecs = start.toSecsSinceEpoch();
     qint64 endSecs = end.toSecsSinceEpoch();
@@ -90,8 +89,11 @@ void RentalController::confirmActiveRental(QString firstname, QString lastname, 
         emit this->dialogController->showInformation("Ungültige Zeitspanne");
     }
     else {
-        rental = new Rental(firstname, lastname, extra, start, end);
-        for(int i = 0; i < this->activeRental->countObjects(); i++) {
-        }
+        // db handler create Rental
     }
+}
+
+bool createRental(Rental* rental)
+{
+
 }

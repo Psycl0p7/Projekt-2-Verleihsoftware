@@ -8,6 +8,7 @@ class Rental
 {
 public:
     Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end);
+    Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QVector<Object*> objects);
     QString getFirstname();
     QString getLastname();
     QString getExtra();
