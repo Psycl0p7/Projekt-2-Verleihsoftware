@@ -49,6 +49,13 @@ void ObjectController::searchObjectsByCategory(int categoryIndex)
     }
 }
 
+void ObjectController::update()
+{
+    // create objects
+
+    // update objects
+}
+
 void ObjectController::removeObject(int index)
 {
 

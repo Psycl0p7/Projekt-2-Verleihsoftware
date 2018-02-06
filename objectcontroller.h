@@ -17,6 +17,7 @@ public:
     void saveDifToDB();
     void setSelectedCategory(int index);
     void searchObjectsByCategory(int categoryIndex);
+    void update();
 
 public slots:
     void receiveCategories(QVector<Object*> categories);

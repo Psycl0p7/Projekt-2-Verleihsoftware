@@ -425,3 +425,8 @@ void MainWindow::on_cbObjectsCategory_currentIndexChanged(int index)
         this->objectController->setSelectedCategory(index);
     }
 }
+
+void MainWindow::on_btnObjectsUpdate_clicked()
+{
+    this->objectController->update();
+}

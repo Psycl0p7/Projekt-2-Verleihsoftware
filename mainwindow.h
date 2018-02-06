@@ -107,6 +107,8 @@ private slots:
 
     void on_cbObjectsCategory_currentIndexChanged(int index);
 
+    void on_btnObjectsUpdate_clicked();
+
 signals:
 
 };
