@@ -56,6 +56,8 @@ void MainWindow::init()
     QObject::connect(this->objectController, SIGNAL(addObjectToTable(Object*)), this, SLOT(addObjectToTable(Object*)));
     QObject::connect(this->objectController, SIGNAL(showObjects(QVector<Object*>)), this, SLOT(showObjects(QVector<Object*>)));
 
+    QObject::connect(this->frmReadInBarcode, SIGNAL(createObject(QString)), this->objectController, SLOT(createObject(QString)));
+
     this->settingsController->init();
     this->resetRentalView();
     this->initRentalObjectDetailTable();

@@ -38,6 +38,9 @@ public:
 
     bool checkObjectAvailability(QString barcode, bool *isAvailable, QString* error);
     bool createRental(Rental* rental, QString* error);
+    bool checkBarcodeisAvailable(QString barcode, bool* isAvailable, QString* error);
+    bool createObject(Object* object);
+    bool updateObect(Object* object);
 
 private:
 

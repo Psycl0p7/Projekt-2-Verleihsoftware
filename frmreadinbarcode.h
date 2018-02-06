@@ -39,7 +39,7 @@ private:
     DialogController* dialogController;
 
     bool manualInputMode = false;
-    bool isBarcodeAlreadyInDb(QString barcode);
+    bool isBarcodeAvailable(QString barcode);
     void init();
 };
 

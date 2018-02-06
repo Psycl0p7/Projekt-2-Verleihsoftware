@@ -9,7 +9,6 @@ FrmReadInBarcode::FrmReadInBarcode(DBHandler *dbHandler, DialogController *dialo
     this->dbHandler = dbHandler;
     this->dialogController = dialogController;
     this->setFixedSize(this->width(),this->height());
-    this->setWindowFlags(Qt::WindowStaysOnTopHint);
     this->init();
     this->hide();
 }
@@ -29,7 +28,8 @@ void FrmReadInBarcode::init()
 void FrmReadInBarcode::on_edtBarcode_returnPressed()
 {
     QString barcode = this->ui->edtBarcode->text();
-    if(!barcode.isEmpty() && this->isBarcodeAlreadyInDb(barcode)) {
+    if(!barcode.isEmpty() && this->isBarcodeAvailable(barcode)) {
+        this->hide();
         emit this->createObject(barcode);
     }
 }
@@ -42,7 +42,8 @@ void FrmReadInBarcode::on_cbManualInput_toggled(bool checked)
 void FrmReadInBarcode::on_edtBarcode_textChanged(const QString &barcode)
 {
     if(!this->manualInputMode) {
-        if(!barcode.isEmpty() && this->isBarcodeAlreadyInDb(barcode)) {
+        if(!barcode.isEmpty() && this->isBarcodeAvailable(barcode)) {
+            this->hide();
             emit this->createObject(barcode);
         }
     }
@@ -64,18 +65,18 @@ void FrmReadInBarcode::on_btnAbort_clicked()
     this->hide();
 }
 
-bool FrmReadInBarcode::isBarcodeAlreadyInDb(QString barcode)
+bool FrmReadInBarcode::isBarcodeAvailable(QString barcode)
 {
     QString error = "";
     // available if code is already in db
-    bool isAlreadyInDb = false;
+    bool isAvailable = false;
 
-    if(!this->dbHandler->checkObjectAvailability(barcode, &isAlreadyInDb, &error)) {
+    if(!this->dbHandler->checkBarcodeisAvailable(barcode, &isAvailable, &error)) {
         emit this->dialogController->showWarning("Barcode konnte nicht geprüft werden", error);
     }
-    else if(isAlreadyInDb) {
+    else if(!isAvailable) {
         emit this->dialogController->showInformation("Barcode bereits eingetragen.");
     }
 
-    return isAlreadyInDb;
+    return isAvailable;
 }

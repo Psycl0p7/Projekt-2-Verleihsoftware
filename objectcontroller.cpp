@@ -29,7 +29,10 @@ void ObjectController::createObject(QString barcode)
     for(int i = 0; i < category->countFields(); i++) {
        object->addField(new Datafield(category->getField(i)->getName(), category->getField(i)->getType(), category->getField(i)->isRequired()));
     }
-    emit this->addObjectToTable(object);
+
+    this->createdObjects.append(object);
+    this->currentObjects.append(object);
+    emit this->showObjects(this->currentObjects);
 }
 
 void ObjectController::searchObjectsByCategory(int categoryIndex)
@@ -41,7 +44,8 @@ void ObjectController::searchObjectsByCategory(int categoryIndex)
         emit this->dialogController->showWarning("Objeckte konnten nicht gesucht werden", error);
     }
     else {
-        emit this->showObjects(foundObjects);
+        this->currentObjects = foundObjects;
+        emit this->showObjects(this->currentObjects);
     }
 }
 

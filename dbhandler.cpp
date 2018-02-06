@@ -434,3 +434,32 @@ bool DBHandler::searchObjectsByCategory(QString category, QVector<Object*>* foun
 
     return ok;
 }
+
+bool DBHandler::checkBarcodeisAvailable(QString barcode, bool* isAvailable, QString* error)
+{
+    QSqlQuery* qry= new QSqlQuery();
+    bool ok = false;
+    QString statement = "SELECT COUNT(barcode) FROM tbl_objects WHERE barcode='"
+            + barcode + "';";
+
+    *isAvailable = false;
+    if(this->execute(statement, qry, error)) {
+        if(qry->first()) {
+            ok = true;
+            if(qry->value(0).toInt() == 0) {
+                *isAvailable = true;
+            }
+        }
+    }
+    return ok;
+}
+
+bool createObject(Object* object)
+{
+
+}
+
+bool updateObect(Object* object)
+{
+
+}

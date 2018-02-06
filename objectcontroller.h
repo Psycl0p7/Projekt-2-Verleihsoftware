@@ -24,15 +24,16 @@ public slots:
 signals:
     void updateCateoryList();
     void addObjectToTable(Object* object);
-    void resetTable(QVector<Datafield*> datafields);
     void showObjects(QVector<Object*> objects);
-
+    void resetTable(QVector<Datafield*> datafields);
 private:
     DBHandler* dbHandler;
     int selectedCategoryIndex;
     DialogController* dialogController;
     QVector<Object*> categories;
     QVector<Object*> currentObjects;
+    QVector<Object*> createdObjects;
+    QVector<Object*> updatedObjects;
 };
 
 #endif // OBJECTCONTROLLER_H
