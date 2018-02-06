@@ -1,11 +1,8 @@
 #include "objectcontroller.h"
 #include "dialogcontroller.h"
 
-const QString ObjectController::LIST_ALL_CATEGORIES = "Alle";
-
 ObjectController::ObjectController(DBHandler* dbHandler, DialogController* dialogController)
 {
-    this->selectedCategoryIndex = ObjectController::LIST_ALL_INDEX;
     this->dbHandler = dbHandler;
     this->dialogController = dialogController;
 }
@@ -19,13 +16,32 @@ void ObjectController::receiveCategories(QVector<Object *> categories)
 void ObjectController::setSelectedCategory(int index)
 {
     this->selectedCategoryIndex = index;
+    emit this->resetTable(this->categories.at(index)->getAllFields());
+    this->searchObjectsByCategory(index);
 }
 
-void ObjectController::createObject()
+void ObjectController::createObject(QString barcode)
 {
     Object* object = NULL;
-    if(this->selectedCategoryIndex > ObjectController::LIST_ALL_INDEX) {
-        object = new Object(this->categories.at(this->selectedCategoryIndex)->getCategory());
+    Object* category = this->categories.at(this->selectedCategoryIndex);
+
+    object = new Object(category->getCategory(), barcode);
+    for(int i = 0; i < category->countFields(); i++) {
+       object->addField(new Datafield(category->getField(i)->getName(), category->getField(i)->getType(), category->getField(i)->isRequired()));
+    }
+    emit this->addObjectToTable(object);
+}
+
+void ObjectController::searchObjectsByCategory(int categoryIndex)
+{
+    QVector<Object*> foundObjects;
+    QString error;
+
+    if(!this->dbHandler->searchObjectsByCategory(this->categories.at(categoryIndex)->getCategory(), &foundObjects, &error)) {
+        emit this->dialogController->showWarning("Objeckte konnten nicht gesucht werden", error);
+    }
+    else {
+        emit this->showObjects(foundObjects);
     }
 }
 

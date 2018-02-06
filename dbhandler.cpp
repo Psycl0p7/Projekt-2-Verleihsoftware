@@ -401,3 +401,36 @@ bool DBHandler::checkObjectAvailability(QString barcode, bool* isAvailable, QStr
     }
     return ok;
 }
+
+bool DBHandler::searchObjectsByCategory(QString category, QVector<Object*>* foundObjects, QString* error)
+{
+    QSqlQuery* qry = new QSqlQuery();
+    bool ok = false;
+    QVector<QString> barcodes;
+    QString statement = "SELECT barcode FROM tbl_objects WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='" + category + "');";
+    bool found = true;
+    Object* foundObject = NULL;
+
+    if(this->execute(statement, qry, error)) {
+        ok = true;
+        // prepare barcodes
+        while(qry->next()) {
+            barcodes.append(qry->value(0).toString());
+        }
+
+        for(int i = 0; i < barcodes.count(); i++) {
+            foundObject = new Object();
+            if(!this->getObjectByBarcode(barcodes.at(i), foundObject, &found, error)) {
+                ok = false;
+            }
+            else if (!found) {
+                found = false;
+            }
+            else {
+                foundObjects->append(foundObject);
+            }
+        }
+    }
+
+    return ok;
+}

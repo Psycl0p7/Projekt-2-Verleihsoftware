@@ -7,10 +7,12 @@
 #include <QVector>
 #include <QDebug>
 #include <QTableWidgetItem>
+#include <QCloseEvent>
 #include "settingscontroller.h"
 #include "rentalcontroller.h"
 #include "dialogcontroller.h"
 #include "objectcontroller.h"
+#include "frmreadinbarcode.h"
 
 namespace Ui {
 class MainWindow;
@@ -49,6 +51,11 @@ public slots:
     void adjustObjectDataTableRows(int countFields);
     void resetRentalView();
 
+    // object view
+    void addObjectToTable(Object* object);
+    void showObjects(QVector<Object*> objects);
+    void resetObjectTable(QVector<Datafield*> datafields);
+
     // ***                  *** //
 
 private:
@@ -59,6 +66,8 @@ private:
     SettingsController *settingsController;
     RentalController* rentalController;
     ObjectController* objectController;
+
+    FrmReadInBarcode* frmReadInBarcode;
 
     bool categoriesReady;
     bool enterBarcodeManually;

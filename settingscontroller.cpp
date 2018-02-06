@@ -31,8 +31,9 @@ void SettingsController::initCategories()
         while(qry.next()) {
             this->categories.append(new Object(qry.value(0).toString()));
         }
-        emit this->showCategories(this->categories);
         this->initCustomfields();
+        emit this->transmitCategories(this->categories);
+        emit this->showCategories(this->categories);
     }
 }
 

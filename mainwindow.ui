@@ -779,7 +779,7 @@
      <attribute name="title">
       <string>Objekte</string>
      </attribute>
-     <widget class="QTableWidget" name="tableWidget10">
+     <widget class="QTableWidget" name="twObjects">
       <property name="geometry">
        <rect>
         <x>150</x>

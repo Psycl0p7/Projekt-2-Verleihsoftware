@@ -11,19 +11,21 @@ class ObjectController : public QObject
     Q_OBJECT
 public:
     ObjectController(DBHandler* dbHandler, DialogController* dialogControler);
-    static const QString LIST_ALL_CATEGORIES;
-    static const int LIST_ALL_INDEX = 0;
-
 
     void createObject();
     void removeObject(int index);
     void saveDifToDB();
     void setSelectedCategory(int index);
+    void searchObjectsByCategory(int categoryIndex);
 
 public slots:
     void receiveCategories(QVector<Object*> categories);
+    void createObject(QString barcode);
 signals:
     void updateCateoryList();
+    void addObjectToTable(Object* object);
+    void resetTable(QVector<Datafield*> datafields);
+    void showObjects(QVector<Object*> objects);
 
 private:
     DBHandler* dbHandler;

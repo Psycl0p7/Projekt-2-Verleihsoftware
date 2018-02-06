@@ -11,17 +11,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    this->frmReadInBarcode->close();
     delete ui;
 }
 
 void MainWindow::init()
 {
     this->setFixedSize(this->width(),this->height());
+
     this->settingsController = new SettingsController(&this->dbHandler, &this->dialogController);
     this->objectController = new ObjectController(&this->dbHandler, &this->dialogController);
     this->rentalController = new RentalController(&this->dbHandler, &this->dialogController);
+
+
     this->categoriesReady = false;
     this->enterBarcodeManually = false;
+
+    this->frmReadInBarcode = new FrmReadInBarcode(&this->dbHandler, &this->dialogController);
+//   this->frmReadInBarcode->showUp();
 
     // ** SIGNAL SLOTS  **
     // dialog controller
@@ -45,7 +52,9 @@ void MainWindow::init()
 
     // object controller
     QObject::connect(this->settingsController, SIGNAL(transmitCategories(QVector<Object*>)), this->objectController, SLOT(receiveCategories(QVector<Object*>)));
-
+    QObject::connect(this->objectController, SIGNAL(resetTable(QVector<Datafield*>)), this, SLOT(resetObjectTable(QVector<Datafield*>)));
+    QObject::connect(this->objectController, SIGNAL(addObjectToTable(Object*)), this, SLOT(addObjectToTable(Object*)));
+    QObject::connect(this->objectController, SIGNAL(showObjects(QVector<Object*>)), this, SLOT(showObjects(QVector<Object*>)));
 
     this->settingsController->init();
     this->resetRentalView();
@@ -144,20 +153,21 @@ void MainWindow::showSupportedTypes(QVector<QString> supportedTypes)
 
 void MainWindow::showCategories(QVector<Object*> categories)
 {
+    this->categoriesReady = true;
     // in settings
     this->ui->cb_category->clear();
     this->ui->cb_category->addItem(SettingsController::CREATE_OPERATOR);
     for(int i = 0; i < categories.count(); i++) {
         this->ui->cb_category->addItem(categories.at(i)->getCategory());
     }
-    this->ui->cb_category->setCurrentIndex(0);
 
     // in objects
     this->ui->cbObjectsCategory->clear();
-    this->ui->cbObjectsCategory->addItem(ObjectController::LIST_ALL_CATEGORIES);
     for(int i = 0; i < categories.count(); i++) {
         this->ui->cbObjectsCategory->addItem(categories.at(i)->getCategory());
     }
+
+    this->ui->cb_category->setCurrentIndex(0);
     this->ui->cbObjectsCategory->setCurrentIndex(0);
 }
 
@@ -207,6 +217,32 @@ void MainWindow::setSelectedObjectIndex(int index)
 void MainWindow::addRentalObject(QString object)
 {
     this->ui->lwRentEntries->addItem(object);
+}
+
+void MainWindow::resetObjectTable(QVector<Datafield *> datafields)
+{
+    this->ui->twObjects->clear();
+    this->ui->twObjects->setColumnCount(datafields.count());
+    for(int i = 0; i < datafields.count(); i++) {
+        this->ui->twObjects->setHorizontalHeaderItem(i, new QTableWidgetItem(datafields.at(i)->getName()));
+    }
+}
+
+void MainWindow::showObjects(QVector<Object*> objects)
+{
+    this->ui->twObjects->clearContents();
+    this->ui->twObjects->setRowCount(objects.count());
+
+    for(int row = 0; row < objects.count(); row++) {
+        for(int column = 0; column < objects.at(row)->countFields(); column++) {
+            this->ui->twObjects->setItem(row, column, new QTableWidgetItem(objects.at(row)->getField(column)->getData()));
+        }
+    }
+}
+
+void MainWindow::addObjectToTable(Object *object)
+{
+
 }
 
 /********************************************************************************
@@ -378,10 +414,12 @@ void MainWindow::on_btnRentalConfirm_clicked()
 
 void MainWindow::on_btnObjectsCreate_clicked()
 {
-
+    this->frmReadInBarcode->showUp();
 }
 
 void MainWindow::on_cbObjectsCategory_currentIndexChanged(int index)
 {
-    this->objectController->setSelectedCategory(index);
+    if(index > -1 && this->categoriesReady) {
+        this->objectController->setSelectedCategory(index);
+    }
 }
