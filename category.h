@@ -5,10 +5,10 @@
 #include <QString>
 #include <QVector>
 
-class Entry
+class Object
 {
 public:
-    Entry(QString name);
+    Object(QString name);
     int getAmountFields();
     bool removeField(int index);
     void addField(Datafield field);

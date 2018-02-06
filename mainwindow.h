@@ -34,18 +34,19 @@ public slots:
 
     // settings view
     void showSupportedTypes(QVector<QString> supportedTypes);
-    void showCategories(QVector<Entry*> categories);
+    void showCategories(QVector<Object*> categories);
     void showDatafields(QVector<Datafield*> fields);
     void showDatafieldAttributes(QString name, int typeIndex, bool required);
     void setSettingsSelectedCategory(int index);
     void setSettingsSelectedCustomfield(int index);
 
     // rental view
-    void setSelectedEntryIndex(int index);
-    void addRentalEntry(QString entryCategory);
-    void showRentalEntries(QVector<Entry*> entries);
-    void showRentalSelectedEntryData(QVector<Datafield*> fields);
-    void adjustEntryDataTableRows(int countFields);
+    void setSelectedObjectIndex(int index);
+    void addRentalObject(QString objectCategory);
+    void showRentalEntries(QVector<Object*> objects);
+    void showRentalSelectedObjectData(QVector<Datafield*> fields);
+    void adjustObjectDataTableRows(int countFields);
+    void resetRentalView();
 
     // ***                  *** //
 
@@ -61,9 +62,8 @@ private:
     bool enterBarcodeManually;
 
     void init();
-    void resetRentalView();
     void toggleCategoryActivated(bool activated);
-    void initRentalEntryDetailTable();
+    void initRentalObjectDetailTable();
 
 private slots:
     void on_cb_category_currentIndexChanged(const QString &category);
@@ -78,31 +78,9 @@ private slots:
 
     void on_btn_customfieldDelete_clicked();
 
-    void GetCustomFieldsForTable();
-
-    void setDevicesInCombiBox();
-
-    void on_deviceCat_activated(const QString &arg1);
-
-    void on_addBtn_clicked();
-
-    void on_saveBtn_clicked();
-
-    bool checkIdIsCorrect(QTableWidgetItem* itemID);
-
-    void CreateOrUpdateDatas(QString id, QString data, QString field, QString category);
-
-    void on_searchBtn_clicked();
-
-    void on_deviceVerliehen_activated(const QString &arg1);
-
-    void fillField(QString cat);
-
     void on_cbRentEnterManually_toggled(bool checked);
 
     void on_lwRentEntries_currentRowChanged(int currentRow);
-
-    void on_btnRentApply_clicked();
 
     void on_btnRentRemove_clicked();
 
@@ -111,6 +89,8 @@ private slots:
     void on_edtRentBarcode_textChanged(const QString &changedText);
 
     void on_btnRentNew_clicked();
+
+    void on_btnRentalConfirm_clicked();
 
 signals:
 

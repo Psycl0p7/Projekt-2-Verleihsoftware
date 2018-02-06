@@ -2,25 +2,29 @@
 #define RENTAL_H
 
 #include <QDateTime>
-#include "entry.h"
+#include "object.h"
 
 class Rental
 {
 public:
+    Rental();
     Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end);
+    Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QVector<Object*> objects);
     QString getFirstname();
     QString getLastname();
     QString getExtra();
     QDateTime getStart();
     QDateTime getEnd();
     qint64 getTimeLeft();
+    bool includesObject(QString barcode);
 
-    int countEntries();
-    Entry* getEntry(int index);
-    void addEntry(Entry* entry);
-    bool removeEntry(int index);
+    int countObjects();
+    QVector<Object*> getAllObjects();
+    Object* getObject(int index);
+    void addObject(Object* object);
+    bool removeObject(int index);
 private:
-    QVector<Entry*> entries;
+    QVector<Object*> objects;
 
     QString firstname;
     QString lastname;

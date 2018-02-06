@@ -1,5 +1,10 @@
 #include "rental.h"
 
+Rental::Rental()
+{
+
+}
+
 Rental::Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end)
 {
     this->firstname = firstname;
@@ -7,6 +12,16 @@ Rental::Rental(QString firstname, QString lastname, QString extra, QDateTime sta
     this->extra = extra;
     this->start = start;
     this->end = end;
+}
+
+Rental::Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QVector<Object *> objects)
+{
+    this->firstname = firstname;
+    this->lastname = lastname;
+    this->extra = extra;
+    this->start = start;
+    this->end = end;
+    this->objects = objects;
 }
 
 QString Rental::getFirstname()
@@ -44,33 +59,49 @@ qint64 Rental::getTimeLeft()
     return secondsLeft;
 }
 
-int Rental::countEntries()
+int Rental::countObjects()
 {
-    return this->entries.count();
+    return this->objects.count();
 }
 
-Entry* Rental::getEntry(int index)
+Object* Rental::getObject(int index)
 {
-    Entry* entry = NULL;
-    if(index < this->entries.count()) {
-        entry = this->entries.at(index);
+    Object* object = NULL;
+    if(index < this->objects.count()) {
+        object = this->objects.at(index);
     }
-    return entry;
+    return object;
 }
 
-void Rental::addEntry(Entry* entry)
+void Rental::addObject(Object* object)
 {
-    this->entries.append(entry);
+    this->objects.append(object);
 }
 
-bool Rental::removeEntry(int index)
+bool Rental::removeObject(int index)
 {
     bool ok = false;
-    if(index < this->entries.count()) {
-        this->entries.removeAt(index);
+    if(index < this->objects.count()) {
+        this->objects.removeAt(index);
         ok = true;
     }
     return ok;
 }
 
+bool Rental::includesObject(QString barcode)
+{   
+    bool includesIt = false;
 
+    for(int i = 0; i < this->objects.count(); i++) {
+        if(barcode == this->objects.at(i)->getBarcode()) {
+            includesIt = true;
+        }
+    }
+
+    return includesIt;
+}
+
+QVector<Object*> Rental::getAllObjects()
+{
+    return this->objects;
+}

@@ -1,27 +1,27 @@
-#include "entry.h"
+#include "object.h"
 
-Entry::Entry(QString category, QString barcode)
+Object::Object(QString category, QString barcode)
 {
     this->category = category;
     this->barcode = barcode;
 }
 
-QString Entry::getCategory()
+QString Object::getCategory()
 {
     return this->category;
 }
 
-bool Entry::isRequired()
+bool Object::isRequired()
 {
     return this->required;
 }
 
-int Entry::countFields()
+int Object::countFields()
 {
     return this->fields.count();
 }
 
-bool Entry::removeField(int index)
+bool Object::removeField(int index)
 {
     bool ok = false;
 
@@ -33,12 +33,12 @@ bool Entry::removeField(int index)
     return ok;
 }
 
-void Entry::addField(Datafield* field)
+void Object::addField(Datafield* field)
 {
     this->fields.append(field);
 }
 
-Datafield* Entry::getField(int index)
+Datafield* Object::getField(int index)
 {
     Datafield* field = NULL;
     if(index < this->fields.count() && index > -1) {
@@ -48,12 +48,12 @@ Datafield* Entry::getField(int index)
     return field;
 }
 
-void Entry::setCategory(QString newName)
+void Object::setCategory(QString newName)
 {
     this->category = newName;
 }
 
-int Entry::getFieldIndex(QString fieldname)
+int Object::getFieldIndex(QString fieldname)
 {
     int index = -1;
 
@@ -67,23 +67,23 @@ int Entry::getFieldIndex(QString fieldname)
     return index;
 }
 
-QVector<Datafield*> Entry::getAllFields()
+QVector<Datafield*> Object::getAllFields()
 {
     return this->fields;
 }
 
-void Entry::setFields(QVector<Datafield*> fields)
+void Object::setFields(QVector<Datafield*> fields)
 {
     this->fields = fields;
 }
 
 
-QString Entry::getBarcode()
+QString Object::getBarcode()
 {
     return this->barcode;
 }
 
-void Entry::setBarcode(QString barcode)
+void Object::setBarcode(QString barcode)
 {
     this->barcode = barcode;
 }

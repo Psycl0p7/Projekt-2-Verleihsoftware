@@ -27,9 +27,9 @@ bool DBHandler::DBExists()
  *
  * tbl_geraetetypen   -> tbl_categories
  * tbl_customfelder   -> tbl_datafields
- * tbl_geraeteData    -> tbl_entrydata
+ * tbl_geraeteData    -> tbl_objectdata
  * tbl_feldDatentypen -> tbl_datatypes
- * tbl_geraete        -> tbl_entries
+ * tbl_geraete        -> tbl_objects
  */
 
 bool DBHandler::createDB()
@@ -37,12 +37,13 @@ bool DBHandler::createDB()
     bool dbCreated = false;
     if(!DBExists()) {
         QString path = "db.sqlite";
-        QString tblCategories = "CREATE TABLE 'tbl_categories' ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL UNIQUE )";
-        QString tblDatafields = "CREATE TABLE 'tbl_datafields' ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL, 'fk_category' INTEGER NOT NULL, 'fk_datatype' INTEGER NOT NULL, 'required' BOOLEAN NOT NULL)";
-        QString tblEntrydata  = "CREATE TABLE 'tbl_entrydata'  ('id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'fk_datafield' INTEGER, 'fk_entry' INTEGER NOT NULL, 'data' TEXT)";
-        QString tblDatatypes  = "CREATE TABLE 'tbl_datatypes'  ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'name' TEXT);";
-        QString tblEntries    = "CREATE TABLE 'tbl_entries'    ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'fk_category' INTEGER, 'barcode' TEXT NOT NULL UNIQUE);";
-        QString tblRentals    = "CREATE TABLE 'tbl_rentals'    ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'firstname' TEXT NOT NULL, 'lastname' TEXT NOT NULL, 'extra' TEXT, 'start' TEXT, end TEXT);";
+        QString tblCategories  = "CREATE TABLE 'tbl_categories'   ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL UNIQUE )";
+        QString tblDatafields  = "CREATE TABLE 'tbl_datafields'   ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL, 'fk_category' INTEGER NOT NULL, 'fk_datatype' INTEGER NOT NULL, 'required' BOOLEAN NOT NULL)";
+        QString tblObjectdata   = "CREATE TABLE 'tbl_objectdata'   ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'fk_datafield' INTEGER, 'fk_object' INTEGER NOT NULL, 'data' TEXT)";
+        QString tblDatatypes   = "CREATE TABLE 'tbl_datatypes'    ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'name' TEXT);";
+        QString tblEntries     = "CREATE TABLE 'tbl_objects'      ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'fk_category' INTEGER, 'barcode' TEXT NOT NULL UNIQUE);";
+        QString tblRentals     = "CREATE TABLE 'tbl_rentals'      ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'firstname' TEXT NOT NULL, 'lastname' TEXT NOT NULL, 'extra' TEXT, 'start' TEXT, end TEXT);";
+        QString tblRentalObject = "CREATE TABLE 'tbl_rental_object' ( 'fk_rental' INTEGER NOT NULL, 'fk_object' INTEGER NOT NULL UNIQUE);";
 
 
         this->db = QSqlDatabase::addDatabase("QSQLITE");
@@ -53,10 +54,11 @@ bool DBHandler::createDB()
 
         query.exec(tblCategories);
         query.exec(tblDatafields);
-        query.exec(tblEntrydata);
+        query.exec(tblObjectdata);
         query.exec(tblDatatypes);
         query.exec(tblEntries);
         query.exec(tblRentals);
+        query.exec(tblRentalObject);
 
         QString addDatentypText = "INSERT INTO tbl_datatypes (name) VALUES('Text')";
 
@@ -65,7 +67,7 @@ bool DBHandler::createDB()
 
         dbCreated = true;
     }
-    if(DBExists()) {
+    else if(DBExists()) {
         this->db = QSqlDatabase::addDatabase("QSQLITE");
         this->db.setDatabaseName("db.sqlite");
     }
@@ -110,7 +112,6 @@ bool DBHandler::execute(QString statement, QSqlQuery *p_qry, QString *error)
         else {
             ok = true;
         }
-
     }
 
     return ok;
@@ -185,8 +186,6 @@ bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, 
             + categoryName
             + "');";
 
-    qDebug() << statement;
-
     if(this->execute(statement, &qry, error)) {
         ok = true;
         if(qry.first())
@@ -210,7 +209,6 @@ bool DBHandler::createCustomField(QString *error, QString name, QString geraeteT
             + QString::number(datentyp) + ","
             + QString::number(required)
             + ");";
-    qDebug() << "statement: " << statement;
 
     return this->execute(statement, new QSqlQuery(), error);
 }
@@ -232,7 +230,6 @@ bool DBHandler::readCustomField(QString* error, QString category, QString fieldn
             ok = true;
         }
     }
-
     return ok;
 }
 
@@ -244,7 +241,6 @@ bool DBHandler::updateCustomField(QString category, QString fieldname, QString n
             + ",required=" + QString::number(newRequired)
             + " WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='" + category
             + "') AND name='" + fieldname + "';";
-    qDebug() << statement;
     return this->execute(statement, new QSqlQuery(), error);
 }
 
@@ -259,12 +255,12 @@ bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* 
     return this->execute(statement, new QSqlQuery(), error);
 }
 
-bool DBHandler::getEntrybyBarcode(QString barcode, Entry* entry, bool *found, QString* error)
+bool DBHandler::getObjectByBarcode(QString barcode, Object *object, bool *found, QString* error)
 {
     bool ok = true;
     QSqlQuery qry;
 
-    // entry construction data
+    // object construction data
     QString category;
 
     // fetch in same order to allaw synchronious merging
@@ -274,19 +270,19 @@ bool DBHandler::getEntrybyBarcode(QString barcode, Entry* entry, bool *found, QS
     QString statementGetFieldnames = "SELECT"
             " tbl_datafields.name"
             " FROM tbl_datafields"
-            " WHERE tbl_datafields.fk_category = (SELECT tbl_entries.fk_category FROM tbl_entries WHERE tbl_entries.barcode = '" + barcode +"')"
+            " WHERE tbl_datafields.fk_category = (SELECT tbl_objects.fk_category FROM tbl_objects WHERE tbl_objects.barcode = '" + barcode +"')"
             " ORDER BY tbl_datafields.id ASC;";
 
     QString statementGetData = "SELECT"
             " tbl_categories.name AS category,"
-            " tbl_entrydata.data"
-            " FROM tbl_entries"
+            " tbl_objectdata.data"
+            " FROM tbl_objects"
             " INNER JOIN tbl_categories"
-            " ON tbl_categories.id = tbl_entries.fk_category"
-            " INNER JOIN tbl_entrydata"
-            " ON tbl_entrydata.fk_entry = tbl_entries.id"
+            " ON tbl_categories.id = tbl_objects.fk_category"
+            " INNER JOIN tbl_objectdata"
+            " ON tbl_objectdata.fk_object = tbl_objects.id"
             " WHERE barcode = '" + barcode + "'"
-            " ORDER BY tbl_entrydata.fk_datafield ASC;";
+            " ORDER BY tbl_objectdata.fk_datafield ASC;";
 
     *found = false;
 
@@ -320,14 +316,14 @@ bool DBHandler::getEntrybyBarcode(QString barcode, Entry* entry, bool *found, QS
 
             if(fieldnames.length() != data.length()) {
                 ok = false;
-                *error = "invalid entry data";
+                *error = "invalid object data";
             }
             else {
-                // create Entry object
-                entry->setBarcode(barcode);
-                entry->setCategory(category);
+                // create Object object
+                object->setBarcode(barcode);
+                object->setCategory(category);
                 for(int i = 0; i < fieldnames.length(); i++) {
-                    entry->addField(new Datafield(fieldnames.at(i), data.at(i)));
+                    object->addField(new Datafield(fieldnames.at(i), data.at(i)));
                 }
             }
         }
@@ -336,130 +332,71 @@ bool DBHandler::getEntrybyBarcode(QString barcode, Entry* entry, bool *found, QS
     return ok;
 }
 
-
-/** Holt sich alle erstellten Typen von Geräte aus der Datenbank. Für die Visuelle Darstellung
- * @brief DBHandler::getAllDeviceTypes
- * @param p_qry - Enthält den Query für die SQL Abfrage
- * @param error - Enthält bei einem Fehler, die Fehlermeldung
- * @return SqlQuery - Enthält alle Device Typen aus der DB
- */
-bool DBHandler::getAllDeviceTypes(QSqlQuery* p_qry, QString* error)
+bool DBHandler::createRental(Rental* rental, QString* error)
 {
-    QString statement = QString("SELECT name FROM tbl_datafields WHERE category = (SELECT name FROM tbl_categories)");
+    // human readable date time format
+    bool ok = true;
+    QSqlQuery qry;
 
-    return this->execute(statement, p_qry, error);
+    QString dateTimeFormat = "dd.MM.yyyy hh:mm";
+    QString rentalId = "";
+
+    // create rental entry
+    QString statement = "INSERT INTO tbl_rentals(firstname, lastname, extra, start, end) VALUES('"
+            + rental->getFirstname() + "', '"
+            + rental->getLastname()  + "', '"
+            + rental->getExtra()     + "', '"
+            + rental->getStart().toString(dateTimeFormat) + "', '"
+            + rental->getEnd().toString(dateTimeFormat) + "');";
+
+    if(!this->execute(statement, new QSqlQuery(), error)) {
+        ok = false;
+    }
+    else if(!this->execute("SELECT MAX(id) FROM tbl_rentals;", &qry, error)){
+        ok = false;
+    }
+    else if(!qry.first()) {
+        ok = false;
+    }
+    else {
+        // fetch id of inserted rental entry
+        rentalId = QString::number(qry.value(0).toInt());
+        // link objects
+        statement = "INSERT INTO tbl_rental_object(fk_rental, fk_object) VALUES";
+
+        for(int i = 0; i < rental->countObjects(); i++) {
+            statement += "(" + rentalId + ", (SELECT id FROM tbl_objects WHERE barcode='" + rental->getObject(i)->getBarcode() + "'))";
+
+            if(i < rental->countObjects() -1) {
+                statement += ", ";
+            } else {
+                statement += ";";
+            }
+        }
+
+        if(!this->execute(statement, new QSqlQuery(), error)) {
+            ok = false;
+        }
+    }
+
+    return ok;
 }
 
-/**
- * Sucht anhand der ID/BarCode einen Daten und Updatet diesen oder erstellt einen neuen, wenn er nicht gefunden worden ist
- * @brief DBHandler::findAndUpdateDevice
- * @param id - Enthält die ID des gesuchten Geräts
- * @param data - ENthält den neuen oder alten Datensatz eines Felds
- * @param field - Enthält das Feld, in dem es gespeichert werden soll
- */
-bool DBHandler::findAndUpdateDevice(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field)
+bool DBHandler::checkObjectAvailability(QString barcode, bool* isAvailable, QString *error)
 {
-    QString statement = QString("UPDATE tbl_entrydata SET " + field + " = " + data + " WHERE ID = " + id);
+    QSqlQuery* qry= new QSqlQuery();
+    bool ok = false;
+    QString statement = "SELECT COUNT(fk_object) FROM tbl_rental_object WHERE fk_object="
+            "(SELECT id FROM tbl_objects WHERE barcode='" + barcode + "');";
+
+    *isAvailable = false;
+    if(this->execute(statement, qry, error)) {
+        if(qry->first()) {
+            ok = true;
+            if(qry->value(0).toInt() < 1) {
+                *isAvailable = true;
+            }
+        }
+    }
+    return ok;
 }
-
-
-
-
-
-
-/**
- * Speichert neue Geräte in die Datenbank oder Updatet die Felder, wenn diese schon vorhanden sind
- * @brief DBHandler::saveNewDeviceData
- * @param p_qry
- * @param error
- * @param id - Feldname
- * @param data - Zu speichender Wert im Feld
- * @param field - Feldname
- * @return
- */
-bool DBHandler::saveNewDeviceDataGetID(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category)
-{
-    QString statement = QString("SELECT id from tbl_categories where tbl_categories.name = '" + category + "'");
-    return this->execute(statement, p_qry, error);
-}
-
-/**
- * @brief DBHandler::saveNewDeviceDataGetNextID
- * @param p_qry
- * @param error
- * @param id
- * @param data
- * @param field
- * @param category
- * @return
- */
-bool DBHandler::saveNewDeviceDataGetNextID(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category)
-{
-    QString statement = QString("SELECT id FROM tbl_datafields "
-                                "WHERE tbl_datafields.fk_category = '" + id + "' AND tbl_datafields.name = '" + field + "'");
-    return this->execute(statement, p_qry, error);
-}
-
-
-
-/**
- * Sucht alle Tabellen mit dem Meta begriff
- * @brief DBHandler::findAllSearchedData
- * @param p_qry
- * @param error
- * @param searchPara - Zu suchender Begriff
- * @return
- */
-bool DBHandler::findAllSearchedData(QSqlQuery* p_qry, QString* error, QString searchPara)
-{
-    QString statement = QString("SELECT * FROM tbl_entrydata WHERE data LIKE '%" + searchPara + "%'");
-    return this->execute(statement, p_qry, error);
-}
-
-/**
- * @brief DBHandler::existDeviceInDB
- * @param p_qry
- * @param error
- * @param ID
- * @return
- */
-bool DBHandler::existDeviceInDB(QSqlQuery* p_qry, QString* error, QString ID)
-{
-    QString statement = QString("SELECT * FROM tbl_entrydata "
-                                "LEFT JOIN tbl_datafields "
-                                "ON tbl_entrydata.fk_datafield = tbl_datafields.id WHERE "
-                                "tbl_datafields.name = 'Barcode' AND tbl_entrydata.data = '" + ID + "'");
-    return this->execute(statement, p_qry, error);
-}
-
-/**
- * @brief DBHandler::getAllDevicesForACategory
- * @param p_qry
- * @param error
- * @param cat
- * @return
- */
-/*bool DBHandler::getAllDevicesForACategory(QSqlQuery* p_qry, QString* error, QString cat)
-{
-    QString statement = QString("SELECT tbl_entrydata.fk_entry, tbl_datafields.name, tbl_entrydata.data "
-                                   "FROM tbl_datafields, tbl_entrydata, tbl_entries"
-                                   "LEFT JOIN tbl_categories ON tbl_entries.id = tbl_entrydata.fk_entry"
-                                   "WHERE tbl_datafields.id = tbl_entrydata.fk_datafield AND tbl_categories.name = " + cat +"");
-    return this->execute(statement, p_qry, error);
-}*/
-
-
-
-
-
-bool DBHandler::getAllDevicesForACategory(QSqlQuery* p_qry, QString* error, QString field, QString cat)
-{
-    QString statement = QString("SELECT tbl_entrydata.data, tbl_entrydata.fk_datafield, tbl_entrydata.fk_entry "
-                                "FROM tbl_datafields, tbl_entrydata, tbl_entries "
-                                "LEFT JOIN tbl_categories ON tbl_entries.id = tbl_entrydata.fk_entry "
-                                "WHERE tbl_datafields.id = tbl_entrydata.fk_datafield "
-                                "AND tbl_categories.name = '" + cat +"' AND tbl_datafields.name = '" + field + "' "
-                                "ORDER BY tbl_entrydata.fk_entry");
-    return this->execute(statement, p_qry, error);
-}
-

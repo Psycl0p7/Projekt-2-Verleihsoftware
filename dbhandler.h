@@ -10,7 +10,8 @@
 #include <QSqlError>
 #include <QDebug>
 
-#include "entry.h"
+#include "object.h"
+#include "rental.h"
 
 class DBHandler
 {
@@ -32,23 +33,17 @@ public:
     bool updateCustomField(QString category, QString fieldname, QString newName, int newDatatype, bool newRequired, QString *error);
     bool deleteCustomField(QString category, QString fieldname, QString* error);
 
-    bool getEntrybyBarcode(QString barcode, Entry* entry, bool *found, QString* error);
+    bool getObjectByBarcode(QString barcode, Object* object, bool *found, QString* error);
 
-    bool getAllDeviceTypes(QSqlQuery* p_qry, QString *error);
-    bool findAndUpdateDevice(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field);
-    bool saveNewDeviceDataGetID(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category);
-    bool saveNewDeviceDataGetNextID(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category);
-    bool findAllSearchedData(QSqlQuery* p_qry, QString* error, QString searchPara);
-    bool existDeviceInDB(QSqlQuery* p_qry, QString* error, QString ID);
-    bool updateDevice(QSqlQuery* p_qry, QString* error, QString id, QString data, QString field, QString category);
-    bool getAllDevicesForACategory(QSqlQuery* p_qry, QString *error, QString field, QString cat);
+    bool checkObjectAvailability(QString barcode, bool *isAvailable, QString* error);
+    bool createRental(Rental* rental, QString* error);
 
 private:
 
     QSqlDatabase db;
 
     bool getFieldnamesByBarcode(QString barcode, QVector<QString>* fieldnames, QString *error);
-    bool getEntryDataByBarcode (QString barcode, QString* category, QVector<QString>* data, QString *error);
+    bool getObjectDataByBarcode (QString barcode, QString* category, QVector<QString>* data, QString *error);
 
     bool DBExists();
     bool createDB();
