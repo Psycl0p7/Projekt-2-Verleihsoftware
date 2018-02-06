@@ -130,7 +130,7 @@ bool DBHandler::readSupportedDatatypes(QSqlQuery* p_qry, QString *error)
 
 bool DBHandler::getCategories(QSqlQuery* p_qry, QString* error)
 {
-    QString statement = "SELECT name FROM tbl_categories";
+    QString statement = "SELECT name FROM tbl_categories ORDER BY name ASC";
     return this->execute(statement, p_qry, error);
 }
 
@@ -352,30 +352,31 @@ bool DBHandler::createRental(Rental* rental, QString* error)
     if(!this->execute(statement, new QSqlQuery(), error)) {
         ok = false;
     }
-    else if(!this->execute("SELECT MAX(id) FROM tbl_rentals;", &qry, error)){
-        ok = false;
-    }
-    else if(!qry.first()) {
-        ok = false;
-    }
-    else {
-        // fetch id of inserted rental entry
-        rentalId = QString::number(qry.value(0).toInt());
-        // link objects
-        statement = "INSERT INTO tbl_rental_object(fk_rental, fk_object) VALUES";
-
-        for(int i = 0; i < rental->countObjects(); i++) {
-            statement += "(" + rentalId + ", (SELECT id FROM tbl_objects WHERE barcode='" + rental->getObject(i)->getBarcode() + "'))";
-
-            if(i < rental->countObjects() -1) {
-                statement += ", ";
-            } else {
-                statement += ";";
-            }
-        }
-
-        if(!this->execute(statement, new QSqlQuery(), error)) {
+    else if(rental->countObjects() > 0) {
+        if(!this->execute("SELECT MAX(id) FROM tbl_rentals;", &qry, error)){
             ok = false;
+        }
+        else if(!qry.first()) {
+            ok = false;
+        }
+        else {
+            // fetch id of inserted rental entry
+            rentalId = QString::number(qry.value(0).toInt());
+            // link objects
+            statement = "INSERT INTO tbl_rental_object(fk_rental, fk_object) VALUES";
+            for(int i = 0; i < rental->countObjects(); i++) {
+                statement += "(" + rentalId + ", (SELECT id FROM tbl_objects WHERE barcode='" + rental->getObject(i)->getBarcode() + "'))";
+
+                if(i < rental->countObjects() -1) {
+                    statement += ", ";
+                } else {
+                    statement += ";";
+                }
+            }
+
+            if(!this->execute(statement, new QSqlQuery(), error)) {
+                ok = false;
+            }
         }
     }
 

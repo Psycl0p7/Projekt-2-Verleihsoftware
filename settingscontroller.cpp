@@ -174,6 +174,7 @@ void SettingsController::createCategory(QString categoryName)
     this->sortCategories();
     emit this->showCategories(this->categories);
     emit this->setSettingsSelectedCategory(this->getCategoryIndex(categoryName));
+    emit this->transmitCategories(this->categories);
 }
 
 void SettingsController::updateCategory(QString categoryName, QString newName)
@@ -196,6 +197,7 @@ void SettingsController::updateCategory(QString categoryName, QString newName)
         this->sortCategories();
         emit this->showCategories(this->categories);
         emit this->setSettingsSelectedCategory(this->getCategoryIndex(newName));
+        emit this->transmitCategories(this->categories);
         this->dialogController->showInformation("Kategorie wurde geändert.");
     }
 }
@@ -213,6 +215,7 @@ void SettingsController::deleteCategory(QString category)
         delete this->categories.at(categoryIndex);
         this->categories.removeAt(categoryIndex);
         emit this->showCategories(this->categories);
+        emit this->transmitCategories(this->categories);
         this->dialogController->showInformation("Kategorie wurde entfernt.");
     }
 }

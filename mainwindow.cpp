@@ -18,6 +18,7 @@ void MainWindow::init()
 {
     this->setFixedSize(this->width(),this->height());
     this->settingsController = new SettingsController(&this->dbHandler, &this->dialogController);
+    this->objectController = new ObjectController(&this->dbHandler, &this->dialogController);
     this->rentalController = new RentalController(&this->dbHandler, &this->dialogController);
     this->categoriesReady = false;
     this->enterBarcodeManually = false;
@@ -41,6 +42,9 @@ void MainWindow::init()
     QObject::connect(this->rentalController, SIGNAL(addRentalObject(QString)), this, SLOT(addRentalObject(QString)));
     QObject::connect(this->rentalController, SIGNAL(adjustObjectDataTableRows(int)), this, SLOT(adjustObjectDataTableRows(int)));
     QObject::connect(this->rentalController, SIGNAL(resetRentalView()), this, SLOT(resetRentalView()));
+
+    // object controller
+    QObject::connect(this->settingsController, SIGNAL(transmitCategories(QVector<Object*>)), this->objectController, SLOT(receiveCategories(QVector<Object*>)));
 
 
     this->settingsController->init();
@@ -140,12 +144,21 @@ void MainWindow::showSupportedTypes(QVector<QString> supportedTypes)
 
 void MainWindow::showCategories(QVector<Object*> categories)
 {
+    // in settings
     this->ui->cb_category->clear();
     this->ui->cb_category->addItem(SettingsController::CREATE_OPERATOR);
     for(int i = 0; i < categories.count(); i++) {
         this->ui->cb_category->addItem(categories.at(i)->getCategory());
     }
     this->ui->cb_category->setCurrentIndex(0);
+
+    // in objects
+    this->ui->cbObjectsCategory->clear();
+    this->ui->cbObjectsCategory->addItem(ObjectController::LIST_ALL_CATEGORIES);
+    for(int i = 0; i < categories.count(); i++) {
+        this->ui->cbObjectsCategory->addItem(categories.at(i)->getCategory());
+    }
+    this->ui->cbObjectsCategory->setCurrentIndex(0);
 }
 
 void MainWindow::showDatafields(QVector<Datafield*> fields)
@@ -355,5 +368,20 @@ void MainWindow::on_btnRentalConfirm_clicked()
     QString extra = this->ui->edtRentExtra->toPlainText();
     QDateTime start = this->ui->dtRentStart->dateTime();
     QDateTime end = this->ui->dtRentEnd->dateTime();
+
+    if(firstname.isEmpty() || lastname.isEmpty()) {
+        this->showInformation("Bitte  Vor- und Nachname angeben.");
+    }
+
     this->rentalController->confirmActiveRental(firstname, lastname, extra, start, end);
+}
+
+void MainWindow::on_btnObjectsCreate_clicked()
+{
+
+}
+
+void MainWindow::on_cbObjectsCategory_currentIndexChanged(int index)
+{
+    this->objectController->setSelectedCategory(index);
 }

@@ -36,7 +36,9 @@ SOURCES += main.cpp\
     rental.cpp \
     rentalcontroller.cpp \
     dialogcontroller.cpp \
-    object.cpp
+    object.cpp \
+    objectcontroller.cpp \
+    frmreadinbarcode.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -49,10 +51,13 @@ HEADERS  += mainwindow.h \
     rental.h \
     rentalcontroller.h \
     dialogcontroller.h \
-    object.h
+    object.h \
+    objectcontroller.h \
+    frmreadinbarcode.h
 
 FORMS    += mainwindow.ui \
-               framelesswindow/framelesswindow.ui
+               framelesswindow/framelesswindow.ui \
+    frmreadinbarcode.ui
 
 RESOURCES += \
     darkstyle.qrc \

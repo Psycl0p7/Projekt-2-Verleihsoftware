@@ -12,7 +12,6 @@ class SettingsController : public QObject
 {
     Q_OBJECT
 
-
 public:
     static const QString CREATE_OPERATOR;
     SettingsController(DBHandler* dbHandler, DialogController* dialogController);
@@ -40,11 +39,9 @@ private:
     DBHandler* dbHandler;
     DialogController* dialogController;
 
-
     void initCategories();
     void initCustomfields();
     void readSupportedDatatypes();
-
 
     void sortCategories();
     void sortDatafields(QString category);
@@ -60,6 +57,7 @@ signals:
 
     void setSettingsSelectedCategory(int);
     void setSettingsSelectedCustomfield(int);
+    void transmitCategories(QVector<Object*>);
 };
 
 #endif // SETTINGS_H

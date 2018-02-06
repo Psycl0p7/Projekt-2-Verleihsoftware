@@ -10,6 +10,7 @@
 #include "settingscontroller.h"
 #include "rentalcontroller.h"
 #include "dialogcontroller.h"
+#include "objectcontroller.h"
 
 namespace Ui {
 class MainWindow;
@@ -57,6 +58,7 @@ private:
     DialogController dialogController;
     SettingsController *settingsController;
     RentalController* rentalController;
+    ObjectController* objectController;
 
     bool categoriesReady;
     bool enterBarcodeManually;
@@ -91,6 +93,10 @@ private slots:
     void on_btnRentNew_clicked();
 
     void on_btnRentalConfirm_clicked();
+
+    void on_btnObjectsCreate_clicked();
+
+    void on_cbObjectsCategory_currentIndexChanged(int index);
 
 signals:
 
