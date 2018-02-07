@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    this->frmReadInBarcode->close();
     delete ui;
 }
 
@@ -55,8 +54,9 @@ void MainWindow::init()
     QObject::connect(this->objectController, SIGNAL(resetTable(QVector<Datafield*>)), this, SLOT(resetObjectTable(QVector<Datafield*>)));
     QObject::connect(this->objectController, SIGNAL(addObjectToTable(Object*)), this, SLOT(addObjectToTable(Object*)));
     QObject::connect(this->objectController, SIGNAL(showObjects(QVector<Object*>)), this, SLOT(showObjects(QVector<Object*>)));
-
     QObject::connect(this->frmReadInBarcode, SIGNAL(createObject(QString)), this->objectController, SLOT(createObject(QString)));
+    QObject::connect(this->ui->twObjects, SIGNAL(currentItemChanged(QTableWidgetItem*,QTableWidgetItem*)), this->objectController, SLOT(updateObject(QTableWidgetItem*)));
+    QObject::connect(this->ui->twObjects, SIGNAL(itemActivated(QTableWidgetItem*)), this->objectController, SLOT(objectChanged(QTableWidgetItem*)));
 
     this->settingsController->init();
     this->resetRentalView();
@@ -281,7 +281,6 @@ void MainWindow::on_btn_categorySave_clicked()
     }
 }
 
-
 void MainWindow::on_btn_customfieldSave_clicked()
 {
     QString category = this->ui->cb_category->currentText();
@@ -428,5 +427,5 @@ void MainWindow::on_cbObjectsCategory_currentIndexChanged(int index)
 
 void MainWindow::on_btnObjectsUpdate_clicked()
 {
-    this->objectController->update();
+    this->objectController->updateToDatabase();
 }

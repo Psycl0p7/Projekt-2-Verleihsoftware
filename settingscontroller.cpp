@@ -213,7 +213,7 @@ void SettingsController::deleteCategory(QString category)
         this->dialogController->showWarning("Kategorie konnte nicht gelöscht werden", error);
     }
     else {
-        delete this->categories.at(categoryIndex);
+        // delete this->categories.at(categoryIndex);
         this->categories.removeAt(categoryIndex);
         emit this->showCategories(this->categories);
         emit this->transmitCategories(this->categories);

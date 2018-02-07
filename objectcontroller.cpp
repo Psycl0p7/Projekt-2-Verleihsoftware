@@ -31,8 +31,8 @@ void ObjectController::createObject(QString barcode)
     }
 
     this->createdObjects.append(object);
-    this->currentObjects.append(object);
-    emit this->showObjects(this->currentObjects);
+    this->displayedObjects.append(object);
+    emit this->showObjects(this->displayedObjects );
 }
 
 void ObjectController::searchObjectsByCategory(int categoryIndex)
@@ -44,24 +44,40 @@ void ObjectController::searchObjectsByCategory(int categoryIndex)
         emit this->dialogController->showWarning("Objeckte konnten nicht gesucht werden", error);
     }
     else {
-        this->currentObjects = foundObjects;
-        emit this->showObjects(this->currentObjects);
+        this->displayedObjects  = foundObjects;
+        emit this->showObjects(this->displayedObjects );
     }
 }
 
-void ObjectController::update()
+// updated depending on diffs in table intio databse
+void ObjectController::updateToDatabase()
 {
-    // create objects
+    QString error;
+    if(!this->dbHandler->createObjects(this->createdObjects, &error)) {
+        emit this->dialogController->showWarning("Fehler bei Erstllung neuer Objekte", error);
+    }
 
     // update objects
 }
 
-void ObjectController::removeObject(int index)
+void ObjectController::updateObject(QTableWidgetItem* changedItem)
+{
+    int objectIndex = 1;
+    int fieldIndex = -1;
+    QString data = changedItem->text();
+    if(!data.isEmpty()) {
+        objectIndex = changedItem->row();
+        fieldIndex = changedItem->column();
+        this->displayedObjects.at(objectIndex)->getField(fieldIndex)->setData(data);
+    }
+}
+
+void ObjectController::objectChanged(QTableWidgetItem *changedItem)
 {
 
 }
 
-void ObjectController::saveDifToDB()
+void ObjectController::removeObject(int index)
 {
 
 }
