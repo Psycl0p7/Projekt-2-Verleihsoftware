@@ -55,8 +55,8 @@ void MainWindow::init()
     QObject::connect(this->objectController, SIGNAL(addObjectToTable(Object*)), this, SLOT(addObjectToTable(Object*)));
     QObject::connect(this->objectController, SIGNAL(showObjects(QVector<Object*>)), this, SLOT(showObjects(QVector<Object*>)));
     QObject::connect(this->frmReadInBarcode, SIGNAL(createObject(QString)), this->objectController, SLOT(createObject(QString)));
-    QObject::connect(this->ui->twObjects, SIGNAL(currentItemChanged(QTableWidgetItem*,QTableWidgetItem*)), this->objectController, SLOT(updateObject(QTableWidgetItem*)));
-    QObject::connect(this->ui->twObjects, SIGNAL(itemActivated(QTableWidgetItem*)), this->objectController, SLOT(objectChanged(QTableWidgetItem*)));
+    // QObject::connect(this->ui->twObjects, SIGNAL(currentItemChanged(QTableWidgetItem*,QTableWidgetItem*)), this->objectController, SLOT(updateObject(QTableWidgetItem*)));
+    // QObject::connect(this->ui->twObjects, SIGNAL(itemActivated(QTableWidgetItem*)), this->objectController, SLOT(objectChanged(QTableWidgetItem*)));
 
     this->settingsController->init();
     this->resetRentalView();
@@ -69,6 +69,7 @@ void MainWindow::initRentalObjectDetailTable()
     this->ui->twRentDetails->insertColumn(1);
     this->ui->twRentDetails->setHorizontalHeaderItem(0, new QTableWidgetItem("Feld"));
     this->ui->twRentDetails->setHorizontalHeaderItem(1, new QTableWidgetItem("Inhalt"));
+    this->ui->twRentDetails->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 void MainWindow::toggleCategoryActivated(bool activated)
@@ -223,11 +224,23 @@ void MainWindow::addRentalObject(QString object)
 
 void MainWindow::resetObjectTable(QVector<Datafield *> datafields)
 {
+    QTableWidgetItem* headerItem;
+    QFont requiredFont;
+    QString headerText = "";
+
+    requiredFont.setBold(true);
     this->ui->twObjects->clear();
     this->ui->twObjects->setColumnCount(datafields.count());
     for(int i = 0; i < datafields.count(); i++) {
-        this->ui->twObjects->setHorizontalHeaderItem(i, new QTableWidgetItem(datafields.at(i)->getName()));
+        headerText = datafields.at(i)->getName();
+        headerItem = new QTableWidgetItem(headerText);
+        if(datafields.at(i)->isRequired()) {
+            headerItem->setFont(requiredFont);
+        }
+        this->ui->twObjects->setHorizontalHeaderItem(i, headerItem);
     }
+    this->ui->twObjects->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
 }
 
 void MainWindow::showObjects(QVector<Object*> objects)
@@ -309,14 +322,13 @@ void MainWindow::on_cb_customfield_currentIndexChanged(const QString &fieldname)
     if(fieldname.isEmpty()) {
         return;
     }
-    QString category = this->ui->cb_category->currentText();
     if(fieldname == SettingsController::CREATE_OPERATOR) {
         this->ui->edt_customfieldName->clear();
         this->ui->cb_customfieldType->setCurrentIndex(0);
         this->ui->cb_customfieldRequired->setChecked(false);
     }
     else if(!this->ui->cb_customfield->currentText().isEmpty() && this->ui->cb_customfield->currentText() != SettingsController::CREATE_OPERATOR ) {
-        this->ui->edt_customfieldName->setText(fieldname);
+        this->settingsController->switchDatafieldAttributes(this->ui->cb_category->currentText(), this->ui->cb_customfield->currentText());
     }
 }
 
@@ -427,5 +439,7 @@ void MainWindow::on_cbObjectsCategory_currentIndexChanged(int index)
 
 void MainWindow::on_btnObjectsUpdate_clicked()
 {
+    // determine deffernces and pack those objects
+    QVector<Object* > currentTableObjects;
     this->objectController->updateToDatabase();
 }

@@ -65,7 +65,7 @@ void ObjectController::updateObject(QTableWidgetItem* changedItem)
     int objectIndex = 1;
     int fieldIndex = -1;
     QString data = changedItem->text();
-    if(!data.isEmpty()) {
+    if(!data.isEmpty() && data != this->displayedObjects.at(objectIndex)->getField(fieldIndex)->getData()) {
         objectIndex = changedItem->row();
         fieldIndex = changedItem->column();
         this->displayedObjects.at(objectIndex)->getField(fieldIndex)->setData(data);

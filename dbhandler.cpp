@@ -196,7 +196,7 @@ bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, 
 
 bool DBHandler::getCustomfields(QSqlQuery* p_qry, QString *error, QString gereateTyp)
 {
-    QString statement = QString("SELECT name, fk_datatype FROM tbl_datafields WHERE fk_category="
+    QString statement = QString("SELECT name, fk_datatype, required FROM tbl_datafields WHERE fk_category="
                                 "(SELECT id FROM tbl_categories WHERE name='") + gereateTyp + "')";
     return this->execute(statement, p_qry, error);
 }
@@ -217,7 +217,7 @@ bool DBHandler::readCustomField(QString* error, QString category, QString fieldn
 {
     bool ok = false;
     QSqlQuery qry;
-    QString statement = "SELECT fk_datatype,required FROM tbl_datafields WHERE name='"
+    QString statement = "SELECT fk_datatype, required FROM tbl_datafields WHERE name='"
             + fieldname + "' AND fk_category=(SELECT id FROM tbl_categories WHERE name='" + category + "');";
 
     if(this->execute(statement, &qry, error)) {

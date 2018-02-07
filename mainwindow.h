@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <QTableWidgetItem>
 #include <QCloseEvent>
+#include <QHeaderView>
+#include <QFont>
 #include "settingscontroller.h"
 #include "rentalcontroller.h"
 #include "dialogcontroller.h"

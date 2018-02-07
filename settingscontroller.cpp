@@ -37,7 +37,6 @@ void SettingsController::initCategories()
     }
 }
 
-// sorting not required, qry is ordered by name asc
 void SettingsController::initCustomfields()
 {
     QSqlQuery qry;
@@ -54,9 +53,10 @@ void SettingsController::initCustomfields()
         }
         else {
             while(qry.next()) {
-                Datafield* field = new Datafield(qry.value(0).toString(), qry.value(1).toInt());
+                Datafield* field = new Datafield(qry.value(0).toString(), qry.value(1).toInt(), qry.value(2).toBool());
                 this->categories.at(categoryIndex)->addField(field);
             }
+            this->sortDatafields(currentCategory);
         }
     }
 }
@@ -130,7 +130,7 @@ void SettingsController::sortDatafields(QString category)
     QVector<Datafield*> sorted;
     QString min = NULL;
     int minIndex = -1;
-
+    Datafield* tmp;
     if(categoryIndex == -1) {
         this->dialogController->showWarning("Datenfelder konnten nicht sortiert werden",
                                "Kategorie [" + category + "] nicht gefunden.");
@@ -149,6 +149,15 @@ void SettingsController::sortDatafields(QString category)
             this->categories.at(categoryIndex)->removeField(minIndex);
         }
         sorted.append(this->categories.at(categoryIndex)->getField(0));
+
+        // required fields first asc then bot required asc
+        for(int i = sorted.count() - 1; i > 0; i--) {
+            if(sorted.at(i)->isRequired()) {
+                tmp = sorted.at(i);
+                sorted.removeAt(i);
+                sorted.push_front(tmp);
+            }
+        }
         this->categories.at(categoryIndex)->setFields(sorted);
     }
 }
@@ -265,7 +274,8 @@ void SettingsController::updateCustomfield(QString category, QString currentFiel
     QString error = NULL;
     bool fieldExists = false;
     int categoryIndex = this->getCategoryIndex(category);
-    int fieldIndex = this->getDatafieldIndex(categoryIndex, currentFieldname);
+    // increment because of create operator
+    int fieldIndex = this->getDatafieldIndex(categoryIndex, currentFieldname) + 1;
 
     if(!this->dbHandler->checkCustomfieldExists(currentFieldname, category, &fieldExists, &error)) {
         this->dialogController->showWarning("Datenfeld konnte nicht gesucht werden", error);
