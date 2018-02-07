@@ -436,6 +436,7 @@ void MainWindow::showActiveLents()
 {
     QString verleihdauer;
     QVector<Rental*> list = this->rentalController->getAllLentDevice();
+    this->ui->lwOverviewBorrower->clear();
     for(int i = 0; i < list.size(); i++)
     {
         qint64 dateEnd = list[i]->getEnd().toSecsSinceEpoch();
@@ -455,16 +456,19 @@ void MainWindow::showActiveLents()
 }
 
 
-void MainWindow::on_lwOverviewBorrower_currentRowChanged(int currentRow)
+void MainWindow::on_lwOverviewBorrower_clicked()
 {
 
-    QVector<Rental*> list = this->rentalController->getAllLentDevice();
-        qDebug() << list[currentRow]->getID();
-    this->ui->edtOverviewFirstname->setText(list[currentRow]->getFirstname());
-    this->ui->edtOverviewLastname->setText(list[currentRow]->getLastname());
-    this->ui->dtOverviewStart->setDateTime(list[currentRow]->getStart());
-    this->ui->dtOverviewEnd->setDateTime(list[currentRow]->getEnd());
-    this->ui->tbOverviewExtra->setText(list[currentRow]->getExtra());
+    int currentRow = this->ui->lwOverviewBorrower->currentRow();
+        QVector<Rental*> list = this->rentalController->getAllLentDevice();
+            qDebug() << list[currentRow]->getID();
+        this->ui->edtOverviewFirstname->setText(list[currentRow]->getFirstname());
+        this->ui->edtOverviewLastname->setText(list[currentRow]->getLastname());
+        this->ui->dtOverviewStart->setDateTime(list[currentRow]->getStart());
+        this->ui->dtOverviewEnd->setDateTime(list[currentRow]->getEnd());
+        this->ui->tbOverviewExtra->setText(list[currentRow]->getExtra());
+
+
 }
 
 void MainWindow::on_btnOverviewEndRental_clicked()
@@ -474,4 +478,5 @@ void MainWindow::on_btnOverviewEndRental_clicked()
     QVector<Rental*> list = this->rentalController->getAllLentDevice();
     QString idVar = list[this->ui->lwOverviewBorrower->currentRow()]->getID();
     dbHandler.closeLents(&sql, &error, idVar);
+    showActiveLents();
 }

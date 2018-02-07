@@ -112,7 +112,7 @@ private slots:
 
     void showActiveLents();
 
-    void on_lwOverviewBorrower_currentRowChanged(int currentRow);
+    void on_lwOverviewBorrower_clicked();
 
     void on_btnOverviewEndRental_clicked();
 
