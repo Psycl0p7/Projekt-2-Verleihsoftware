@@ -34,9 +34,13 @@ public:
     bool deleteCustomField(QString category, QString fieldname, QString* error);
 
     bool getObjectByBarcode(QString barcode, Object* object, bool *found, QString* error);
+    bool searchObjectsByCategory(QString category, QVector<Object *> *foundObjects, QString* error);
 
     bool checkObjectAvailability(QString barcode, bool *isAvailable, QString* error);
     bool createRental(Rental* rental, QString* error);
+    bool checkBarcodeisAvailable(QString barcode, bool* isAvailable, QString* error);
+    bool createObject(Object* object);
+    bool updateObect(Object* object);
 
 private:
 
