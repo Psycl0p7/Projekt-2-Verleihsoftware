@@ -173,9 +173,9 @@ void SettingsController::createCategory(QString categoryName)
 
     this->categories.append(new Object(categoryName));
     this->sortCategories();
-    emit this->showCategories(this->categories);
-    emit this->setSettingsSelectedCategory(this->getCategoryIndex(categoryName));
     emit this->transmitCategories(this->categories);
+    emit this->setSettingsSelectedCategory(this->getCategoryIndex(categoryName));
+    emit this->showCategories(this->categories);
 }
 
 void SettingsController::updateCategory(QString categoryName, QString newName)
