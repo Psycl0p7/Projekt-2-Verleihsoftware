@@ -466,6 +466,12 @@ bool updateObect(Object* object)
 
 bool DBHandler::getAllLents(QSqlQuery* sql, QString* error)
 {
-    QString statement = QString("SELECT firstname, lastname, extra, start, end FROM tbl_rentals");
+    QString statement = QString("SELECT firstname, lastname, extra, start, end, id FROM tbl_rentals");
+    return this->execute(statement, sql, error);
+}
+
+bool DBHandler::closeLents(QSqlQuery* sql, QString* error, QString id)
+{
+    QString statement = QString("DELETE FROM tbl_rentals WHERE tbl_rentals.id = " + id);
     return this->execute(statement, sql, error);
 }

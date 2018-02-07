@@ -126,7 +126,8 @@ QVector<Rental*> RentalController::getAllLentDevice()
                                   sql.value(1).toString(),
                                   sql.value(2).toString(),
                                   QDateTime::fromString(sql.value(3).toString(), "dd.MM.yyyy HH:mm"),
-                                  QDateTime::fromString(sql.value(4).toString(), "dd.MM.yyyy HH:mm"));
+                                  QDateTime::fromString(sql.value(4).toString(), "dd.MM.yyyy HH:mm"),
+                                  sql.value(5).toString());
         list.append(rent);
     }
     return list;

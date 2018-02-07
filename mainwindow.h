@@ -114,6 +114,8 @@ private slots:
 
     void on_lwOverviewBorrower_currentRowChanged(int currentRow);
 
+    void on_btnOverviewEndRental_clicked();
+
 signals:
 
 };

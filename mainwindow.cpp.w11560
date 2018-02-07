@@ -472,6 +472,6 @@ void MainWindow::on_btnOverviewEndRental_clicked()
     QSqlQuery sql;
     QString error;
     QVector<Rental*> list = this->rentalController->getAllLentDevice();
-    QString idVar = list[this->ui->lwOverviewBorrower->currentRow()]->getID();
-    dbHandler.closeLents(&sql, &error, idVar);
+
+    dbHandler.closeLent(&sql, &error, list[this->ui->lwOverviewBorrower->currentRow()]->getID());
 }

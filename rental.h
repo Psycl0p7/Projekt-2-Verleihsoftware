@@ -10,12 +10,14 @@ public:
     Rental();
     Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end);
     Rental(QString firstname, QString lastname, QString extra, QString start, QString end);
+        Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QString id);
     Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QVector<Object*> objects);
     QString getFirstname();
     QString getLastname();
     QString getExtra();
     QDateTime getStart();
     QDateTime getEnd();
+    QString getID();
     qint64 getTimeLeft();
     bool includesObject(QString barcode);
 
@@ -36,6 +38,7 @@ private:
 
     QString startDate;
     QString endDate;
+    QString id;
 };
 
 #endif // RENTAL_H

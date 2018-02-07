@@ -23,6 +23,16 @@ Rental::Rental(QString firstname, QString lastname, QString extra, QString start
     this->endDate = end;
 }
 
+Rental::Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QString id)
+{
+    this->firstname = firstname;
+    this->lastname = lastname;
+    this->extra = extra;
+    this->start = start;
+    this->end = end;
+    this->id = id;
+}
+
 Rental::Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QVector<Object *> objects)
 {
     this->firstname = firstname;
@@ -56,6 +66,11 @@ QDateTime Rental::getStart()
 QDateTime Rental::getEnd()
 {
     return this->end;
+}
+
+QString Rental::getID()
+{
+    return this->id;
 }
 
 // negative values if time expired
