@@ -43,6 +43,8 @@ public:
     bool createObject(Object* object);
     bool updateObect(Object* object);
     bool getAllLents(QSqlQuery* sql, QString* error);
+    bool getCategorieForLent(QSqlQuery* sql, QString* error, QString id);
+    bool getCategorieForLentNext(QSqlQuery* sql, QString* error, QString id);
 
 private:
 

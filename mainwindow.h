@@ -118,6 +118,10 @@ private slots:
 
     void on_tabWidget_tabBarClicked(int index);
 
+    void getCategory(QString id);
+
+    void clearAllFields();
+
 signals:
 
 };

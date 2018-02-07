@@ -477,3 +477,16 @@ bool DBHandler::closeLents(QSqlQuery* sql, QString* error, QString id)
     this->execute(statement, sql, error);
     return this->execute(statement2, sql, error);
 }
+
+
+bool DBHandler::getCategorieForLent(QSqlQuery* sql, QString* error, QString id)
+{
+    QString statement = QString("SELECT fk_object FROM tbl_rental_object WHERE fk_rental = " + id);
+    return this->execute(statement, sql, error);
+}
+
+bool DBHandler::getCategorieForLentNext(QSqlQuery* sql, QString* error, QString id)
+{
+    QString statement = QString("SELECT name FROM tbl_categories WHERE id = " + id);
+    return this->execute(statement, sql, error);
+}

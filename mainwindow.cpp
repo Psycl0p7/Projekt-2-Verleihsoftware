@@ -461,6 +461,7 @@ void MainWindow::on_lwOverviewBorrower_clicked()
 
     int currentRow = this->ui->lwOverviewBorrower->currentRow();
         QVector<Rental*> list = this->rentalController->getAllLentDevice();
+        getCategory(list[currentRow]->getID());
         this->ui->edtOverviewFirstname->setText(list[currentRow]->getFirstname());
         this->ui->edtOverviewLastname->setText(list[currentRow]->getLastname());
         this->ui->dtOverviewStart->setDateTime(list[currentRow]->getStart());
@@ -479,6 +480,7 @@ void MainWindow::on_btnOverviewEndRental_clicked()
         QVector<Rental*> list = this->rentalController->getAllLentDevice();
         QString idVar = list[this->ui->lwOverviewBorrower->currentRow()]->getID();
         dbHandler.closeLents(&sql, &error, idVar);
+        clearAllFields();
         showActiveLents();
     } else {
         QMessageBox::warning(this, "Fehler", "Es wurde kein Verleihausgewählt");
@@ -486,10 +488,37 @@ void MainWindow::on_btnOverviewEndRental_clicked()
 
 }
 
+void MainWindow::clearAllFields()
+{
+this->ui->lwOverviewObjects->clear();
+    this->ui->edtOverviewFirstname->clear();
+    this->ui->edtOverviewLastname->clear();
+    this->ui->dtOverviewStart->clear();
+    this->ui->dtOverviewEnd->clear();
+    this->ui->tbOverviewExtra->clear();
+}
+
 void MainWindow::on_tabWidget_tabBarClicked(int index)
 {
     if (index == 0)
     {
         showActiveLents();
+    }
+}
+
+void MainWindow::getCategory(QString id)
+{
+    QSqlQuery sql;
+    QString error;
+    dbHandler.getCategorieForLent(&sql, &error, id);
+    while(sql.next())
+    {
+        dbHandler.getCategorieForLentNext(&sql, &error, sql.value(0).toString());
+        while(sql.next())
+        {
+            this->ui->lwOverviewObjects->clear();
+            this->ui->lwOverviewObjects->addItem(sql.value(0).toString());
+        }
+
     }
 }
