@@ -461,7 +461,6 @@ void MainWindow::on_lwOverviewBorrower_clicked()
 
     int currentRow = this->ui->lwOverviewBorrower->currentRow();
         QVector<Rental*> list = this->rentalController->getAllLentDevice();
-            qDebug() << list[currentRow]->getID();
         this->ui->edtOverviewFirstname->setText(list[currentRow]->getFirstname());
         this->ui->edtOverviewLastname->setText(list[currentRow]->getLastname());
         this->ui->dtOverviewStart->setDateTime(list[currentRow]->getStart());
@@ -473,10 +472,24 @@ void MainWindow::on_lwOverviewBorrower_clicked()
 
 void MainWindow::on_btnOverviewEndRental_clicked()
 {
-    QSqlQuery sql;
-    QString error;
-    QVector<Rental*> list = this->rentalController->getAllLentDevice();
-    QString idVar = list[this->ui->lwOverviewBorrower->currentRow()]->getID();
-    dbHandler.closeLents(&sql, &error, idVar);
-    showActiveLents();
+    if (this->ui->lwOverviewBorrower->currentRow() >= 0)
+    {
+        QSqlQuery sql;
+        QString error;
+        QVector<Rental*> list = this->rentalController->getAllLentDevice();
+        QString idVar = list[this->ui->lwOverviewBorrower->currentRow()]->getID();
+        dbHandler.closeLents(&sql, &error, idVar);
+        showActiveLents();
+    } else {
+        QMessageBox::warning(this, "Fehler", "Es wurde kein Verleihausgewählt");
+    }
+
+}
+
+void MainWindow::on_tabWidget_tabBarClicked(int index)
+{
+    if (index == 0)
+    {
+        showActiveLents();
+    }
 }

@@ -116,6 +116,8 @@ private slots:
 
     void on_btnOverviewEndRental_clicked();
 
+    void on_tabWidget_tabBarClicked(int index);
+
 signals:
 
 };

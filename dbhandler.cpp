@@ -473,5 +473,7 @@ bool DBHandler::getAllLents(QSqlQuery* sql, QString* error)
 bool DBHandler::closeLents(QSqlQuery* sql, QString* error, QString id)
 {
     QString statement = QString("DELETE FROM tbl_rentals WHERE tbl_rentals.id = " + id);
-    return this->execute(statement, sql, error);
+    QString statement2 = QString("DELETE FROM tbl_rental_object WHERE fk_rental = " + id);
+    this->execute(statement, sql, error);
+    return this->execute(statement2, sql, error);
 }
