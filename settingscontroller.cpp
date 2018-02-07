@@ -135,7 +135,7 @@ void SettingsController::sortDatafields(QString category)
         this->dialogController->showWarning("Datenfelder konnten nicht sortiert werden",
                                "Kategorie [" + category + "] nicht gefunden.");
     }
-    else {
+    else if(this->categories.at(categoryIndex)->countFields() > 1){
         while(this->categories.at(categoryIndex)->countFields() > 1) {
             minIndex = 0;
             min = this->categories.at(categoryIndex)->getField(minIndex)->getName();
@@ -149,16 +149,7 @@ void SettingsController::sortDatafields(QString category)
             this->categories.at(categoryIndex)->removeField(minIndex);
         }
         sorted.append(this->categories.at(categoryIndex)->getField(0));
-
-        // required fields first asc then bot required asc
-        // for(int i = sorted.count() - 1; i > 0; i--) {
-        //     if(sorted.at(i)->isRequired()) {
-        //         tmp = sorted.at(i);
-        //         sorted.removeAt(i);
-        //         sorted.push_front(tmp);
-        //     }
-        // }
-        // this->categories.at(categoryIndex)->setFields(sorted);
+        this->categories.at(categoryIndex)->setFields(sorted);
     }
 }
 
