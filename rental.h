@@ -9,6 +9,7 @@ class Rental
 public:
     Rental();
     Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end);
+    Rental(QString firstname, QString lastname, QString extra, QString start, QString end);
     Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QVector<Object*> objects);
     QString getFirstname();
     QString getLastname();
@@ -32,6 +33,9 @@ private:
 
     QDateTime start;
     QDateTime end;
+
+    QString startDate;
+    QString endDate;
 };
 
 #endif // RENTAL_H

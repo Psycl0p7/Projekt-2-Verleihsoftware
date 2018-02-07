@@ -106,3 +106,28 @@ void RentalController::confirmActiveRental(QString firstname, QString lastname, 
         }
     }
 }
+
+QVector<Rental*> RentalController::getAllLentDevice()
+{
+    QSqlQuery sql;
+    QString error;
+    dbHandler->getAllLents(&sql, &error);
+    QVector<Rental*> list;
+    while(sql.next())
+    {
+        /*
+         * 0 = firstname
+         * 1 = lastname
+         * 2 = extra
+         * 3 = start
+         * 4 = end
+         */
+        Rental* rent = new Rental(sql.value(0).toString(),
+                                  sql.value(1).toString(),
+                                  sql.value(2).toString(),
+                                  QDateTime::fromString(sql.value(3).toString(), "dd.MM.yyyy HH:mm"),
+                                  QDateTime::fromString(sql.value(4).toString(), "dd.MM.yyyy HH:mm"));
+        list.append(rent);
+    }
+    return list;
+}

@@ -26,6 +26,7 @@ void MainWindow::init()
 
     this->categoriesReady = false;
     this->enterBarcodeManually = false;
+    this->showActiveLents();
 
     this->frmReadInBarcode = new FrmReadInBarcode(&this->dbHandler, &this->dialogController);
 //   this->frmReadInBarcode->showUp();
@@ -61,7 +62,6 @@ void MainWindow::init()
     this->settingsController->init();
     this->resetRentalView();
     this->initRentalObjectDetailTable();
-    this->showActiveLents();
 }
 
 void MainWindow::initRentalObjectDetailTable()
@@ -434,33 +434,6 @@ void MainWindow::on_btnObjectsUpdate_clicked()
 
 void MainWindow::showActiveLents()
 {
-    QString verleihdauer;
-    QVector<Rental*> list = this->rentalController->getAllLentDevice();
-    for(int i = 0; i < list.size(); i++)
-    {
-        qint64 dateEnd = list[i]->getEnd().toSecsSinceEpoch();
-        qint64 dateNow = QDateTime::currentSecsSinceEpoch();
-        qint64 dateDiff = dateEnd - dateNow;
-        QListWidgetItem* pItem =new QListWidgetItem();
-        if (dateDiff <= 0)
-        {
-            verleihdauer = "Verzug";
-            pItem->setBackground(Qt::red); // sets green background
-        } else {
-            verleihdauer = "Ok";
-        }
-        pItem->setText(verleihdauer+ " - " + list[i]->getFirstname() + " " + list[i]->getLastname());
-        this->ui->lwOverviewBorrower->addItem(pItem);
-    }
-}
-
-
-void MainWindow::on_lwOverviewBorrower_currentRowChanged(int currentRow)
-{
-    QVector<Rental*> list = this->rentalController->getAllLentDevice();
-    this->ui->edtOverviewFirstname->setText(list[currentRow]->getFirstname());
-    this->ui->edtOverviewLastname->setText(list[currentRow]->getLastname());
-    this->ui->dtOverviewStart->setDateTime(list[currentRow]->getStart());
-    this->ui->dtOverviewEnd->setDateTime(list[currentRow]->getEnd());
-    this->ui->tbOverviewExtra->setText(list[currentRow]->getExtra());
+    qDebug() << this->rentalController->activeRental;
+    //this->ui->lwOverviewBorrower->addItem("Sascha");
 }

@@ -463,3 +463,9 @@ bool updateObect(Object* object)
 {
 
 }
+
+bool DBHandler::getAllLents(QSqlQuery* sql, QString* error)
+{
+    QString statement = QString("SELECT firstname, lastname, extra, start, end FROM tbl_rentals");
+    return this->execute(statement, sql, error);
+}

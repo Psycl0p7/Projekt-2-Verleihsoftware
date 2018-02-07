@@ -6,6 +6,8 @@
 #include <QObject>
 #include "dialogcontroller.h"
 #include "rental.h"
+#include <QVector>
+#include <QDateTime>
 class RentalController : public QObject
 {
     Q_OBJECT
@@ -17,14 +19,14 @@ public:
     void switchSelectedObject(int index);
     void removeSelectedObject(int index);
     void confirmActiveRental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end);
-
-
+    QVector<Rental*> getAllLentDevice();
 private:
     DBHandler* dbHandler;
     DialogController* dialogController;
     Rental* activeRental;
     Object* searchObjectByBarcode(QString barcode);
     void updateObjectDataTable(QVector<Datafield*> fields);
+
 signals:
     void showRentalEntries(QVector<Object*>);
     void addRentalObject(QString object);

@@ -56,6 +56,7 @@ public slots:
     void showObjects(QVector<Object*> objects);
     void resetObjectTable(QVector<Datafield*> datafields);
 
+
     // ***                  *** //
 
 private:
@@ -108,6 +109,10 @@ private slots:
     void on_cbObjectsCategory_currentIndexChanged(int index);
 
     void on_btnObjectsUpdate_clicked();
+
+    void showActiveLents();
+
+    void on_lwOverviewBorrower_currentRowChanged(int currentRow);
 
 signals:
 

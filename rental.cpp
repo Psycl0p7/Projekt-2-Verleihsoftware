@@ -14,6 +14,15 @@ Rental::Rental(QString firstname, QString lastname, QString extra, QDateTime sta
     this->end = end;
 }
 
+Rental::Rental(QString firstname, QString lastname, QString extra, QString start, QString end)
+{
+    this->firstname = firstname;
+    this->lastname = lastname;
+    this->extra = extra;
+    this->startDate = start;
+    this->endDate = end;
+}
+
 Rental::Rental(QString firstname, QString lastname, QString extra, QDateTime start, QDateTime end, QVector<Object *> objects)
 {
     this->firstname = firstname;

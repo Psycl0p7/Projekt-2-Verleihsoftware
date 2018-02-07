@@ -41,6 +41,7 @@ public:
     bool checkBarcodeisAvailable(QString barcode, bool* isAvailable, QString* error);
     bool createObject(Object* object);
     bool updateObect(Object* object);
+    bool getAllLents(QSqlQuery* sql, QString* error);
 
 private:
 
