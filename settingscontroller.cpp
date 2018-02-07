@@ -130,7 +130,7 @@ void SettingsController::sortDatafields(QString category)
     QVector<Datafield*> sorted;
     QString min = NULL;
     int minIndex = -1;
-    Datafield* tmp;
+   // Datafield* tmp;
     if(categoryIndex == -1) {
         this->dialogController->showWarning("Datenfelder konnten nicht sortiert werden",
                                "Kategorie [" + category + "] nicht gefunden.");
@@ -151,14 +151,14 @@ void SettingsController::sortDatafields(QString category)
         sorted.append(this->categories.at(categoryIndex)->getField(0));
 
         // required fields first asc then bot required asc
-        for(int i = sorted.count() - 1; i > 0; i--) {
-            if(sorted.at(i)->isRequired()) {
-                tmp = sorted.at(i);
-                sorted.removeAt(i);
-                sorted.push_front(tmp);
-            }
-        }
-        this->categories.at(categoryIndex)->setFields(sorted);
+        // for(int i = sorted.count() - 1; i > 0; i--) {
+        //     if(sorted.at(i)->isRequired()) {
+        //         tmp = sorted.at(i);
+        //         sorted.removeAt(i);
+        //         sorted.push_front(tmp);
+        //     }
+        // }
+        // this->categories.at(categoryIndex)->setFields(sorted);
     }
 }
 
@@ -183,8 +183,8 @@ void SettingsController::createCategory(QString categoryName)
     this->categories.append(new Object(categoryName));
     this->sortCategories();
     emit this->transmitCategories(this->categories);
-    emit this->setSettingsSelectedCategory(this->getCategoryIndex(categoryName));
     emit this->showCategories(this->categories);
+    emit this->setSettingsSelectedCategory(this->getCategoryIndex(categoryName));
 }
 
 void SettingsController::updateCategory(QString categoryName, QString newName)
@@ -250,6 +250,7 @@ void SettingsController::createCustomfield(QString fieldname, QString category, 
         this->categories.at(categoryIndex)->addField(new Datafield(fieldname, typeIndex, isRequired));
         this->sortDatafields(category);
         emit this->showDatafields(this->categories.at(categoryIndex)->getAllFields());
+        emit this->setSettingsSelectedCustomfield(this->getDatafieldIndex(this->getCategoryIndex(category), fieldname));
         this->dialogController->showInformation("Datenfeld erfolgreich angelegt.");
     }
 }
@@ -275,7 +276,7 @@ void SettingsController::updateCustomfield(QString category, QString currentFiel
     bool fieldExists = false;
     int categoryIndex = this->getCategoryIndex(category);
     // increment because of create operator
-    int fieldIndex = this->getDatafieldIndex(categoryIndex, currentFieldname) + 1;
+    int fieldIndex = this->getDatafieldIndex(categoryIndex, currentFieldname);
 
     if(!this->dbHandler->checkCustomfieldExists(currentFieldname, category, &fieldExists, &error)) {
         this->dialogController->showWarning("Datenfeld konnte nicht gesucht werden", error);

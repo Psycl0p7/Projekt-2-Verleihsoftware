@@ -199,7 +199,8 @@ void MainWindow::setSettingsSelectedCategory(int index)
 
 void MainWindow::setSettingsSelectedCustomfield(int index)
 {
-    this->ui->cb_customfield->setCurrentIndex(index);
+    // first index is always the create operator
+    this->ui->cb_customfield->setCurrentIndex(index + 1);
 }
 
 void MainWindow::showRentalEntries(QVector<Object *> objects)
