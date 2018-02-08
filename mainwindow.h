@@ -117,8 +117,6 @@ private slots:
 
     void showActiveLents();
 
-    void on_lwOverviewBorrower_clicked();
-
     void on_btnOverviewEndRental_clicked();
 
     void on_tabWidget_tabBarClicked(int index);
@@ -126,6 +124,8 @@ private slots:
     void getCategory(QString id);
 
     void clearAllFields();
+
+    void on_lwOverviewBorrower_currentRowChanged(int currentRow);
 
 signals:
 

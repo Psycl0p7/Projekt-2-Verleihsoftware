@@ -508,22 +508,6 @@ void MainWindow::showActiveLents()
     }
 }
 
-
-void MainWindow::on_lwOverviewBorrower_clicked()
-{
-
-    int currentRow = this->ui->lwOverviewBorrower->currentRow();
-        QVector<Rental*> list = this->rentalController->getAllLentDevice();
-        getCategory(list[currentRow]->getID());
-        this->ui->edtOverviewFirstname->setText(list[currentRow]->getFirstname());
-        this->ui->edtOverviewLastname->setText(list[currentRow]->getLastname());
-        this->ui->dtOverviewStart->setDateTime(list[currentRow]->getStart());
-        this->ui->dtOverviewEnd->setDateTime(list[currentRow]->getEnd());
-        this->ui->tbOverviewExtra->setText(list[currentRow]->getExtra());
-
-
-}
-
 void MainWindow::on_btnOverviewEndRental_clicked()
 {
     if (this->ui->lwOverviewBorrower->currentRow() >= 0)
@@ -574,4 +558,15 @@ void MainWindow::getCategory(QString id)
         }
 
     }
+}
+
+void MainWindow::on_lwOverviewBorrower_currentRowChanged(int currentRow)
+{
+    QVector<Rental*> list = this->rentalController->getAllLentDevice();
+    getCategory(list[currentRow]->getID());
+    this->ui->edtOverviewFirstname->setText(list[currentRow]->getFirstname());
+    this->ui->edtOverviewLastname->setText(list[currentRow]->getLastname());
+    this->ui->dtOverviewStart->setDateTime(list[currentRow]->getStart());
+    this->ui->dtOverviewEnd->setDateTime(list[currentRow]->getEnd());
+    this->ui->tbOverviewExtra->setText(list[currentRow]->getExtra());
 }
