@@ -53,28 +53,38 @@ void ObjectController::searchObjectsByCategory(int categoryIndex)
 void ObjectController::updateToDatabase()
 {
     QString error;
-    if(!this->dbHandler->createObjects(this->createdObjects, &error)) {
-        emit this->dialogController->showWarning("Fehler bei Erstllung neuer Objekte", error);
+    if(!this->checkRequiredData()) {
+        emit this->dialogController->showInformation("Es sind nicht alle Pflichtfelder gefüllt.");
     }
-
-    // update objects
+    else {
+        if(!this->dbHandler->createObjects(this->createdObjects, &error)) {
+            emit this->dialogController->showWarning("Fehler bei Erstellung neuer Objekte", error);
+        }
+        else if(!this->dbHandler->updateObjects(this->displayedObjects, &error)) {
+            emit this->dialogController->showWarning("Fehler bei der Speicherung von Objektdaten", error);
+        }
+    }
 }
 
 void ObjectController::updateObject(QTableWidgetItem* changedItem)
 {
-    int objectIndex = 1;
-    int fieldIndex = -1;
+    int objectIndex = changedItem->row();
+    int fieldIndex = changedItem->column();
     QString data = changedItem->text();
-    if(!data.isEmpty() && data != this->displayedObjects.at(objectIndex)->getField(fieldIndex)->getData()) {
-        objectIndex = changedItem->row();
-        fieldIndex = changedItem->column();
-        this->displayedObjects.at(objectIndex)->getField(fieldIndex)->setData(data);
-    }
+    this->displayedObjects.at(objectIndex)->getField(fieldIndex)->setData(data);
 }
 
-void ObjectController::objectChanged(QTableWidgetItem *changedItem)
+bool ObjectController::checkRequiredData()
 {
-
+    bool ok = true;
+    for(int objectIndex = 0; objectIndex < this->displayedObjects.count(); objectIndex++) {
+        for(int fieldIndex = 0; fieldIndex < this->displayedObjects.at(objectIndex)->countFields(); fieldIndex++) {
+            if(this->displayedObjects.at(objectIndex)->getField(fieldIndex)->isRequired() && this->displayedObjects.at(objectIndex)->getField(fieldIndex)->getData().isEmpty()) {
+                ok = false;
+            }
+        }
+    }
+    return ok;
 }
 
 void ObjectController::removeObject(int index)

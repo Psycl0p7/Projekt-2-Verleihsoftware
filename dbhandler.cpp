@@ -459,8 +459,6 @@ bool DBHandler::createObjects(QVector<Object*> objects, QString* error)
     bool ok = true;;
     // create objects entries;
     QString statementCreateObjects = "INSERT INTO tbl_objects(barcode, fk_category) VALUES";
-    QVector<QString> statementsLinkData;
-    QString statementLinkData;
     QSqlQuery qry;
 
     // compile sql statements
@@ -474,32 +472,10 @@ bool DBHandler::createObjects(QVector<Object*> objects, QString* error)
         else {
             statementCreateObjects += ";";
         }
-
-        for(int fieldIndex = 0; fieldIndex < objects.at(objectIndex)->countFields(); fieldIndex++) {
-            statementLinkData = "INSERT INTO tbl_objectdata(fk_object, fk_datafield, data) VALUES"
-                "((SELECT id FROM tbl_objects WHERE barcode='" + objects.at(objectIndex)->getBarcode() + "')"
-                ",(SELECT id FROM tbl_datafields WHERE fk_category=(SELECT id FROM tbl_objects WHERE barcode='"
-                    + objects.at(objectIndex)->getBarcode() + "') AND name='" + objects.at(objectIndex)->getField(fieldIndex)->getName() + "')"
-                ",'" + objects.at(objectIndex)->getField(fieldIndex)->getData() + "');";
-
-            statementsLinkData.append(statementLinkData);
-        }
     }
-
-    qDebug() << statementCreateObjects;
-
     // execute
     if(!this->execute(statementCreateObjects, &qry, error)) {
         ok = false;
-    }
-    else {
-        qry.finish();
-        for(int i = 0; i < statementsLinkData.count(); i++) {
-            qDebug() << statementsLinkData.at(i);
-            if(!this->execute(statementsLinkData.at(i), &qry, error)) {
-                ok = false;
-            }
-        }
     }
 
     return ok;
@@ -507,6 +483,29 @@ bool DBHandler::createObjects(QVector<Object*> objects, QString* error)
 
 bool DBHandler::updateObjects(QVector<Object*> objects, QString *error)
 {
-    bool ok = false;
-    // QString statement = "UPDATE tbl_"
+    bool ok = true;
+    QVector<QString> statementsLinkData;
+    QString statementLinkData;
+    QSqlQuery qry;
+
+
+    for(int objectIndex = 0; objectIndex < objects.count(); objectIndex++) {
+        for(int fieldIndex = 0; fieldIndex < objects.at(objectIndex)->countFields(); fieldIndex++) {
+            statementLinkData = "INSERT INTO tbl_objectdata(fk_object, fk_datafield, data) VALUES"
+                "((SELECT id FROM tbl_objects WHERE barcode='" + objects.at(objectIndex)->getBarcode() + "')"
+                ",(SELECT id FROM tbl_datafields WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='"
+                    + objects.at(objectIndex)->getCategory() + "') AND name='" + objects.at(objectIndex)->getField(fieldIndex)->getName() + "')"
+                ",'" + objects.at(objectIndex)->getField(fieldIndex)->getData() + "');";
+
+            statementsLinkData.append(statementLinkData);
+        }
+    }
+
+    for(int i = 0; i < statementsLinkData.count(); i++) {
+        if(!this->execute(statementsLinkData.at(i), &qry, error)) {
+            ok = false;
+        }
+    }
+
+    return ok;
 }

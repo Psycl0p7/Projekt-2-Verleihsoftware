@@ -55,9 +55,7 @@ void MainWindow::init()
     QObject::connect(this->objectController, SIGNAL(addObjectToTable(Object*)), this, SLOT(addObjectToTable(Object*)));
     QObject::connect(this->objectController, SIGNAL(showObjects(QVector<Object*>)), this, SLOT(showObjects(QVector<Object*>)));
     QObject::connect(this->frmReadInBarcode, SIGNAL(createObject(QString)), this->objectController, SLOT(createObject(QString)));
-    // QObject::connect(this->ui->twObjects, SIGNAL(currentItemChanged(QTableWidgetItem*,QTableWidgetItem*)), this->objectController, SLOT(updateObject(QTableWidgetItem*)));
-    // QObject::connect(this->ui->twObjects, SIGNAL(itemActivated(QTableWidgetItem*)), this->objectController, SLOT(objectChanged(QTableWidgetItem*)));
-
+    QObject::connect(this->ui->twObjects, SIGNAL(itemChanged(QTableWidgetItem*)), this->objectController, SLOT(updateObject(QTableWidgetItem*)));
     this->settingsController->init();
     this->resetRentalView();
     this->initRentalObjectDetailTable();
@@ -440,7 +438,5 @@ void MainWindow::on_cbObjectsCategory_currentIndexChanged(int index)
 
 void MainWindow::on_btnObjectsUpdate_clicked()
 {
-    // determine deffernces and pack those objects
-    QVector<Object* > currentTableObjects;
     this->objectController->updateToDatabase();
 }

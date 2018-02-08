@@ -23,7 +23,6 @@ public:
 public slots:
     void receiveCategories(QVector<Object*> categories);
     void updateObject(QTableWidgetItem* changedItem);
-    void objectChanged(QTableWidgetItem* changedItem);
     void createObject(QString barcode);
 signals:
     void updateCateoryList();
@@ -35,6 +34,8 @@ private:
     int selectedCategoryIndex;
     DialogController* dialogController;
     QVector<Object*> categories;
+
+    bool checkRequiredData();
 
     QVector<Object*> displayedObjects;
     QVector<Object*> createdObjects;
