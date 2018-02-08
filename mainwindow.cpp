@@ -442,3 +442,9 @@ void MainWindow::on_btnObjectsDiscard_clicked()
 {
     this->objectController->searchObjectsByCategory(this->ui->cbObjectsCategory->currentIndex());
 }
+
+void MainWindow::on_btnObjectsDelete_clicked()
+{
+    int index = this->ui->twObjects->currentRow();
+    this->objectController->removeObject(index);
+}

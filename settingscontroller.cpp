@@ -237,6 +237,9 @@ void SettingsController::createCustomfield(QString fieldname, QString category, 
     else if(!this->dbHandler->createCustomField(&error, fieldname, category, typeIndex, isRequired)) {
         this->dialogController->showWarning("Datenfeld konnte nicht angelegt werden", error);
     }
+    else if(!this->dbHandler->insertObjectDataForFieldCreation(category, fieldname, &error)) {
+        this->dialogController->showWarning("Datenfelder konnten nicht angelegt werden", error);
+    }
     else {
         this->categories.at(categoryIndex)->addField(new Datafield(fieldname, typeIndex, isRequired));
         this->sortDatafields(category);

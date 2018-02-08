@@ -42,6 +42,7 @@ public:
     bool createObjects(QVector<Object*> objects, QString* error);
     bool insertObjectData(QVector<Object*> objects, QString* error);
     bool updateObjectData(QVector<Object*> objects, QString* error);
+    bool insertObjectDataForFieldCreation(QString category, QString fieldname, QString *error);
 
 private:
 

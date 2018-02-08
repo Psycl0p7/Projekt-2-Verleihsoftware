@@ -52,7 +52,7 @@ void ObjectController::searchObjectsByCategory(int categoryIndex)
     QString error;
 
     if(!this->dbHandler->searchObjectsByCategory(this->categories.at(categoryIndex)->getCategory(), &foundObjects, &error)) {
-        emit this->dialogController->showWarning("Objeckte konnten nicht gesucht werden", error);
+        emit this->dialogController->showWarning("Objekte konnten nicht gesucht werden", error);
     }
     else {
         this->displayedObjects  = foundObjects;
@@ -121,5 +121,7 @@ bool ObjectController::checkRequiredData()
 
 void ObjectController::removeObject(int index)
 {
-
+    this->removedObjects.append(this->displayedObjects.at(index));
+    this->displayedObjects.removeAt(index);
+    emit this->showObjects(this->displayedObjects);
 }

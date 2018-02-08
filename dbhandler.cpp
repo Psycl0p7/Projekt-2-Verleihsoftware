@@ -486,11 +486,51 @@ bool DBHandler::updateObjectData(QVector<Object*> objects, QString* error)
                     " WHERE fk_object=(SELECT id  FROM tbl_objects WHERE barcode='" + objects.at(objectIndex)->getBarcode() + "')"
                     " AND"
                     " fk_datafield=(SELECT id FROM tbl_datafields WHERE name='" + objects.at(objectIndex)->getField(fieldIndex)->getName() + "');";
-            qDebug() << statement;
 
             if(!this->execute(statement, &qry, error)) {
                 ok = false;
             }
+        }
+    }
+
+    return ok;
+}
+
+bool DBHandler::insertObjectDataForFieldCreation(QString category, QString fieldname, QString* error)
+{
+    bool ok = true;
+    QSqlQuery qry;
+    QVector<int> ids;
+    QString statementGetObjectIds = "SELECT id FROM tbl_objects WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='" + category + "');";
+    QString insertStatement = "INSERT INTO tbl_objectdata(fk_datafield, fk_object) VALUES";
+    if(!this->execute(statementGetObjectIds, &qry, error)) {
+        ok = false;
+    }
+    else {
+        while(qry.next()) {
+            ids.append(qry.value(0).toInt());
+        }
+        qry.finish();
+
+        for(int i = 0; i <  ids.count(); i++) {
+            insertStatement += "((SELECT id FROM tbl_datafields WHERE name='" + fieldname + "')," + QString::number(ids.at(i)) + ")";
+            if(i < ids.count() - 1) {
+                insertStatement += ',';
+            }
+            else {
+                insertStatement += ";";
+            }
+        }
+        qDebug() << insertStatement;
+
+        if(ids.count() == 0) {
+            ok = true;
+        }
+        else if(this->execute(insertStatement, &qry, error)) {
+            ok = true;
+        }
+        else {
+            ok = false;
         }
     }
 

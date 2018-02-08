@@ -112,6 +112,8 @@ private slots:
 
     void on_btnObjectsDiscard_clicked();
 
+    void on_btnObjectsDelete_clicked();
+
 signals:
 
 };
