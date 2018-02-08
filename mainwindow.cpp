@@ -240,6 +240,7 @@ void MainWindow::resetObjectTable(QVector<Datafield *> datafields)
         this->ui->twObjects->setHorizontalHeaderItem(i, headerItem);
     }
     this->ui->twObjects->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    this->objectController->searchObjectsByCategory(this->ui->cbObjectsCategory->currentIndex());
 }
 
 void MainWindow::showObjects(QVector<Object*> objects)
