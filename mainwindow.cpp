@@ -439,12 +439,22 @@ void MainWindow::on_cbObjectsCategory_currentIndexChanged(int index)
 
 void MainWindow::on_btnObjectsUpdate_clicked()
 {
-    this->objectController->updateToDatabase();
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Änderungen speichern", "Wollen Sie wirklich Ihre Änderungen speichern?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        this->objectController->updateToDatabase();
+    }
 }
 
 void MainWindow::on_btnObjectsDiscard_clicked()
 {
-    this->objectController->discardChanged();
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Änderungen verwerfen", "Wollen Sie wirklich Ihre Änderungen verwerfen?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        this->objectController->discardChanged();
+    }
 }
 
 void MainWindow::on_btnObjectsDelete_clicked()
