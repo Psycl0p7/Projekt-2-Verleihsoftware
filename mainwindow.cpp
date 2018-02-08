@@ -17,6 +17,8 @@ MainWindow::~MainWindow()
 void MainWindow::init()
 {
     this->setFixedSize(this->width(),this->height());
+    this->ui->btnObjectsCreate->setEnabled(false);
+    this->ui->btnObjectsDelete->setEnabled(false);
 
     this->settingsController = new SettingsController(&this->dbHandler, &this->dialogController);
     this->objectController = new ObjectController(&this->dbHandler, &this->dialogController);
@@ -27,6 +29,7 @@ void MainWindow::init()
     this->enterBarcodeManually = false;
 
     this->frmReadInBarcode = new FrmReadInBarcode(&this->dbHandler, &this->dialogController);
+
 //   this->frmReadInBarcode->showUp();
 
     // ** SIGNAL SLOTS  **
@@ -433,7 +436,13 @@ void MainWindow::on_btnObjectsCreate_clicked()
 void MainWindow::on_cbObjectsCategory_currentIndexChanged(int index)
 {
     if(index > -1 && this->categoriesReady) {
+        this->ui->btnObjectsCreate->setEnabled(true);
+        this->ui->btnObjectsDelete->setEnabled(true);
         this->objectController->setSelectedCategory(index);
+    }
+    else {
+        this->ui->btnObjectsCreate->setEnabled(false);
+        this->ui->btnObjectsDelete->setEnabled(false);
     }
 }
 
@@ -460,7 +469,12 @@ void MainWindow::on_btnObjectsDiscard_clicked()
 void MainWindow::on_btnObjectsDelete_clicked()
 {
     int index = this->ui->twObjects->currentRow();
-    this->objectController->removeObject(index);
+    if(index < 0) {
+        this->showInformation("Kein Objekt ausgewählt.");
+    }
+    else {
+        this->objectController->removeObject(index);
+    }
 }
 
 void MainWindow::showActiveLents()
