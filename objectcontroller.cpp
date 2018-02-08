@@ -41,7 +41,7 @@ void ObjectController::searchObjectsByCategory(int categoryIndex)
     QString error;
 
     if(!this->dbHandler->searchObjectsByCategory(this->categories.at(categoryIndex)->getCategory(), &foundObjects, &error)) {
-        emit this->dialogController->showWarning("Objeckte konnten nicht gesucht werden", error);
+        emit this->dialogController->showWarning("Objekte konnten nicht gesucht werden", error);
     }
     else {
         this->displayedObjects  = foundObjects;

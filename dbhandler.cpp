@@ -304,13 +304,13 @@ bool DBHandler::getObjectByBarcode(QString barcode, Object *object, bool *found,
         }
         else {
             // get category in first record
-            if(qry.first()) {
-                category = qry.value(0).toString();
-                data.append(qry.value(1).toString());
-            }
+            //if(qry.first()) {
+            //    data.append(qry.value(1).toString());
+            //}
 
             // fetch rest of data
             while(qry.next()) {
+                category = qry.value(0).toString();
                 data.append(qry.value(1).toString());
             }
 
@@ -458,8 +458,10 @@ bool DBHandler::createObjects(QVector<Object*> objects, QString* error)
 {
     bool ok = true;;
     // create objects entries;
-    QString statementCreateObjects = "INSERT INTO tbl_objects(barcode, fk_category) VALUES";
     QSqlQuery qry;
+    QString statementCreateObjects = "INSERT INTO tbl_objects(barcode, fk_category) VALUES";
+    QVector<QString> statementsLinkData;
+    QString statementLinkData;
 
     // compile sql statements
     for(int objectIndex = 0; objectIndex < objects.count(); objectIndex++) {
@@ -472,24 +474,7 @@ bool DBHandler::createObjects(QVector<Object*> objects, QString* error)
         else {
             statementCreateObjects += ";";
         }
-    }
-    // execute
-    if(!this->execute(statementCreateObjects, &qry, error)) {
-        ok = false;
-    }
-
-    return ok;
-}
-
-bool DBHandler::updateObjects(QVector<Object*> objects, QString *error)
-{
-    bool ok = true;
-    QVector<QString> statementsLinkData;
-    QString statementLinkData;
-    QSqlQuery qry;
-
-
-    for(int objectIndex = 0; objectIndex < objects.count(); objectIndex++) {
+        // create link data statement
         for(int fieldIndex = 0; fieldIndex < objects.at(objectIndex)->countFields(); fieldIndex++) {
             statementLinkData = "INSERT INTO tbl_objectdata(fk_object, fk_datafield, data) VALUES"
                 "((SELECT id FROM tbl_objects WHERE barcode='" + objects.at(objectIndex)->getBarcode() + "')"
@@ -500,12 +485,22 @@ bool DBHandler::updateObjects(QVector<Object*> objects, QString *error)
             statementsLinkData.append(statementLinkData);
         }
     }
-
-    for(int i = 0; i < statementsLinkData.count(); i++) {
-        if(!this->execute(statementsLinkData.at(i), &qry, error)) {
-            ok = false;
+    // execute
+    if(!this->execute(statementCreateObjects, &qry, error)) {
+        ok = false;
+    }
+    else {
+        for(int i = 0; i < statementsLinkData.count(); i++) {
+            if(!this->execute(statementsLinkData.at(i), &qry, error)) {
+                ok = false;
+            }
         }
     }
 
     return ok;
+}
+
+bool DBHandler::updateObjects(QVector<Object*> objects, QString *error)
+{
+
 }
