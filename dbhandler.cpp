@@ -156,6 +156,7 @@ bool DBHandler::deleteCategory(QString name, QString *error)
     QSqlQuery qry;
     QVector<QString> barcodes;
     QString getObjectBarcodes = "SELECT barcode FROM tbl_objects WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='" + name + "');";
+    QString deleteDataFields = "DELETE FROM tbl_datafields WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='" + name +"')";
     QString deleteCategory = "DELETE FROM tbl_categories WHERE name='"
             + name
             + "';";
@@ -169,6 +170,9 @@ bool DBHandler::deleteCategory(QString name, QString *error)
         }
 
         if(!this->deleteObjects(barcodes, error)) {
+            ok = false;
+        }
+        else if(!this->execute(deleteDataFields, &qry, error)) {
             ok = false;
         }
         else if(!this->execute(deleteCategory, &qry, error)) {

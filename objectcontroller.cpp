@@ -12,7 +12,12 @@ ObjectController::ObjectController(DBHandler* dbHandler, DialogController* dialo
 // transmitted by settingscontroller
 void ObjectController::receiveCategories(QVector<Object *> categories)
 {
+    QVector<Datafield*> empty;
     this->categories = categories;
+    if(categories.count() == 0) {
+        this->selectedCategoryIndex = -1;
+        emit this->resetTable(empty);
+    }
     if(this->selectedCategoryIndex > -1) {
         emit this->resetTable(this->categories.at(this->selectedCategoryIndex)->getAllFields());
     }
@@ -20,9 +25,11 @@ void ObjectController::receiveCategories(QVector<Object *> categories)
 
 void ObjectController::setSelectedCategory(int index)
 {
-    this->selectedCategoryIndex = index;
-    emit this->resetTable(this->categories.at(index)->getAllFields());
-    this->searchObjectsByCategory(index);
+    if(index < this->categories.count()) {
+        this->selectedCategoryIndex = index;
+        emit this->resetTable(this->categories.at(index)->getAllFields());
+        this->searchObjectsByCategory(index);
+    }
 }
 
 void ObjectController::setTableReady(bool isReady)
@@ -51,17 +58,19 @@ void ObjectController::searchObjectsByCategory(int categoryIndex)
     QVector<Object*> foundObjects;
     QString error;
 
-    if(!this->dbHandler->searchObjectsByCategory(this->categories.at(categoryIndex)->getCategory(), &foundObjects, &error)) {
-        emit this->dialogController->showWarning("Objekte konnten nicht gesucht werden", error);
-    }
-    else {
-        for(int i = 0; i < this->displayedObjects.count(); i++) {
-            delete this->displayedObjects.at(i);
+    if(categoryIndex > -1) {
+        if(!this->dbHandler->searchObjectsByCategory(this->categories.at(categoryIndex)->getCategory(), &foundObjects, &error)) {
+            emit this->dialogController->showWarning("Objekte konnten nicht gesucht werden", error);
         }
-        displayedObjects.clear();
-        this->displayedObjects  = foundObjects;
-        emit this->showObjects(this->displayedObjects);
+        else {
+            for(int i = 0; i < this->displayedObjects.count(); i++) {
+                delete this->displayedObjects.at(i);
+            }
+            displayedObjects.clear();
+            this->displayedObjects  = foundObjects;
+        }
     }
+    emit this->showObjects(this->displayedObjects);
 }
 
 // updated depending on diffs in table intio databse

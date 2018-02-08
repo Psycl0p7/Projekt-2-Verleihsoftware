@@ -205,7 +205,6 @@ void SettingsController::updateCategory(QString categoryName, QString newName)
 
 void SettingsController::deleteCategory(QString category)
 {
-    //@TODO delete ALL objects of given category
     QString error = NULL;
     int categoryIndex = this->getCategoryIndex(category);
 
@@ -302,5 +301,6 @@ void SettingsController::deleteCustomfield(QString category, QString fieldname)
         this->categories.at(categoryIndex)->removeField(fieldIndex);
         emit this->showDatafields(this->categories.at(categoryIndex)->getAllFields());
         this->dialogController->showInformation("Datenfeld erfolgreich gelöscht.");
+        emit this->transmitCategories(this->categories);
     }
 }

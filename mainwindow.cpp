@@ -166,9 +166,10 @@ void MainWindow::showCategories(QVector<Object*> categories)
     for(int i = 0; i < categories.count(); i++) {
         this->ui->cbObjectsCategory->addItem(categories.at(i)->getCategory());
     }
-
     this->ui->cb_category->setCurrentIndex(0);
-    this->ui->cbObjectsCategory->setCurrentIndex(0);
+    if(categories.count() > 0) {
+        this->ui->cbObjectsCategory->setCurrentIndex(0);
+    }
 }
 
 void MainWindow::showDatafields(QVector<Datafield*> fields)
@@ -240,6 +241,7 @@ void MainWindow::resetObjectTable(QVector<Datafield *> datafields)
         this->ui->twObjects->setHorizontalHeaderItem(i, headerItem);
     }
     this->ui->twObjects->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
     this->objectController->searchObjectsByCategory(this->ui->cbObjectsCategory->currentIndex());
 }
 
