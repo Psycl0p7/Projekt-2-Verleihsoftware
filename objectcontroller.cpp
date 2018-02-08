@@ -64,8 +64,8 @@ void ObjectController::updateToDatabase()
         if(!this->dbHandler->createObjects(this->createdObjects, &error)) {
             emit this->dialogController->showWarning("Fehler bei Erstellung neuer Objekte", error);
         }
-        else if(!this->dbHandler->updateObjects(this->displayedObjects, &error)) {
-            emit this->dialogController->showWarning("Fehler bei der Speicherung von Objektdaten", error);
+        else if(!this->dbHandler->insertObjectData(this->displayedObjects, &error)) {
+            emit this->dialogController->showWarning("Fehler bei der Erstellung von Objektdaten neuer Objekte", error);
         }
     }
 }

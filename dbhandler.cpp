@@ -263,19 +263,11 @@ bool DBHandler::getObjectByBarcode(QString barcode, Object *object, bool *found,
     // object construction data
     QString category;
 
-    // fetch in same order to allaw synchronious merging
-    QVector<QString> fieldnames;
-    QVector<QString> data;
-
-    QString statementGetFieldnames = "SELECT"
-            " tbl_datafields.name"
-            " FROM tbl_datafields"
-            " WHERE tbl_datafields.fk_category = (SELECT tbl_objects.fk_category FROM tbl_objects WHERE tbl_objects.barcode = '" + barcode +"')"
-            " ORDER BY tbl_datafields.id ASC;";
-
-    QString statementGetData = "SELECT"
+    QString statement = "SELECT DISTINCT"
             " tbl_categories.name AS category,"
-            " tbl_objectdata.data"
+            " (SELECT name FROM tbl_datafields WHERE id = tbl_objectdata.fk_datafield) AS fieldname,"
+            " (SELECT required FROM tbl_datafields WHERE id = tbl_objectdata.fk_datafield) AS required,"
+            " tbl_objectdata.data AS data"
             " FROM tbl_objects"
             " INNER JOIN tbl_categories"
             " ON tbl_categories.id = tbl_objects.fk_category"
@@ -283,50 +275,21 @@ bool DBHandler::getObjectByBarcode(QString barcode, Object *object, bool *found,
             " ON tbl_objectdata.fk_object = tbl_objects.id"
             " WHERE barcode = '" + barcode + "'"
             " ORDER BY tbl_objectdata.fk_datafield ASC;";
-
     *found = false;
 
-    if(!this->execute(statementGetFieldnames, &qry, error)) {
+    if(!this->execute(statement, &qry, error)) {
         ok = false;
     }
-    else if(qry.first()) {
-        *found = true;
-
-        fieldnames.append(qry.value(0).toString());
+    else {
         while(qry.next()) {
-            fieldnames.append(qry.value(0).toString());
+            *found = true;
+            category = qry.value(0).toString();
+            object->addField(new Datafield(qry.value(1).toString(), Datafield::TYPE_UNDEFINED, qry.value(2).toBool(), qry.value(3).toString()));
         }
 
-        qry.finish();
-
-        if(!this->execute(statementGetData, &qry, error)) {
-            ok = false;
-        }
-        else {
-            // get category in first record
-            if(qry.first()) {
-                category = qry.value(0).toString();
-                data.append(qry.value(1).toString());
-            }
-
-            // fetch rest of data
-            while(qry.next()) {
-                data.append(qry.value(1).toString());
-            }
-
-            if(fieldnames.length() != data.length()) {
-                ok = false;
-                *error = "invalid object data";
-            }
-            else {
-                // create Object object
-                object->setBarcode(barcode);
-                object->setCategory(category);
-                for(int i = 0; i < fieldnames.length(); i++) {
-                    object->addField(new Datafield(fieldnames.at(i), data.at(i)));
-                }
-            }
-        }
+        // create Object object
+        object->setBarcode(barcode);
+        object->setCategory(category);
     }
 
     return ok;
@@ -481,7 +444,7 @@ bool DBHandler::createObjects(QVector<Object*> objects, QString* error)
     return ok;
 }
 
-bool DBHandler::updateObjects(QVector<Object*> objects, QString *error)
+bool DBHandler::insertObjectData(QVector<Object*> objects, QString *error)
 {
     bool ok = true;
     QVector<QString> statementsLinkData;

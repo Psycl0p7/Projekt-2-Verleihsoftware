@@ -11,11 +11,6 @@ QString Object::getCategory()
     return this->category;
 }
 
-bool Object::isRequired()
-{
-    return this->required;
-}
-
 int Object::countFields()
 {
     return this->fields.count();

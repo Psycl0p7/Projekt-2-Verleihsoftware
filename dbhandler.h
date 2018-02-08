@@ -40,7 +40,7 @@ public:
     bool createRental(Rental* rental, QString* error);
     bool checkBarcodeisAvailable(QString barcode, bool* isAvailable, QString* error);
     bool createObjects(QVector<Object*> objects, QString* error);
-    bool updateObjects(QVector<Object*> objects, QString* error);
+    bool insertObjectData(QVector<Object*> objects, QString* error);
 
 private:
 

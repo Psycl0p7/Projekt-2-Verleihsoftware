@@ -13,7 +13,6 @@ public:
     QVector<Datafield*> getAllFields();
     QString getBarcode();
     void setBarcode(QString barcode);
-    bool isRequired();
     bool removeField(int index);
     bool setFieldData(QString data);
     int countFields();
@@ -23,7 +22,6 @@ public:
     void setFields(QVector<Datafield*> fields);
 private:
     QString category;
-    bool required;
     QVector<Datafield*> fields;
     QString barcode;
 };
