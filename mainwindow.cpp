@@ -441,7 +441,7 @@ void MainWindow::on_btnObjectsUpdate_clicked()
 
 void MainWindow::on_btnObjectsDiscard_clicked()
 {
-    this->objectController->searchObjectsByCategory(this->ui->cbObjectsCategory->currentIndex());
+    this->objectController->discardChanged();
 }
 
 void MainWindow::on_btnObjectsDelete_clicked()

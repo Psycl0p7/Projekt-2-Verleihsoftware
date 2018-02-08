@@ -496,6 +496,75 @@ bool DBHandler::updateObjectData(QVector<Object*> objects, QString* error)
     return ok;
 }
 
+bool DBHandler::deleteObjects(QVector<Object*> objects, QString *error)
+{
+    bool ok = true;
+    QSqlQuery qry;
+    QVector<QString> barcodes;
+    QVector<int> objectIds;
+    QString strObjectIds;
+    QString getObjectIds = "SELECT id FROM tbl_objects WHERE barcode IN ";
+    QString deleteRentalAssociation;
+    QString deleteObjectData;
+    QString deleteObjectEntries;
+
+    for(int i = 0; i < objects.count(); i++) {
+        barcodes.append(objects.at(i)->getBarcode());
+    }
+
+    getObjectIds += "(";
+    for(int i = 0; i < barcodes.count(); i++) {
+        getObjectIds += "'" + barcodes.at(i) + "'";
+        if(i < barcodes.count() -1) {
+            getObjectIds += ", ";
+        }
+    }
+    getObjectIds += ")";
+
+
+    qDebug() << getObjectIds;
+    if(!this->execute(getObjectIds, &qry, error)) {
+        ok = false;
+    }
+    else {
+        while(qry.next()) {
+            objectIds.append(qry.value(0).toInt());
+        }
+        qry.finish();
+    }
+
+    strObjectIds = "(";
+    for(int i = 0; i < objectIds.count(); i++) {
+        strObjectIds += QString::number(objectIds.at(i));
+        if(i < objectIds.count() -1) {
+            strObjectIds += ", ";
+        }
+    }
+    strObjectIds += ")";
+
+    qDebug() << strObjectIds;
+
+    deleteRentalAssociation = "DELETE FROM tbl_rental_object WHERE fk_object IN " + strObjectIds;
+    deleteObjectData        = "DELETE FROM tbl_objectdata WHERE fk_object IN " + strObjectIds;
+    deleteObjectEntries     = "DELETE FROM tbl_objects WHERE id IN " + strObjectIds;
+
+    qDebug() << deleteRentalAssociation;
+    qDebug() << deleteObjectData;
+    qDebug() << deleteObjectEntries;
+
+    if(!this->execute(deleteRentalAssociation, &qry, error)) {
+        ok = false;
+    }
+    else if(!this->execute(deleteObjectData, &qry, error)) {
+        ok = false;
+    }
+    else if(!this->execute(deleteObjectEntries, &qry, error)) {
+        ok = false;
+    }
+
+    return ok;
+}
+
 bool DBHandler::insertObjectDataForFieldCreation(QString category, QString fieldname, QString* error)
 {
     bool ok = true;
@@ -521,7 +590,6 @@ bool DBHandler::insertObjectDataForFieldCreation(QString category, QString field
                 insertStatement += ";";
             }
         }
-        qDebug() << insertStatement;
 
         if(ids.count() == 0) {
             ok = true;

@@ -20,6 +20,7 @@ public:
     void searchObjectsByCategory(int categoryIndex);
     void updateToDatabase();
     void setTableReady(bool isReady);
+    void discardChanged();
 
 public slots:
     void receiveCategories(QVector<Object*> categories);

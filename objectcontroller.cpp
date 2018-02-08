@@ -55,8 +55,12 @@ void ObjectController::searchObjectsByCategory(int categoryIndex)
         emit this->dialogController->showWarning("Objekte konnten nicht gesucht werden", error);
     }
     else {
+        for(int i = 0; i < this->displayedObjects.count(); i++) {
+            delete this->displayedObjects.at(i);
+        }
+        displayedObjects.clear();
         this->displayedObjects  = foundObjects;
-        emit this->showObjects(this->displayedObjects );
+        emit this->showObjects(this->displayedObjects);
     }
 }
 
@@ -68,7 +72,7 @@ void ObjectController::updateToDatabase()
         emit this->dialogController->showInformation("Es sind nicht alle Pflichtfelder gefüllt.");
     }
     else {
-        // object creation
+        // create
         if(this->createdObjects.count() > 0) {
             if(!this->dbHandler->createObjects(this->createdObjects, &error)) {
                 emit this->dialogController->showWarning("Fehler bei Erstellung neuer Objekte", error);
@@ -76,18 +80,29 @@ void ObjectController::updateToDatabase()
             else if(!this->dbHandler->insertObjectData(this->createdObjects, &error)) {
                 emit this->dialogController->showWarning("Fehler bei der Erstellung von Objektdaten neuer Objekte", error);
             }
-            this->createdObjects.clear();
-            this->createdObjectsBarcodes.clear();
         }
 
         // update
-        if(!this->dbHandler->updateObjectData(this->updatedObjects, &error)) {
-            emit this->dialogController->showWarning("Fehler bei Datenüberschreibung", error);
+        if(this->updatedObjects.count() > 0) {
+            if(!this->dbHandler->updateObjectData(this->updatedObjects, &error)) {
+                emit this->dialogController->showWarning("Fehler bei Datenüberschreibung", error);
+            }
         }
+        // delete
+        if(this->removedObjects.count() > 0) {
+            if(!this->dbHandler->deleteObjects(this->removedObjects, &error)) {
+                emit this->dialogController->showWarning("Fehler bei Löschung von Objekten und zusammenhängenden Daten", error);
+            }
+        }
+
+        this->createdObjects.clear();
+        this->createdObjectsBarcodes.clear();
         this->updatedObjects.clear();
 
-
-        // deletion
+        for(int i = 0; i < removedObjects.count(); i++) {
+            delete this->removedObjects.at(i);
+        }
+        this->removedObjects.clear();
     }
 }
 
@@ -106,6 +121,13 @@ void ObjectController::updateObject(QTableWidgetItem* changedItem)
     }
 }
 
+void ObjectController::removeObject(int index)
+{
+    this->removedObjects.append(this->displayedObjects.at(index));
+    this->displayedObjects.removeAt(index);
+    emit this->showObjects(this->displayedObjects);
+}
+
 bool ObjectController::checkRequiredData()
 {
     bool ok = true;
@@ -119,9 +141,12 @@ bool ObjectController::checkRequiredData()
     return ok;
 }
 
-void ObjectController::removeObject(int index)
+void ObjectController::discardChanged()
 {
-    this->removedObjects.append(this->displayedObjects.at(index));
-    this->displayedObjects.removeAt(index);
-    emit this->showObjects(this->displayedObjects);
+    this->createdObjects.clear();
+    this->createdObjectsBarcodes.clear();
+    this->updatedObjects.clear();
+    this->removedObjects.clear();
+    this->searchObjectsByCategory(this->selectedCategoryIndex);
 }
+
