@@ -37,12 +37,12 @@ bool DBHandler::createDB()
     bool dbCreated = false;
     if(!DBExists()) {
         QString path = "db.sqlite";
-        QString tblCategories  = "CREATE TABLE 'tbl_categories'   ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL UNIQUE )";
-        QString tblDatafields  = "CREATE TABLE 'tbl_datafields'   ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL, 'fk_category' INTEGER NOT NULL, 'fk_datatype' INTEGER NOT NULL, 'required' BOOLEAN NOT NULL)";
-        QString tblObjectdata   = "CREATE TABLE 'tbl_objectdata'   ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'fk_datafield' INTEGER, 'fk_object' INTEGER NOT NULL, 'data' TEXT)";
-        QString tblDatatypes   = "CREATE TABLE 'tbl_datatypes'    ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'name' TEXT);";
-        QString tblEntries     = "CREATE TABLE 'tbl_objects'      ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'fk_category' INTEGER, 'barcode' TEXT NOT NULL UNIQUE);";
-        QString tblRentals     = "CREATE TABLE 'tbl_rentals'      ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'firstname' TEXT NOT NULL, 'lastname' TEXT NOT NULL, 'extra' TEXT, 'start' TEXT, end TEXT);";
+        QString tblCategories   = "CREATE TABLE 'tbl_categories'    ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL UNIQUE )";
+        QString tblDatafields   = "CREATE TABLE 'tbl_datafields'    ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'name' TEXT NOT NULL, 'fk_category' INTEGER NOT NULL, 'fk_datatype' INTEGER NOT NULL, 'required' BOOLEAN NOT NULL)";
+        QString tblObjectdata   = "CREATE TABLE 'tbl_objectdata'    ( 'id' INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, 'fk_datafield' INTEGER, 'fk_object' INTEGER NOT NULL, 'data' TEXT DEFAULT '')";
+        QString tblDatatypes    = "CREATE TABLE 'tbl_datatypes'     ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'name' TEXT);";
+        QString tblEntries      = "CREATE TABLE 'tbl_objects'       ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'fk_category' INTEGER, 'barcode' TEXT NOT NULL UNIQUE);";
+        QString tblRentals      = "CREATE TABLE 'tbl_rentals'       ( 'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 'firstname' TEXT NOT NULL, 'lastname' TEXT NOT NULL, 'extra' TEXT, 'start' TEXT, end TEXT);";
         QString tblRentalObject = "CREATE TABLE 'tbl_rental_object' ( 'fk_rental' INTEGER NOT NULL, 'fk_object' INTEGER NOT NULL UNIQUE);";
 
 
@@ -152,11 +152,36 @@ bool DBHandler::updateCategory(QString name, QString newName, QString* error)
 
 bool DBHandler::deleteCategory(QString name, QString *error)
 {
-    //@TODO löschen aller Geräteeintrage sowie GeräteDaten
-    QString statement = "DELETE FROM tbl_categories WHERE name='"
+    bool ok = true;
+    QSqlQuery qry;
+    QVector<QString> barcodes;
+    QString getObjectBarcodes = "SELECT barcode FROM tbl_objects WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='" + name + "');";
+    QString deleteDataFields = "DELETE FROM tbl_datafields WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='" + name +"')";
+    QString deleteCategory = "DELETE FROM tbl_categories WHERE name='"
             + name
             + "';";
-    return this->execute(statement, new QSqlQuery(), error);
+
+    if(!this->execute(getObjectBarcodes, &qry, error)) {
+        ok = false;
+    }
+    else {
+        while(qry.next()) {
+            barcodes.append(qry.value(0).toString());
+        }
+
+        if(!this->deleteObjects(barcodes, error)) {
+            ok = false;
+        }
+        else if(!this->execute(deleteDataFields, &qry, error)) {
+            ok = false;
+        }
+        else if(!this->execute(deleteCategory, &qry, error)) {
+            ok = false;
+        }
+    }
+
+    return ok;
+
 }
 
 bool DBHandler::checkCategoryExists(QString categoryName, bool *categoryExists, QString *error)
@@ -196,7 +221,7 @@ bool DBHandler::checkCustomfieldExists(QString fieldName, QString categoryName, 
 
 bool DBHandler::getCustomfields(QSqlQuery* p_qry, QString *error, QString gereateTyp)
 {
-    QString statement = QString("SELECT name, fk_datatype FROM tbl_datafields WHERE fk_category="
+    QString statement = QString("SELECT name, fk_datatype, required FROM tbl_datafields WHERE fk_category="
                                 "(SELECT id FROM tbl_categories WHERE name='") + gereateTyp + "')";
     return this->execute(statement, p_qry, error);
 }
@@ -217,7 +242,7 @@ bool DBHandler::readCustomField(QString* error, QString category, QString fieldn
 {
     bool ok = false;
     QSqlQuery qry;
-    QString statement = "SELECT fk_datatype,required FROM tbl_datafields WHERE name='"
+    QString statement = "SELECT fk_datatype, required FROM tbl_datafields WHERE name='"
             + fieldname + "' AND fk_category=(SELECT id FROM tbl_categories WHERE name='" + category + "');";
 
     if(this->execute(statement, &qry, error)) {
@@ -246,13 +271,22 @@ bool DBHandler::updateCustomField(QString category, QString fieldname, QString n
 
 bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* error)
 {
-    QString statement = "DELETE FROM tbl_datafields WHERE name='"
+    QSqlQuery qry;
+    bool ok = true;
+    QString deleteData = "DELETE FROM tbl_objectdata WHERE fk_datafield=(SELECT id FROM tbl_datafields WHERE name='" + fieldname + "');";
+    QString deleteField = "DELETE FROM tbl_datafields WHERE name='"
             + fieldname
             + "' AND fk_category=(SELECT id FROM tbl_categories WHERE name='"
             + category
             + "');";
 
-    return this->execute(statement, new QSqlQuery(), error);
+    if(!this->execute(deleteData, &qry, error)) {
+        ok = false;
+    }
+    else if(!this->execute(deleteField, &qry, error)) {
+        ok = false;
+    }
+    return ok;
 }
 
 bool DBHandler::getObjectByBarcode(QString barcode, Object *object, bool *found, QString* error)
@@ -263,70 +297,33 @@ bool DBHandler::getObjectByBarcode(QString barcode, Object *object, bool *found,
     // object construction data
     QString category;
 
-    // fetch in same order to allaw synchronious merging
-    QVector<QString> fieldnames;
-    QVector<QString> data;
-
-    QString statementGetFieldnames = "SELECT"
-            " tbl_datafields.name"
-            " FROM tbl_datafields"
-            " WHERE tbl_datafields.fk_category = (SELECT tbl_objects.fk_category FROM tbl_objects WHERE tbl_objects.barcode = '" + barcode +"')"
-            " ORDER BY tbl_datafields.id ASC;";
-
-    QString statementGetData = "SELECT"
+    QString statement = "SELECT DISTINCT"
             " tbl_categories.name AS category,"
-            " tbl_objectdata.data"
+            " (SELECT name FROM tbl_datafields WHERE id = tbl_objectdata.fk_datafield) AS fieldname,"
+            " (SELECT required FROM tbl_datafields WHERE id = tbl_objectdata.fk_datafield) AS required,"
+            " tbl_objectdata.data AS data"
             " FROM tbl_objects"
             " INNER JOIN tbl_categories"
             " ON tbl_categories.id = tbl_objects.fk_category"
             " INNER JOIN tbl_objectdata"
             " ON tbl_objectdata.fk_object = tbl_objects.id"
             " WHERE barcode = '" + barcode + "'"
-            " ORDER BY tbl_objectdata.fk_datafield ASC;";
-
+            " ORDER BY fieldname ASC;";
     *found = false;
 
-    if(!this->execute(statementGetFieldnames, &qry, error)) {
+    if(!this->execute(statement, &qry, error)) {
         ok = false;
     }
-    else if(qry.first()) {
-        *found = true;
-
-        fieldnames.append(qry.value(0).toString());
+    else {
         while(qry.next()) {
-            fieldnames.append(qry.value(0).toString());
+            *found = true;
+            category = qry.value(0).toString();
+            object->addField(new Datafield(qry.value(1).toString(), Datafield::TYPE_UNDEFINED, qry.value(2).toBool(), qry.value(3).toString()));
         }
 
-        qry.finish();
-
-        if(!this->execute(statementGetData, &qry, error)) {
-            ok = false;
-        }
-        else {
-            // get category in first record
-            if(qry.first()) {
-                category = qry.value(0).toString();
-                data.append(qry.value(1).toString());
-            }
-
-            // fetch rest of data
-            while(qry.next()) {
-                data.append(qry.value(1).toString());
-            }
-
-            if(fieldnames.length() != data.length()) {
-                ok = false;
-                *error = "invalid object data";
-            }
-            else {
-                // create Object object
-                object->setBarcode(barcode);
-                object->setCategory(category);
-                for(int i = 0; i < fieldnames.length(); i++) {
-                    object->addField(new Datafield(fieldnames.at(i), data.at(i)));
-                }
-            }
-        }
+        // create Object object
+        object->setBarcode(barcode);
+        object->setCategory(category);
     }
 
     return ok;
@@ -454,14 +451,181 @@ bool DBHandler::checkBarcodeisAvailable(QString barcode, bool* isAvailable, QStr
     return ok;
 }
 
-bool createObject(Object* object)
+bool DBHandler::createObjects(QVector<Object*> objects, QString* error)
 {
+    bool ok = true;;
+    // create objects entries;
+    QString statementCreateObjects = "INSERT INTO tbl_objects(barcode, fk_category) VALUES";
+    QSqlQuery qry;
 
+    // compile sql statements
+    for(int objectIndex = 0; objectIndex < objects.count(); objectIndex++) {
+        statementCreateObjects += "('" + objects.at(objectIndex)->getBarcode() + "', "
+                + "(SELECT id FROM tbl_categories WHERE name='" + objects.at(objectIndex)->getCategory() + "'))";
+
+        if(objectIndex < objects.count() - 1) {
+            statementCreateObjects += ',';
+        }
+        else {
+            statementCreateObjects += ";";
+        }
+    }
+    // execute
+    if(!this->execute(statementCreateObjects, &qry, error)) {
+        ok = false;
+    }
+
+    return ok;
 }
 
-bool updateObect(Object* object)
+bool DBHandler::insertObjectData(QVector<Object*> objects, QString *error)
 {
+    bool ok = true;
+    QVector<QString> statementsLinkData;
+    QString statementLinkData;
+    QSqlQuery qry;
 
+
+    for(int objectIndex = 0; objectIndex < objects.count(); objectIndex++) {
+        for(int fieldIndex = 0; fieldIndex < objects.at(objectIndex)->countFields(); fieldIndex++) {
+            statementLinkData = "INSERT INTO tbl_objectdata(fk_object, fk_datafield, data) VALUES"
+                "((SELECT id FROM tbl_objects WHERE barcode='" + objects.at(objectIndex)->getBarcode() + "')"
+                ",(SELECT id FROM tbl_datafields WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='"
+                    + objects.at(objectIndex)->getCategory() + "') AND name='" + objects.at(objectIndex)->getField(fieldIndex)->getName() + "')"
+                ",'" + objects.at(objectIndex)->getField(fieldIndex)->getData() + "');";
+
+            statementsLinkData.append(statementLinkData);
+        }
+    }
+
+    for(int i = 0; i < statementsLinkData.count(); i++) {
+        if(!this->execute(statementsLinkData.at(i), &qry, error)) {
+            ok = false;
+        }
+    }
+
+    return ok;
+}
+
+bool DBHandler::updateObjectData(QVector<Object*> objects, QString* error)
+{
+    bool ok = true;
+    QSqlQuery qry;
+    QString statement;
+
+    for(int objectIndex = 0; objectIndex < objects.count(); objectIndex++) {
+        for(int fieldIndex = 0; fieldIndex < objects.at(objectIndex)->countFields(); fieldIndex++) {
+            statement = "UPDATE tbl_objectdata"
+                    " SET data='" + objects.at(objectIndex)->getField(fieldIndex)->getData() + "'"
+                    " WHERE fk_object=(SELECT id  FROM tbl_objects WHERE barcode='" + objects.at(objectIndex)->getBarcode() + "')"
+                    " AND"
+                    " fk_datafield=(SELECT id FROM tbl_datafields WHERE name='" + objects.at(objectIndex)->getField(fieldIndex)->getName() + "');";
+
+            if(!this->execute(statement, &qry, error)) {
+                ok = false;
+            }
+        }
+    }
+
+    return ok;
+}
+
+bool DBHandler::deleteObjects(QVector<QString> barcodes, QString *error)
+{
+    bool ok = true;
+    QSqlQuery qry;
+    QVector<int> objectIds;
+    QString strObjectIds;
+    QString getObjectIds = "SELECT id FROM tbl_objects WHERE barcode IN ";
+    QString deleteRentalAssociation;
+    QString deleteObjectData;
+    QString deleteObjectEntries;
+
+    getObjectIds += "(";
+    for(int i = 0; i < barcodes.count(); i++) {
+        getObjectIds += "'" + barcodes.at(i) + "'";
+        if(i < barcodes.count() -1) {
+            getObjectIds += ", ";
+        }
+    }
+    getObjectIds += ")";
+
+
+    qDebug() << getObjectIds;
+    if(!this->execute(getObjectIds, &qry, error)) {
+        ok = false;
+    }
+    else {
+        while(qry.next()) {
+            objectIds.append(qry.value(0).toInt());
+        }
+        qry.finish();
+    }
+
+    strObjectIds = "(";
+    for(int i = 0; i < objectIds.count(); i++) {
+        strObjectIds += QString::number(objectIds.at(i));
+        if(i < objectIds.count() -1) {
+            strObjectIds += ", ";
+        }
+    }
+    strObjectIds += ")";
+
+    deleteRentalAssociation = "DELETE FROM tbl_rental_object WHERE fk_object IN " + strObjectIds;
+    deleteObjectData        = "DELETE FROM tbl_objectdata WHERE fk_object IN " + strObjectIds;
+    deleteObjectEntries     = "DELETE FROM tbl_objects WHERE id IN " + strObjectIds;
+
+    if(!this->execute(deleteRentalAssociation, &qry, error)) {
+        ok = false;
+    }
+    else if(!this->execute(deleteObjectData, &qry, error)) {
+        ok = false;
+    }
+    else if(!this->execute(deleteObjectEntries, &qry, error)) {
+        ok = false;
+    }
+
+    return ok;
+}
+
+bool DBHandler::insertObjectDataForFieldCreation(QString category, QString fieldname, QString* error)
+{
+    bool ok = true;
+    QSqlQuery qry;
+    QVector<int> ids;
+    QString statementGetObjectIds = "SELECT id FROM tbl_objects WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='" + category + "');";
+    QString insertStatement = "INSERT INTO tbl_objectdata(fk_datafield, fk_object) VALUES";
+    if(!this->execute(statementGetObjectIds, &qry, error)) {
+        ok = false;
+    }
+    else {
+        while(qry.next()) {
+            ids.append(qry.value(0).toInt());
+        }
+        qry.finish();
+
+        for(int i = 0; i <  ids.count(); i++) {
+            insertStatement += "((SELECT id FROM tbl_datafields WHERE name='" + fieldname + "')," + QString::number(ids.at(i)) + ")";
+            if(i < ids.count() - 1) {
+                insertStatement += ',';
+            }
+            else {
+                insertStatement += ";";
+            }
+        }
+
+        if(ids.count() == 0) {
+            ok = true;
+        }
+        else if(this->execute(insertStatement, &qry, error)) {
+            ok = true;
+        }
+        else {
+            ok = false;
+        }
+    }
+
+    return ok;
 }
 
 bool DBHandler::getAllLents(QSqlQuery* sql, QString* error)

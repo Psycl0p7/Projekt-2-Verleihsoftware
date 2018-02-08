@@ -2,6 +2,7 @@
 #define OBJECTCONTROLLER_H
 
 #include <QObject>
+#include <QTableWidgetItem>
 #include "object.h"
 #include "dbhandler.h"
 #include "dialogcontroller.h"
@@ -17,10 +18,13 @@ public:
     void saveDifToDB();
     void setSelectedCategory(int index);
     void searchObjectsByCategory(int categoryIndex);
-    void update();
+    void updateToDatabase();
+    void setTableReady(bool isReady);
+    void discardChanged();
 
 public slots:
     void receiveCategories(QVector<Object*> categories);
+    void updateObject(QTableWidgetItem* changedItem);
     void createObject(QString barcode);
 signals:
     void updateCateoryList();
@@ -32,9 +36,19 @@ private:
     int selectedCategoryIndex;
     DialogController* dialogController;
     QVector<Object*> categories;
-    QVector<Object*> currentObjects;
+    bool tableReady;
+
+    bool checkRequiredData();
+
+    QVector<Object*> displayedObjects;
+
     QVector<Object*> createdObjects;
+    QVector<QString> createdObjectsBarcodes;
+
     QVector<Object*> updatedObjects;
+
+    QVector<Object*> removedObjects;
+
 };
 
 #endif // OBJECTCONTROLLER_H

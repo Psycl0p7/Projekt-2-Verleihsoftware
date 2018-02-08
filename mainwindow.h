@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <QTableWidgetItem>
 #include <QCloseEvent>
+#include <QHeaderView>
+#include <QFont>
 #include "settingscontroller.h"
 #include "rentalcontroller.h"
 #include "dialogcontroller.h"
@@ -52,7 +54,6 @@ public slots:
     void resetRentalView();
 
     // object view
-    void addObjectToTable(Object* object);
     void showObjects(QVector<Object*> objects);
     void resetObjectTable(QVector<Datafield*> datafields);
 
@@ -109,6 +110,10 @@ private slots:
     void on_cbObjectsCategory_currentIndexChanged(int index);
 
     void on_btnObjectsUpdate_clicked();
+
+    void on_btnObjectsDiscard_clicked();
+
+    void on_btnObjectsDelete_clicked();
 
     void showActiveLents();
 

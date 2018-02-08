@@ -782,9 +782,9 @@
      <widget class="QTableWidget" name="twObjects">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>20</x>
         <y>91</y>
-        <width>681</width>
+        <width>811</width>
         <height>471</height>
        </rect>
       </property>
@@ -818,10 +818,10 @@
      <widget class="QPushButton" name="btnObjectsDelete">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>340</y>
+        <x>300</x>
+        <y>40</y>
         <width>111</width>
-        <height>41</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">
@@ -837,10 +837,10 @@
      <widget class="QPushButton" name="btnObjectsCreate">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>280</y>
+        <x>170</x>
+        <y>40</y>
         <width>111</width>
-        <height>41</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">
@@ -851,22 +851,6 @@
       </property>
       <property name="text">
        <string>Neues Objekt</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="edtObjectSearchText">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>40</y>
-        <width>541</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Segoe UI</family>
-        <pointsize>10</pointsize>
-       </font>
       </property>
      </widget>
      <widget class="QLabel" name="label_14">
@@ -888,26 +872,13 @@
        <string>Kategorie:</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="cbObjectsOnlyAwarded">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>90</y>
-        <width>131</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Nur verliehen</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="btnObjectsUpdate">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>140</y>
+        <x>720</x>
+        <y>40</y>
         <width>111</width>
-        <height>41</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">
@@ -920,26 +891,13 @@
        <string>Speichern</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="btnObjectsSearch">
-      <property name="geometry">
-       <rect>
-        <x>710</x>
-        <y>40</y>
-        <width>121</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Suchen</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="btnObjectsDiscard">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>200</y>
+        <x>590</x>
+        <y>40</y>
         <width>111</width>
-        <height>41</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">

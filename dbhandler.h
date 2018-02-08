@@ -41,10 +41,14 @@ public:
     bool createRental(Rental* rental, QString* error);
     bool checkBarcodeisAvailable(QString barcode, bool* isAvailable, QString* error);
     bool createObject(Object* object);
-    bool updateObect(Object* object);
     bool getAllLents(QSqlQuery* sql, QString* error);
     bool getCategorieForLent(QSqlQuery* sql, QString* error, QString id);
     bool getCategorieForLentNext(QSqlQuery* sql, QString* error, QString id);
+    bool createObjects(QVector<Object*> objects, QString* error);
+    bool insertObjectData(QVector<Object*> objects, QString* error);
+    bool updateObjectData(QVector<Object*> objects, QString* error);
+    bool deleteObjects(QVector<QString> barcodes, QString* error);
+    bool insertObjectDataForFieldCreation(QString category, QString fieldname, QString *error);
 
 private:
 

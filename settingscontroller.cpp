@@ -37,7 +37,6 @@ void SettingsController::initCategories()
     }
 }
 
-// sorting not required, qry is ordered by name asc
 void SettingsController::initCustomfields()
 {
     QSqlQuery qry;
@@ -54,9 +53,10 @@ void SettingsController::initCustomfields()
         }
         else {
             while(qry.next()) {
-                Datafield* field = new Datafield(qry.value(0).toString(), qry.value(1).toInt());
+                Datafield* field = new Datafield(qry.value(0).toString(), qry.value(1).toInt(), qry.value(2).toBool());
                 this->categories.at(categoryIndex)->addField(field);
             }
+            this->sortDatafields(currentCategory);
         }
     }
 }
@@ -130,12 +130,12 @@ void SettingsController::sortDatafields(QString category)
     QVector<Datafield*> sorted;
     QString min = NULL;
     int minIndex = -1;
-
+   // Datafield* tmp;
     if(categoryIndex == -1) {
         this->dialogController->showWarning("Datenfelder konnten nicht sortiert werden",
                                "Kategorie [" + category + "] nicht gefunden.");
     }
-    else {
+    else if(this->categories.at(categoryIndex)->countFields() > 1){
         while(this->categories.at(categoryIndex)->countFields() > 1) {
             minIndex = 0;
             min = this->categories.at(categoryIndex)->getField(minIndex)->getName();
@@ -173,9 +173,9 @@ void SettingsController::createCategory(QString categoryName)
 
     this->categories.append(new Object(categoryName));
     this->sortCategories();
+    emit this->transmitCategories(this->categories);
     emit this->showCategories(this->categories);
     emit this->setSettingsSelectedCategory(this->getCategoryIndex(categoryName));
-    emit this->transmitCategories(this->categories);
 }
 
 void SettingsController::updateCategory(QString categoryName, QString newName)
@@ -205,7 +205,6 @@ void SettingsController::updateCategory(QString categoryName, QString newName)
 
 void SettingsController::deleteCategory(QString category)
 {
-    //@TODO delete ALL objects of given category
     QString error = NULL;
     int categoryIndex = this->getCategoryIndex(category);
 
@@ -213,7 +212,7 @@ void SettingsController::deleteCategory(QString category)
         this->dialogController->showWarning("Kategorie konnte nicht gelöscht werden", error);
     }
     else {
-        delete this->categories.at(categoryIndex);
+        // delete this->categories.at(categoryIndex);
         this->categories.removeAt(categoryIndex);
         emit this->showCategories(this->categories);
         emit this->transmitCategories(this->categories);
@@ -237,10 +236,15 @@ void SettingsController::createCustomfield(QString fieldname, QString category, 
     else if(!this->dbHandler->createCustomField(&error, fieldname, category, typeIndex, isRequired)) {
         this->dialogController->showWarning("Datenfeld konnte nicht angelegt werden", error);
     }
+    else if(!this->dbHandler->insertObjectDataForFieldCreation(category, fieldname, &error)) {
+        this->dialogController->showWarning("Datenfelder konnten nicht angelegt werden", error);
+    }
     else {
         this->categories.at(categoryIndex)->addField(new Datafield(fieldname, typeIndex, isRequired));
         this->sortDatafields(category);
         emit this->showDatafields(this->categories.at(categoryIndex)->getAllFields());
+        emit this->setSettingsSelectedCustomfield(this->getDatafieldIndex(this->getCategoryIndex(category), fieldname));
+        emit this->transmitCategories(this->categories);
         this->dialogController->showInformation("Datenfeld erfolgreich angelegt.");
     }
 }
@@ -265,6 +269,7 @@ void SettingsController::updateCustomfield(QString category, QString currentFiel
     QString error = NULL;
     bool fieldExists = false;
     int categoryIndex = this->getCategoryIndex(category);
+    // increment because of create operator
     int fieldIndex = this->getDatafieldIndex(categoryIndex, currentFieldname);
 
     if(!this->dbHandler->checkCustomfieldExists(currentFieldname, category, &fieldExists, &error)) {
@@ -280,6 +285,7 @@ void SettingsController::updateCustomfield(QString category, QString currentFiel
         this->categories.at(categoryIndex)->getField(fieldIndex)->updateMeta(newFieldname, newType, newRequired);
         emit this->showDatafields(this->categories.at(categoryIndex)->getAllFields());
         emit this->setSettingsSelectedCustomfield(fieldIndex);
+        emit this->transmitCategories(this->categories);
     }
 }
 
@@ -295,5 +301,6 @@ void SettingsController::deleteCustomfield(QString category, QString fieldname)
         this->categories.at(categoryIndex)->removeField(fieldIndex);
         emit this->showDatafields(this->categories.at(categoryIndex)->getAllFields());
         this->dialogController->showInformation("Datenfeld erfolgreich gelöscht.");
+        emit this->transmitCategories(this->categories);
     }
 }

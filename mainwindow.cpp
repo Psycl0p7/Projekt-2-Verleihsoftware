@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    this->frmReadInBarcode->close();
     delete ui;
 }
 
@@ -53,11 +52,9 @@ void MainWindow::init()
     // object controller
     QObject::connect(this->settingsController, SIGNAL(transmitCategories(QVector<Object*>)), this->objectController, SLOT(receiveCategories(QVector<Object*>)));
     QObject::connect(this->objectController, SIGNAL(resetTable(QVector<Datafield*>)), this, SLOT(resetObjectTable(QVector<Datafield*>)));
-    QObject::connect(this->objectController, SIGNAL(addObjectToTable(Object*)), this, SLOT(addObjectToTable(Object*)));
     QObject::connect(this->objectController, SIGNAL(showObjects(QVector<Object*>)), this, SLOT(showObjects(QVector<Object*>)));
-
     QObject::connect(this->frmReadInBarcode, SIGNAL(createObject(QString)), this->objectController, SLOT(createObject(QString)));
-
+    QObject::connect(this->ui->twObjects, SIGNAL(itemChanged(QTableWidgetItem*)), this->objectController, SLOT(updateObject(QTableWidgetItem*)));
     this->settingsController->init();
     this->resetRentalView();
     this->initRentalObjectDetailTable();
@@ -70,6 +67,7 @@ void MainWindow::initRentalObjectDetailTable()
     this->ui->twRentDetails->insertColumn(1);
     this->ui->twRentDetails->setHorizontalHeaderItem(0, new QTableWidgetItem("Feld"));
     this->ui->twRentDetails->setHorizontalHeaderItem(1, new QTableWidgetItem("Inhalt"));
+    this->ui->twRentDetails->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 void MainWindow::toggleCategoryActivated(bool activated)
@@ -169,9 +167,10 @@ void MainWindow::showCategories(QVector<Object*> categories)
     for(int i = 0; i < categories.count(); i++) {
         this->ui->cbObjectsCategory->addItem(categories.at(i)->getCategory());
     }
-
     this->ui->cb_category->setCurrentIndex(0);
-    this->ui->cbObjectsCategory->setCurrentIndex(0);
+    if(categories.count() > 0) {
+        this->ui->cbObjectsCategory->setCurrentIndex(0);
+    }
 }
 
 void MainWindow::showDatafields(QVector<Datafield*> fields)
@@ -199,7 +198,8 @@ void MainWindow::setSettingsSelectedCategory(int index)
 
 void MainWindow::setSettingsSelectedCustomfield(int index)
 {
-    this->ui->cb_customfield->setCurrentIndex(index);
+    // first index is always the create operator
+    this->ui->cb_customfield->setCurrentIndex(index + 1);
 }
 
 void MainWindow::showRentalEntries(QVector<Object *> objects)
@@ -224,15 +224,31 @@ void MainWindow::addRentalObject(QString object)
 
 void MainWindow::resetObjectTable(QVector<Datafield *> datafields)
 {
+    QTableWidgetItem* headerItem;
+    QFont requiredFont;
+    QString headerText = "";
+
+    this->objectController->setTableReady(false);
+
+    requiredFont.setBold(true);
     this->ui->twObjects->clear();
     this->ui->twObjects->setColumnCount(datafields.count());
     for(int i = 0; i < datafields.count(); i++) {
-        this->ui->twObjects->setHorizontalHeaderItem(i, new QTableWidgetItem(datafields.at(i)->getName()));
+        headerText = datafields.at(i)->getName();
+        headerItem = new QTableWidgetItem(headerText);
+        if(datafields.at(i)->isRequired()) {
+            headerItem->setFont(requiredFont);
+        }
+        this->ui->twObjects->setHorizontalHeaderItem(i, headerItem);
     }
+    this->ui->twObjects->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    this->objectController->searchObjectsByCategory(this->ui->cbObjectsCategory->currentIndex());
 }
 
 void MainWindow::showObjects(QVector<Object*> objects)
 {
+    this->objectController->setTableReady(false);
     this->ui->twObjects->clearContents();
     this->ui->twObjects->setRowCount(objects.count());
 
@@ -241,11 +257,7 @@ void MainWindow::showObjects(QVector<Object*> objects)
             this->ui->twObjects->setItem(row, column, new QTableWidgetItem(objects.at(row)->getField(column)->getData()));
         }
     }
-}
-
-void MainWindow::addObjectToTable(Object *object)
-{
-
+    this->objectController->setTableReady(true);
 }
 
 /********************************************************************************
@@ -282,7 +294,6 @@ void MainWindow::on_btn_categorySave_clicked()
     }
 }
 
-
 void MainWindow::on_btn_customfieldSave_clicked()
 {
     QString category = this->ui->cb_category->currentText();
@@ -311,14 +322,13 @@ void MainWindow::on_cb_customfield_currentIndexChanged(const QString &fieldname)
     if(fieldname.isEmpty()) {
         return;
     }
-    QString category = this->ui->cb_category->currentText();
     if(fieldname == SettingsController::CREATE_OPERATOR) {
         this->ui->edt_customfieldName->clear();
         this->ui->cb_customfieldType->setCurrentIndex(0);
         this->ui->cb_customfieldRequired->setChecked(false);
     }
     else if(!this->ui->cb_customfield->currentText().isEmpty() && this->ui->cb_customfield->currentText() != SettingsController::CREATE_OPERATOR ) {
-        this->ui->edt_customfieldName->setText(fieldname);
+        this->settingsController->switchDatafieldAttributes(this->ui->cb_category->currentText(), this->ui->cb_customfield->currentText());
     }
 }
 
@@ -429,7 +439,28 @@ void MainWindow::on_cbObjectsCategory_currentIndexChanged(int index)
 
 void MainWindow::on_btnObjectsUpdate_clicked()
 {
-    this->objectController->update();
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Änderungen speichern", "Wollen Sie wirklich Ihre Änderungen speichern?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        this->objectController->updateToDatabase();
+    }
+}
+
+void MainWindow::on_btnObjectsDiscard_clicked()
+{
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Änderungen verwerfen", "Wollen Sie wirklich Ihre Änderungen verwerfen?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        this->objectController->discardChanged();
+    }
+}
+
+void MainWindow::on_btnObjectsDelete_clicked()
+{
+    int index = this->ui->twObjects->currentRow();
+    this->objectController->removeObject(index);
 }
 
 void MainWindow::showActiveLents()
