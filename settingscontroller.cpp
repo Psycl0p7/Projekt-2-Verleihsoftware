@@ -242,6 +242,7 @@ void SettingsController::createCustomfield(QString fieldname, QString category, 
         this->sortDatafields(category);
         emit this->showDatafields(this->categories.at(categoryIndex)->getAllFields());
         emit this->setSettingsSelectedCustomfield(this->getDatafieldIndex(this->getCategoryIndex(category), fieldname));
+        emit this->transmitCategories(this->categories);
         this->dialogController->showInformation("Datenfeld erfolgreich angelegt.");
     }
 }
@@ -282,6 +283,7 @@ void SettingsController::updateCustomfield(QString category, QString currentFiel
         this->categories.at(categoryIndex)->getField(fieldIndex)->updateMeta(newFieldname, newType, newRequired);
         emit this->showDatafields(this->categories.at(categoryIndex)->getAllFields());
         emit this->setSettingsSelectedCustomfield(fieldIndex);
+        emit this->transmitCategories(this->categories);
     }
 }
 

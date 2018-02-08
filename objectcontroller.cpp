@@ -5,12 +5,16 @@ ObjectController::ObjectController(DBHandler* dbHandler, DialogController* dialo
 {
     this->dbHandler = dbHandler;
     this->dialogController = dialogController;
+    this->selectedCategoryIndex = -1;
 }
 
 // transmitted by settingscontroller
 void ObjectController::receiveCategories(QVector<Object *> categories)
 {
     this->categories = categories;
+    if(this->selectedCategoryIndex > -1) {
+        emit this->resetTable(this->categories.at(this->selectedCategoryIndex)->getAllFields());
+    }
 }
 
 void ObjectController::setSelectedCategory(int index)
