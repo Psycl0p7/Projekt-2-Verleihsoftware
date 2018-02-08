@@ -394,12 +394,14 @@ void MainWindow::on_btnRentRemove_clicked()
 void MainWindow::on_edtRentBarcode_returnPressed()
 {
     this->rentalController->tryAddObjectByBarcode(this->ui->edtRentBarcode->text());
+    this->ui->edtRentBarcode->clear();
 }
 
 void MainWindow::on_edtRentBarcode_textChanged(const QString &changedText)
 {
     if(!this->enterBarcodeManually && !changedText.isEmpty()) {
         this->rentalController->tryAddObjectByBarcode(changedText);
+        this->ui->edtRentBarcode->clear();
     }
 }
 
@@ -415,6 +417,7 @@ void MainWindow::on_btnRentNew_clicked()
 
 void MainWindow::on_btnRentalConfirm_clicked()
 {
+    QMessageBox::StandardButton reply;
     QString firstname = this->ui->edtRentFirstname->text();
     QString lastname = this->ui->edtRentLastname->text();
     QString extra = this->ui->edtRentExtra->toPlainText();
@@ -424,8 +427,13 @@ void MainWindow::on_btnRentalConfirm_clicked()
     if(firstname.isEmpty() || lastname.isEmpty()) {
         this->showInformation("Bitte  Vor- und Nachname angeben.");
     }
-
-    this->rentalController->confirmActiveRental(firstname, lastname, extra, start, end);
+    else {
+        reply = QMessageBox::question(this, "Verleih bestätigen", "Sicher?",
+                                      QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::Yes) {
+            this->rentalController->confirmActiveRental(firstname, lastname, extra, start, end);
+        }
+    }
 }
 
 void MainWindow::on_btnObjectsCreate_clicked()
