@@ -627,3 +627,30 @@ bool DBHandler::insertObjectDataForFieldCreation(QString category, QString field
 
     return ok;
 }
+
+bool DBHandler::getAllLents(QSqlQuery* sql, QString* error)
+{
+    QString statement = QString("SELECT firstname, lastname, extra, start, end, id FROM tbl_rentals");
+    return this->execute(statement, sql, error);
+}
+
+bool DBHandler::closeLents(QSqlQuery* sql, QString* error, QString id)
+{
+    QString statement = QString("DELETE FROM tbl_rentals WHERE tbl_rentals.id = " + id);
+    QString statement2 = QString("DELETE FROM tbl_rental_object WHERE fk_rental = " + id);
+    this->execute(statement, sql, error);
+    return this->execute(statement2, sql, error);
+}
+
+
+bool DBHandler::getCategorieForLent(QSqlQuery* sql, QString* error, QString id)
+{
+    QString statement = QString("SELECT fk_object FROM tbl_rental_object WHERE fk_rental = " + id);
+    return this->execute(statement, sql, error);
+}
+
+bool DBHandler::getCategorieForLentNext(QSqlQuery* sql, QString* error, QString id)
+{
+    QString statement = QString("SELECT name FROM tbl_categories WHERE id = " + id);
+    return this->execute(statement, sql, error);
+}

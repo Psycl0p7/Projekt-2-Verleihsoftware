@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    this->frmReadInBarcode->close();
     delete ui;
 }
 
@@ -52,9 +53,11 @@ void MainWindow::init()
     // object controller
     QObject::connect(this->settingsController, SIGNAL(transmitCategories(QVector<Object*>)), this->objectController, SLOT(receiveCategories(QVector<Object*>)));
     QObject::connect(this->objectController, SIGNAL(resetTable(QVector<Datafield*>)), this, SLOT(resetObjectTable(QVector<Datafield*>)));
+    QObject::connect(this->objectController, SIGNAL(addObjectToTable(Object*)), this, SLOT(addObjectToTable(Object*)));
     QObject::connect(this->objectController, SIGNAL(showObjects(QVector<Object*>)), this, SLOT(showObjects(QVector<Object*>)));
+
     QObject::connect(this->frmReadInBarcode, SIGNAL(createObject(QString)), this->objectController, SLOT(createObject(QString)));
-    QObject::connect(this->ui->twObjects, SIGNAL(itemChanged(QTableWidgetItem*)), this->objectController, SLOT(updateObject(QTableWidgetItem*)));
+
     this->settingsController->init();
     this->resetRentalView();
     this->initRentalObjectDetailTable();
@@ -67,7 +70,6 @@ void MainWindow::initRentalObjectDetailTable()
     this->ui->twRentDetails->insertColumn(1);
     this->ui->twRentDetails->setHorizontalHeaderItem(0, new QTableWidgetItem("Feld"));
     this->ui->twRentDetails->setHorizontalHeaderItem(1, new QTableWidgetItem("Inhalt"));
-    this->ui->twRentDetails->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 void MainWindow::toggleCategoryActivated(bool activated)
@@ -167,10 +169,9 @@ void MainWindow::showCategories(QVector<Object*> categories)
     for(int i = 0; i < categories.count(); i++) {
         this->ui->cbObjectsCategory->addItem(categories.at(i)->getCategory());
     }
+
     this->ui->cb_category->setCurrentIndex(0);
-    if(categories.count() > 0) {
-        this->ui->cbObjectsCategory->setCurrentIndex(0);
-    }
+    this->ui->cbObjectsCategory->setCurrentIndex(0);
 }
 
 void MainWindow::showDatafields(QVector<Datafield*> fields)
@@ -198,8 +199,7 @@ void MainWindow::setSettingsSelectedCategory(int index)
 
 void MainWindow::setSettingsSelectedCustomfield(int index)
 {
-    // first index is always the create operator
-    this->ui->cb_customfield->setCurrentIndex(index + 1);
+    this->ui->cb_customfield->setCurrentIndex(index);
 }
 
 void MainWindow::showRentalEntries(QVector<Object *> objects)
@@ -224,31 +224,15 @@ void MainWindow::addRentalObject(QString object)
 
 void MainWindow::resetObjectTable(QVector<Datafield *> datafields)
 {
-    QTableWidgetItem* headerItem;
-    QFont requiredFont;
-    QString headerText = "";
-
-    this->objectController->setTableReady(false);
-
-    requiredFont.setBold(true);
     this->ui->twObjects->clear();
     this->ui->twObjects->setColumnCount(datafields.count());
     for(int i = 0; i < datafields.count(); i++) {
-        headerText = datafields.at(i)->getName();
-        headerItem = new QTableWidgetItem(headerText);
-        if(datafields.at(i)->isRequired()) {
-            headerItem->setFont(requiredFont);
-        }
-        this->ui->twObjects->setHorizontalHeaderItem(i, headerItem);
+        this->ui->twObjects->setHorizontalHeaderItem(i, new QTableWidgetItem(datafields.at(i)->getName()));
     }
-    this->ui->twObjects->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
-    this->objectController->searchObjectsByCategory(this->ui->cbObjectsCategory->currentIndex());
 }
 
 void MainWindow::showObjects(QVector<Object*> objects)
 {
-    this->objectController->setTableReady(false);
     this->ui->twObjects->clearContents();
     this->ui->twObjects->setRowCount(objects.count());
 
@@ -257,7 +241,11 @@ void MainWindow::showObjects(QVector<Object*> objects)
             this->ui->twObjects->setItem(row, column, new QTableWidgetItem(objects.at(row)->getField(column)->getData()));
         }
     }
-    this->objectController->setTableReady(true);
+}
+
+void MainWindow::addObjectToTable(Object *object)
+{
+
 }
 
 /********************************************************************************
@@ -294,6 +282,7 @@ void MainWindow::on_btn_categorySave_clicked()
     }
 }
 
+
 void MainWindow::on_btn_customfieldSave_clicked()
 {
     QString category = this->ui->cb_category->currentText();
@@ -322,13 +311,14 @@ void MainWindow::on_cb_customfield_currentIndexChanged(const QString &fieldname)
     if(fieldname.isEmpty()) {
         return;
     }
+    QString category = this->ui->cb_category->currentText();
     if(fieldname == SettingsController::CREATE_OPERATOR) {
         this->ui->edt_customfieldName->clear();
         this->ui->cb_customfieldType->setCurrentIndex(0);
         this->ui->cb_customfieldRequired->setChecked(false);
     }
     else if(!this->ui->cb_customfield->currentText().isEmpty() && this->ui->cb_customfield->currentText() != SettingsController::CREATE_OPERATOR ) {
-        this->settingsController->switchDatafieldAttributes(this->ui->cb_category->currentText(), this->ui->cb_customfield->currentText());
+        this->ui->edt_customfieldName->setText(fieldname);
     }
 }
 
@@ -439,107 +429,12 @@ void MainWindow::on_cbObjectsCategory_currentIndexChanged(int index)
 
 void MainWindow::on_btnObjectsUpdate_clicked()
 {
-    this->objectController->updateToDatabase();
+    this->objectController->update();
 }
 
-void MainWindow::on_btnObjectsDiscard_clicked()
-{
-    this->objectController->discardChanged();
-}
-
-void MainWindow::on_btnObjectsDelete_clicked()
-{
-    int index = this->ui->twObjects->currentRow();
-    this->objectController->removeObject(index);
-}
 
 void MainWindow::showActiveLents()
 {
-    QString verleihdauer;
-    QVector<Rental*> list = this->rentalController->getAllLentDevice();
-    this->ui->lwOverviewBorrower->clear();
-    for(int i = 0; i < list.size(); i++)
-    {
-        qint64 dateEnd = list[i]->getEnd().toSecsSinceEpoch();
-        qint64 dateNow = QDateTime::currentSecsSinceEpoch();
-        qint64 dateDiff = dateEnd - dateNow;
-        QListWidgetItem* pItem =new QListWidgetItem();
-        if (dateDiff <= 0)
-        {
-            verleihdauer = "Verzug";
-            pItem->setBackground(Qt::red); // sets green background
-        } else {
-            verleihdauer = "Ok";
-        }
-        pItem->setText(verleihdauer+ " - " + list[i]->getFirstname() + " " + list[i]->getLastname());
-        this->ui->lwOverviewBorrower->addItem(pItem);
-    }
-}
-
-
-void MainWindow::on_lwOverviewBorrower_clicked()
-{
-
-    int currentRow = this->ui->lwOverviewBorrower->currentRow();
-        QVector<Rental*> list = this->rentalController->getAllLentDevice();
-        getCategory(list[currentRow]->getID());
-        this->ui->edtOverviewFirstname->setText(list[currentRow]->getFirstname());
-        this->ui->edtOverviewLastname->setText(list[currentRow]->getLastname());
-        this->ui->dtOverviewStart->setDateTime(list[currentRow]->getStart());
-        this->ui->dtOverviewEnd->setDateTime(list[currentRow]->getEnd());
-        this->ui->tbOverviewExtra->setText(list[currentRow]->getExtra());
-
-
-}
-
-void MainWindow::on_btnOverviewEndRental_clicked()
-{
-    if (this->ui->lwOverviewBorrower->currentRow() >= 0)
-    {
-        QSqlQuery sql;
-        QString error;
-        QVector<Rental*> list = this->rentalController->getAllLentDevice();
-        QString idVar = list[this->ui->lwOverviewBorrower->currentRow()]->getID();
-        dbHandler.closeLents(&sql, &error, idVar);
-        clearAllFields();
-        showActiveLents();
-    } else {
-        QMessageBox::warning(this, "Fehler", "Es wurde kein Verleihausgewählt");
-    }
-
-}
-
-void MainWindow::clearAllFields()
-{
-this->ui->lwOverviewObjects->clear();
-    this->ui->edtOverviewFirstname->clear();
-    this->ui->edtOverviewLastname->clear();
-    this->ui->dtOverviewStart->clear();
-    this->ui->dtOverviewEnd->clear();
-    this->ui->tbOverviewExtra->clear();
-}
-
-void MainWindow::on_tabWidget_tabBarClicked(int index)
-{
-    if (index == 0)
-    {
-        showActiveLents();
-    }
-}
-
-void MainWindow::getCategory(QString id)
-{
-    QSqlQuery sql;
-    QString error;
-    dbHandler.getCategorieForLent(&sql, &error, id);
-    while(sql.next())
-    {
-        dbHandler.getCategorieForLentNext(&sql, &error, sql.value(0).toString());
-        while(sql.next())
-        {
-            this->ui->lwOverviewObjects->clear();
-            this->ui->lwOverviewObjects->addItem(sql.value(0).toString());
-        }
-
-    }
+    this->rentalController->activeRental->getAllObjects();
+    //this->ui->lwOverviewBorrower->addItem("Sascha");
 }

@@ -57,6 +57,7 @@ public slots:
     void showObjects(QVector<Object*> objects);
     void resetObjectTable(QVector<Datafield*> datafields);
 
+
     // ***                  *** //
 
 private:
@@ -113,6 +114,18 @@ private slots:
     void on_btnObjectsDiscard_clicked();
 
     void on_btnObjectsDelete_clicked();
+
+    void showActiveLents();
+
+    void on_lwOverviewBorrower_clicked();
+
+    void on_btnOverviewEndRental_clicked();
+
+    void on_tabWidget_tabBarClicked(int index);
+
+    void getCategory(QString id);
+
+    void clearAllFields();
 
 signals:
 

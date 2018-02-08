@@ -35,10 +35,15 @@ public:
 
     bool getObjectByBarcode(QString barcode, Object* object, bool *found, QString* error);
     bool searchObjectsByCategory(QString category, QVector<Object *> *foundObjects, QString* error);
+    bool closeLents(QSqlQuery* sql, QString* error, QString id);
 
     bool checkObjectAvailability(QString barcode, bool *isAvailable, QString* error);
     bool createRental(Rental* rental, QString* error);
     bool checkBarcodeisAvailable(QString barcode, bool* isAvailable, QString* error);
+    bool createObject(Object* object);
+    bool getAllLents(QSqlQuery* sql, QString* error);
+    bool getCategorieForLent(QSqlQuery* sql, QString* error, QString id);
+    bool getCategorieForLentNext(QSqlQuery* sql, QString* error, QString id);
     bool createObjects(QVector<Object*> objects, QString* error);
     bool insertObjectData(QVector<Object*> objects, QString* error);
     bool updateObjectData(QVector<Object*> objects, QString* error);
