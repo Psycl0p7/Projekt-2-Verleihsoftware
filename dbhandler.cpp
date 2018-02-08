@@ -152,11 +152,32 @@ bool DBHandler::updateCategory(QString name, QString newName, QString* error)
 
 bool DBHandler::deleteCategory(QString name, QString *error)
 {
-    //@TODO löschen aller Geräteeintrage sowie GeräteDaten
-    QString statement = "DELETE FROM tbl_categories WHERE name='"
+    bool ok = true;
+    QSqlQuery qry;
+    QVector<QString> barcodes;
+    QString getObjectBarcodes = "SELECT barcode FROM tbl_objects WHERE fk_category=(SELECT id FROM tbl_categories WHERE name='" + name + "');";
+    QString deleteCategory = "DELETE FROM tbl_categories WHERE name='"
             + name
             + "';";
-    return this->execute(statement, new QSqlQuery(), error);
+
+    if(!this->execute(getObjectBarcodes, &qry, error)) {
+        ok = false;
+    }
+    else {
+        while(qry.next()) {
+            barcodes.append(qry.value(0).toString());
+        }
+
+        if(!this->deleteObjects(barcodes, error)) {
+            ok = false;
+        }
+        else if(!this->execute(deleteCategory, &qry, error)) {
+            ok = false;
+        }
+    }
+
+    return ok;
+
 }
 
 bool DBHandler::checkCategoryExists(QString categoryName, bool *categoryExists, QString *error)
@@ -246,13 +267,22 @@ bool DBHandler::updateCustomField(QString category, QString fieldname, QString n
 
 bool DBHandler::deleteCustomField(QString category, QString fieldname, QString* error)
 {
-    QString statement = "DELETE FROM tbl_datafields WHERE name='"
+    QSqlQuery qry;
+    bool ok = true;
+    QString deleteData = "DELETE FROM tbl_objectdata WHERE fk_datafield=(SELECT id FROM tbl_datafields WHERE name='" + fieldname + "');";
+    QString deleteField = "DELETE FROM tbl_datafields WHERE name='"
             + fieldname
             + "' AND fk_category=(SELECT id FROM tbl_categories WHERE name='"
             + category
             + "');";
 
-    return this->execute(statement, new QSqlQuery(), error);
+    if(!this->execute(deleteData, &qry, error)) {
+        ok = false;
+    }
+    else if(!this->execute(deleteField, &qry, error)) {
+        ok = false;
+    }
+    return ok;
 }
 
 bool DBHandler::getObjectByBarcode(QString barcode, Object *object, bool *found, QString* error)
@@ -496,21 +526,16 @@ bool DBHandler::updateObjectData(QVector<Object*> objects, QString* error)
     return ok;
 }
 
-bool DBHandler::deleteObjects(QVector<Object*> objects, QString *error)
+bool DBHandler::deleteObjects(QVector<QString> barcodes, QString *error)
 {
     bool ok = true;
     QSqlQuery qry;
-    QVector<QString> barcodes;
     QVector<int> objectIds;
     QString strObjectIds;
     QString getObjectIds = "SELECT id FROM tbl_objects WHERE barcode IN ";
     QString deleteRentalAssociation;
     QString deleteObjectData;
     QString deleteObjectEntries;
-
-    for(int i = 0; i < objects.count(); i++) {
-        barcodes.append(objects.at(i)->getBarcode());
-    }
 
     getObjectIds += "(";
     for(int i = 0; i < barcodes.count(); i++) {
@@ -542,15 +567,9 @@ bool DBHandler::deleteObjects(QVector<Object*> objects, QString *error)
     }
     strObjectIds += ")";
 
-    qDebug() << strObjectIds;
-
     deleteRentalAssociation = "DELETE FROM tbl_rental_object WHERE fk_object IN " + strObjectIds;
     deleteObjectData        = "DELETE FROM tbl_objectdata WHERE fk_object IN " + strObjectIds;
     deleteObjectEntries     = "DELETE FROM tbl_objects WHERE id IN " + strObjectIds;
-
-    qDebug() << deleteRentalAssociation;
-    qDebug() << deleteObjectData;
-    qDebug() << deleteObjectEntries;
 
     if(!this->execute(deleteRentalAssociation, &qry, error)) {
         ok = false;

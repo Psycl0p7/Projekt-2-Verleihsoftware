@@ -68,6 +68,7 @@ void ObjectController::searchObjectsByCategory(int categoryIndex)
 void ObjectController::updateToDatabase()
 {
     QString error;
+    QVector<QString> deleteBarcodes;
     if(!this->checkRequiredData()) {
         emit this->dialogController->showInformation("Es sind nicht alle Pflichtfelder gefüllt.");
     }
@@ -90,7 +91,10 @@ void ObjectController::updateToDatabase()
         }
         // delete
         if(this->removedObjects.count() > 0) {
-            if(!this->dbHandler->deleteObjects(this->removedObjects, &error)) {
+            for(int i = 0; i < this->removedObjects.count(); i++) {
+                deleteBarcodes.append(this->removedObjects.at(i)->getBarcode());
+            }
+            if(!this->dbHandler->deleteObjects(deleteBarcodes, &error)) {
                 emit this->dialogController->showWarning("Fehler bei Löschung von Objekten und zusammenhängenden Daten", error);
             }
         }
