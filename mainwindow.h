@@ -110,6 +110,8 @@ private slots:
 
     void on_btnObjectsUpdate_clicked();
 
+    void on_btnObjectsDiscard_clicked();
+
 signals:
 
 };

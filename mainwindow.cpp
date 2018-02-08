@@ -437,3 +437,8 @@ void MainWindow::on_btnObjectsUpdate_clicked()
 {
     this->objectController->updateToDatabase();
 }
+
+void MainWindow::on_btnObjectsDiscard_clicked()
+{
+    this->objectController->searchObjectsByCategory(this->ui->cbObjectsCategory->currentIndex());
+}
