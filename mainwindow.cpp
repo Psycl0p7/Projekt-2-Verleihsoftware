@@ -29,6 +29,7 @@ void MainWindow::init()
     this->enterBarcodeManually = false;
 
     this->frmReadInBarcode = new FrmReadInBarcode(&this->dbHandler, &this->dialogController);
+    this->listedRentals =this->rentalController->getAllLentDevice();
 
 //   this->frmReadInBarcode->showUp();
 
@@ -562,11 +563,17 @@ void MainWindow::getCategory(QString id)
 
 void MainWindow::on_lwOverviewBorrower_currentRowChanged(int currentRow)
 {
-    QVector<Rental*> list = this->rentalController->getAllLentDevice();
-    getCategory(list[currentRow]->getID());
-    this->ui->edtOverviewFirstname->setText(list[currentRow]->getFirstname());
-    this->ui->edtOverviewLastname->setText(list[currentRow]->getLastname());
-    this->ui->dtOverviewStart->setDateTime(list[currentRow]->getStart());
-    this->ui->dtOverviewEnd->setDateTime(list[currentRow]->getEnd());
-    this->ui->tbOverviewExtra->setText(list[currentRow]->getExtra());
+    this->getCategory(listedRentals.at(currentRow)->getID());
+    this->ui->edtOverviewFirstname->setText(this->listedRentals.at(currentRow)->getFirstname());
+    this->ui->edtOverviewLastname->setText(this->listedRentals.at(currentRow)->getLastname());
+    this->ui->dtOverviewStart->setDateTime(this->listedRentals.at(currentRow)->getStart());
+    this->ui->dtOverviewEnd->setDateTime(this->listedRentals.at(currentRow)->getEnd());
+    this->ui->tbOverviewExtra->setText(this->listedRentals.at(currentRow)->getExtra());
+}
+
+void MainWindow::on_tabWidget_currentChanged(int index)
+{
+    if(index == 0) {
+        this->listedRentals =this->rentalController->getAllLentDevice();
+    }
 }

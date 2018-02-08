@@ -71,6 +71,8 @@ private:
 
     FrmReadInBarcode* frmReadInBarcode;
 
+    QVector<Rental*> listedRentals;
+
     bool categoriesReady;
     bool enterBarcodeManually;
 
@@ -126,6 +128,8 @@ private slots:
     void clearAllFields();
 
     void on_lwOverviewBorrower_currentRowChanged(int currentRow);
+
+    void on_tabWidget_currentChanged(int index);
 
 signals:
 
