@@ -898,7 +898,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Nur verliehen</string>
+       <string>verliehen</string>
       </property>
      </widget>
      <widget class="QPushButton" name="btnObjectsUpdate">

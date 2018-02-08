@@ -19,6 +19,7 @@ public:
     void setSelectedCategory(int index);
     void searchObjectsByCategory(int categoryIndex);
     void updateToDatabase();
+    void setTableReady(bool isReady);
 
 public slots:
     void receiveCategories(QVector<Object*> categories);
@@ -34,12 +35,17 @@ private:
     int selectedCategoryIndex;
     DialogController* dialogController;
     QVector<Object*> categories;
+    bool tableReady;
 
     bool checkRequiredData();
 
     QVector<Object*> displayedObjects;
+
     QVector<Object*> createdObjects;
+    QVector<QString> createdObjectsBarcodes;
+
     QVector<Object*> updatedObjects;
+
     QVector<Object*> removedObjects;
 
 };

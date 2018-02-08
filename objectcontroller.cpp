@@ -6,6 +6,7 @@ ObjectController::ObjectController(DBHandler* dbHandler, DialogController* dialo
     this->dbHandler = dbHandler;
     this->dialogController = dialogController;
     this->selectedCategoryIndex = -1;
+    this->tableReady = false;
 }
 
 // transmitted by settingscontroller
@@ -24,6 +25,11 @@ void ObjectController::setSelectedCategory(int index)
     this->searchObjectsByCategory(index);
 }
 
+void ObjectController::setTableReady(bool isReady)
+{
+    this->tableReady = isReady;
+}
+
 void ObjectController::createObject(QString barcode)
 {
     Object* object = NULL;
@@ -35,6 +41,7 @@ void ObjectController::createObject(QString barcode)
     }
 
     this->createdObjects.append(object);
+    this->createdObjectsBarcodes.append(barcode);
     this->displayedObjects.append(object);
     emit this->showObjects(this->displayedObjects );
 }
@@ -61,21 +68,42 @@ void ObjectController::updateToDatabase()
         emit this->dialogController->showInformation("Es sind nicht alle Pflichtfelder gefüllt.");
     }
     else {
-        if(!this->dbHandler->createObjects(this->createdObjects, &error)) {
-            emit this->dialogController->showWarning("Fehler bei Erstellung neuer Objekte", error);
+        // object creation
+        if(this->createdObjects.count() > 0) {
+            if(!this->dbHandler->createObjects(this->createdObjects, &error)) {
+                emit this->dialogController->showWarning("Fehler bei Erstellung neuer Objekte", error);
+            }
+            else if(!this->dbHandler->insertObjectData(this->createdObjects, &error)) {
+                emit this->dialogController->showWarning("Fehler bei der Erstellung von Objektdaten neuer Objekte", error);
+            }
+            this->createdObjects.clear();
+            this->createdObjectsBarcodes.clear();
         }
-        else if(!this->dbHandler->insertObjectData(this->displayedObjects, &error)) {
-            emit this->dialogController->showWarning("Fehler bei der Erstellung von Objektdaten neuer Objekte", error);
+
+        // update
+        if(!this->dbHandler->updateObjectData(this->updatedObjects, &error)) {
+            emit this->dialogController->showWarning("Fehler bei Datenüberschreibung", error);
         }
+        this->updatedObjects.clear();
+
+
+        // deletion
     }
 }
 
 void ObjectController::updateObject(QTableWidgetItem* changedItem)
 {
-    int objectIndex = changedItem->row();
-    int fieldIndex = changedItem->column();
-    QString data = changedItem->text();
-    this->displayedObjects.at(objectIndex)->getField(fieldIndex)->setData(data);
+    if(this->tableReady) {
+        int objectIndex = changedItem->row();
+        int fieldIndex = changedItem->column();
+        QString data = changedItem->text();
+        // update data via pointer (affects createdObjects, updatedObjects)
+        this->displayedObjects.at(objectIndex)->getField(fieldIndex)->setData(data);
+        // if its not an create obj, update it
+        if(this->createdObjectsBarcodes.indexOf(this->displayedObjects.at(objectIndex)->getBarcode()) < 0) {
+            this->updatedObjects.append(this->displayedObjects.at(objectIndex));
+        }
+    }
 }
 
 bool ObjectController::checkRequiredData()

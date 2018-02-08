@@ -41,6 +41,7 @@ public:
     bool checkBarcodeisAvailable(QString barcode, bool* isAvailable, QString* error);
     bool createObjects(QVector<Object*> objects, QString* error);
     bool insertObjectData(QVector<Object*> objects, QString* error);
+    bool updateObjectData(QVector<Object*> objects, QString* error);
 
 private:
 

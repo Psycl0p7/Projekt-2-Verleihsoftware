@@ -274,7 +274,7 @@ bool DBHandler::getObjectByBarcode(QString barcode, Object *object, bool *found,
             " INNER JOIN tbl_objectdata"
             " ON tbl_objectdata.fk_object = tbl_objects.id"
             " WHERE barcode = '" + barcode + "'"
-            " ORDER BY tbl_objectdata.fk_datafield ASC;";
+            " ORDER BY fieldname ASC;";
     *found = false;
 
     if(!this->execute(statement, &qry, error)) {
@@ -467,6 +467,30 @@ bool DBHandler::insertObjectData(QVector<Object*> objects, QString *error)
     for(int i = 0; i < statementsLinkData.count(); i++) {
         if(!this->execute(statementsLinkData.at(i), &qry, error)) {
             ok = false;
+        }
+    }
+
+    return ok;
+}
+
+bool DBHandler::updateObjectData(QVector<Object*> objects, QString* error)
+{
+    bool ok = true;
+    QSqlQuery qry;
+    QString statement;
+
+    for(int objectIndex = 0; objectIndex < objects.count(); objectIndex++) {
+        for(int fieldIndex = 0; fieldIndex < objects.at(objectIndex)->countFields(); fieldIndex++) {
+            statement = "UPDATE tbl_objectdata"
+                    " SET data='" + objects.at(objectIndex)->getField(fieldIndex)->getData() + "'"
+                    " WHERE fk_object=(SELECT id  FROM tbl_objects WHERE barcode='" + objects.at(objectIndex)->getBarcode() + "')"
+                    " AND"
+                    " fk_datafield=(SELECT id FROM tbl_datafields WHERE name='" + objects.at(objectIndex)->getField(fieldIndex)->getName() + "');";
+            qDebug() << statement;
+
+            if(!this->execute(statement, &qry, error)) {
+                ok = false;
+            }
         }
     }
 

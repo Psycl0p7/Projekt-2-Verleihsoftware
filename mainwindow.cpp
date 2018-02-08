@@ -52,7 +52,6 @@ void MainWindow::init()
     // object controller
     QObject::connect(this->settingsController, SIGNAL(transmitCategories(QVector<Object*>)), this->objectController, SLOT(receiveCategories(QVector<Object*>)));
     QObject::connect(this->objectController, SIGNAL(resetTable(QVector<Datafield*>)), this, SLOT(resetObjectTable(QVector<Datafield*>)));
-    QObject::connect(this->objectController, SIGNAL(addObjectToTable(Object*)), this, SLOT(addObjectToTable(Object*)));
     QObject::connect(this->objectController, SIGNAL(showObjects(QVector<Object*>)), this, SLOT(showObjects(QVector<Object*>)));
     QObject::connect(this->frmReadInBarcode, SIGNAL(createObject(QString)), this->objectController, SLOT(createObject(QString)));
     QObject::connect(this->ui->twObjects, SIGNAL(itemChanged(QTableWidgetItem*)), this->objectController, SLOT(updateObject(QTableWidgetItem*)));
@@ -227,6 +226,8 @@ void MainWindow::resetObjectTable(QVector<Datafield *> datafields)
     QFont requiredFont;
     QString headerText = "";
 
+    this->objectController->setTableReady(false);
+
     requiredFont.setBold(true);
     this->ui->twObjects->clear();
     this->ui->twObjects->setColumnCount(datafields.count());
@@ -239,11 +240,11 @@ void MainWindow::resetObjectTable(QVector<Datafield *> datafields)
         this->ui->twObjects->setHorizontalHeaderItem(i, headerItem);
     }
     this->ui->twObjects->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
 }
 
 void MainWindow::showObjects(QVector<Object*> objects)
 {
+    this->objectController->setTableReady(false);
     this->ui->twObjects->clearContents();
     this->ui->twObjects->setRowCount(objects.count());
 
@@ -252,11 +253,7 @@ void MainWindow::showObjects(QVector<Object*> objects)
             this->ui->twObjects->setItem(row, column, new QTableWidgetItem(objects.at(row)->getField(column)->getData()));
         }
     }
-}
-
-void MainWindow::addObjectToTable(Object *object)
-{
-
+    this->objectController->setTableReady(true);
 }
 
 /********************************************************************************

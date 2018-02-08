@@ -54,7 +54,6 @@ public slots:
     void resetRentalView();
 
     // object view
-    void addObjectToTable(Object* object);
     void showObjects(QVector<Object*> objects);
     void resetObjectTable(QVector<Datafield*> datafields);
 
